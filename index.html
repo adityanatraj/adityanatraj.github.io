@@ -1,320 +1,578 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aditya Natraj - Tools & Projects</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Aditya N</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
 
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --border: #2a2a2a;
-        }
+			:root {
+				--bg-primary: #0a0a0a;
+				--bg-secondary: #1a1a1a;
+				--text-primary: #ffffff;
+				--text-secondary: #a0a0a0;
+				--accent: #3b82f6;
+				--accent-hover: #2563eb;
+				--border: #2a2a2a;
+			}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+			body {
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+					Arial, sans-serif;
+				background: var(--bg-primary);
+				color: var(--text-primary);
+				line-height: 1.6;
+				min-height: 100vh;
+			}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+			/* Navigation */
+			nav {
+				background: var(--bg-secondary);
+				border-bottom: 1px solid var(--border);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+				backdrop-filter: blur(10px);
+			}
 
-        header {
-            padding: 80px 0 60px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
+			.nav-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 20px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				height: 64px;
+			}
 
-        h1 {
-            font-size: 3.5em;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -2px;
-        }
+			.nav-brand {
+				font-size: 1.25em;
+				font-weight: 600;
+				color: var(--text-primary);
+				text-decoration: none;
+				letter-spacing: -0.5px;
+			}
 
-        .subtitle {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-            font-weight: 300;
-            letter-spacing: 0.5px;
-        }
+			.nav-links {
+				display: flex;
+				gap: 32px;
+				list-style: none;
+			}
 
-        main {
-            padding: 80px 0;
-        }
+			.nav-links a {
+				color: var(--text-secondary);
+				text-decoration: none;
+				font-weight: 500;
+				font-size: 0.95em;
+				transition: color 0.2s ease;
+			}
 
-        .section-title {
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 40px;
-            color: var(--text-primary);
-            letter-spacing: -1px;
-        }
+			.nav-links a:hover {
+				color: var(--text-primary);
+			}
 
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            margin-bottom: 60px;
-        }
+			.nav-links a.active {
+				color: var(--accent);
+			}
 
-        .tool-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 20px;
+			}
 
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+			header {
+				padding: 60px 0 40px;
+				text-align: center;
+			}
 
-        .tool-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent);
-            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
-        }
+			h1 {
+				font-size: 3em;
+				font-weight: 700;
+				margin-bottom: 12px;
+				background: linear-gradient(
+					135deg,
+					var(--text-primary) 0%,
+					var(--text-secondary) 100%
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				letter-spacing: -2px;
+			}
 
-        .tool-card:hover::before {
-            transform: scaleX(1);
-        }
+			.subtitle {
+				font-size: 1.1em;
+				color: var(--text-secondary);
+				font-weight: 300;
+				letter-spacing: 0.5px;
+			}
 
-        .tool-icon {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            display: block;
-        }
+			main {
+				padding: 40px 0 80px;
+			}
 
-        .tool-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
+			.section-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 32px;
+				gap: 20px;
+				flex-wrap: wrap;
+			}
 
-        .tool-description {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
+			.section-title {
+				font-size: 1.75em;
+				font-weight: 600;
+				color: var(--text-primary);
+				letter-spacing: -1px;
+			}
 
-        .tool-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95em;
-            transition: all 0.2s ease;
-        }
+			.search-box {
+				flex: 1;
+				max-width: 400px;
+				position: relative;
+			}
 
-        .tool-link:hover {
-            color: var(--accent-hover);
-            gap: 12px;
-        }
+			.search-box input {
+				width: 100%;
+				padding: 12px 16px 12px 44px;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				color: var(--text-primary);
+				font-size: 0.95em;
+				transition: all 0.2s ease;
+			}
 
-        .tool-link::after {
-            content: '→';
-            font-size: 1.2em;
-            transition: transform 0.2s ease;
-        }
+			.search-box input:focus {
+				outline: none;
+				border-color: var(--accent);
+				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+			}
 
-        .tool-link:hover::after {
-            transform: translateX(4px);
-        }
+			.search-box input::placeholder {
+				color: var(--text-secondary);
+			}
 
-        .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 20px;
-            font-size: 0.75em;
-            color: var(--accent);
-            margin-bottom: 16px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
+			.search-box::before {
+				content: "🔍";
+				position: absolute;
+				left: 16px;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 1.1em;
+				opacity: 0.6;
+			}
 
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 40px 0;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
+			.tools-list {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
 
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
+			.tool-row {
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 24px;
+				display: flex;
+				align-items: center;
+				gap: 24px;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				text-decoration: none;
+				position: relative;
+				overflow: hidden;
+			}
 
-        footer a:hover {
-            color: var(--accent-hover);
-        }
+			.tool-row::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 4px;
+				background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+				transform: scaleY(0);
+				transform-origin: top;
+				transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			}
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
-            }
+			.tool-row:hover {
+				transform: translateX(4px);
+				border-color: var(--accent);
+				box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
+			}
 
-            header {
-                padding: 60px 0 40px;
-            }
+			.tool-row:hover::before {
+				transform: scaleY(1);
+			}
 
-            main {
-                padding: 60px 0;
-            }
+			.tool-row.hidden {
+				display: none;
+			}
 
-            .tools-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+			.tool-icon-row {
+				font-size: 2.5em;
+				flex-shrink: 0;
+				width: 64px;
+				height: 64px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(59, 130, 246, 0.1);
+				border-radius: 12px;
+			}
 
-            .section-title {
-                font-size: 1.6em;
-            }
-        }
+			.tool-content {
+				flex: 1;
+				min-width: 0;
+			}
 
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-primary: #ffffff;
-                --bg-secondary: #f8f9fa;
-                --text-primary: #0a0a0a;
-                --text-secondary: #6b7280;
-                --border: #e5e7eb;
-            }
+			.tool-header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				margin-bottom: 8px;
+			}
 
-            .tool-card {
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            }
+			.tool-title-row {
+				font-size: 1.25em;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
 
-            .tool-card:hover {
-                box-shadow: 0 12px 40px rgba(59, 130, 246, 0.1);
-            }
-        }
+			.tag {
+				display: inline-block;
+				padding: 4px 10px;
+				background: rgba(59, 130, 246, 0.1);
+				border: 1px solid rgba(59, 130, 246, 0.2);
+				border-radius: 6px;
+				font-size: 0.7em;
+				color: var(--accent);
+				font-weight: 600;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+			}
 
-        .coming-soon {
-            opacity: 0.6;
-        }
+			.tool-description-row {
+				color: var(--text-secondary);
+				line-height: 1.5;
+				font-size: 0.95em;
+			}
 
-        .coming-soon-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 20px;
-            font-size: 0.75em;
-            color: #a855f7;
-            margin-bottom: 16px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Aditya Natraj</h1>
-            <p class="subtitle">A collection of simple, useful tools</p>
-        </header>
+			.tool-arrow {
+				flex-shrink: 0;
+				font-size: 1.5em;
+				color: var(--text-secondary);
+				transition: all 0.2s ease;
+			}
 
-        <main>
-            <h2 class="section-title">Tools</h2>
+			.tool-row:hover .tool-arrow {
+				color: var(--accent);
+				transform: translateX(4px);
+			}
 
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <span class="tool-icon">🇻🇳</span>
-                    <span class="tag">LANGUAGE</span>
-                    <h3 class="tool-title">Vietnamese Conversations</h3>
-                    <p class="tool-description">
-                        Learn practical Vietnamese dialogues for food vendors, shopping, and everyday situations.
-                        Interactive pronunciation with click-to-listen audio.
-                    </p>
-                    <a href="tools/web/vietnamese_conversations.html" class="tool-link">
-                        Launch Tool
-                    </a>
-                </div>
+			.coming-soon-badge {
+				display: inline-block;
+				padding: 4px 10px;
+				background: rgba(168, 85, 247, 0.1);
+				border: 1px solid rgba(168, 85, 247, 0.2);
+				border-radius: 6px;
+				font-size: 0.7em;
+				color: #a855f7;
+				font-weight: 600;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+			}
 
-                <div class="tool-card">
-                    <span class="tool-icon">🏨</span>
-                    <span class="tag">LANGUAGE</span>
-                    <h3 class="tool-title">Vietnamese Hotel Guide</h3>
-                    <p class="tool-description">
-                        Essential Vietnamese phrases for hotels and accommodation. From check-in to check-out,
-                        handle any hotel situation with confidence.
-                    </p>
-                    <a href="tools/web/vietnamese_hotel.html" class="tool-link">
-                        Launch Tool
-                    </a>
-                </div>
+			.tool-row.coming-soon {
+				opacity: 0.6;
+				cursor: default;
+			}
 
-                <div class="tool-card">
-                    <span class="tool-icon">📱</span>
-                    <span class="tag">UTILITY</span>
-                    <h3 class="tool-title">QR Code Generator</h3>
-                    <p class="tool-description">
-                        Generate QR codes from any URL instantly. Real-time preview as you type,
-                        with high-quality downloads ready for sharing.
-                    </p>
-                    <a href="tools/web/qr_coder.html" class="tool-link">
-                        Launch Tool
-                    </a>
-                </div>
+			.tool-row.coming-soon:hover {
+				transform: none;
+				border-color: var(--border);
+				box-shadow: none;
+			}
 
-                <!-- Placeholder for future tools -->
-                <div class="tool-card coming-soon">
-                    <span class="tool-icon">🛠️</span>
-                    <span class="coming-soon-badge">COMING SOON</span>
-                    <h3 class="tool-title">More Tools</h3>
-                    <p class="tool-description">
-                        Additional utilities and web apps are on the way. Check back soon for more helpful tools.
-                    </p>
-                </div>
-            </div>
-        </main>
+			.no-results {
+				text-align: center;
+				padding: 60px 20px;
+				color: var(--text-secondary);
+			}
 
-        <footer>
-            <p>
-                Built with care by Aditya Natraj &middot;
-                <a href="https://github.com/adityanatraj" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </p>
-        </footer>
-    </div>
-</body>
+			.no-results-icon {
+				font-size: 3em;
+				margin-bottom: 16px;
+				opacity: 0.5;
+			}
+
+			.no-results-text {
+				font-size: 1.1em;
+			}
+
+			footer {
+				border-top: 1px solid var(--border);
+				padding: 40px 0;
+				text-align: center;
+				color: var(--text-secondary);
+				font-size: 0.9em;
+			}
+
+			footer a {
+				color: var(--accent);
+				text-decoration: none;
+				transition: color 0.2s ease;
+			}
+
+			footer a:hover {
+				color: var(--accent-hover);
+			}
+
+			@media (max-width: 768px) {
+				.nav-container {
+					height: auto;
+					padding: 16px 20px;
+					flex-direction: column;
+					gap: 16px;
+				}
+
+				.nav-links {
+					gap: 24px;
+				}
+
+				h1 {
+					font-size: 2.2em;
+				}
+
+				header {
+					padding: 40px 0 30px;
+				}
+
+				.section-header {
+					flex-direction: column;
+					align-items: stretch;
+				}
+
+				.search-box {
+					max-width: 100%;
+				}
+
+				.tool-row {
+					flex-direction: column;
+					align-items: flex-start;
+					padding: 20px;
+				}
+
+				.tool-icon-row {
+					width: 56px;
+					height: 56px;
+					font-size: 2em;
+				}
+
+				.tool-arrow {
+					align-self: flex-end;
+				}
+			}
+
+			@media (prefers-color-scheme: light) {
+				:root {
+					--bg-primary: #ffffff;
+					--bg-secondary: #f8f9fa;
+					--text-primary: #0a0a0a;
+					--text-secondary: #6b7280;
+					--border: #e5e7eb;
+				}
+
+				nav {
+					background: rgba(255, 255, 255, 0.8);
+				}
+
+				.tool-row {
+					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+				}
+
+				.tool-row:hover {
+					box-shadow: 0 4px 20px rgba(59, 130, 246, 0.08);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<div class="nav-container">
+				<a href="/" class="nav-brand">Aditya N</a>
+				<ul class="nav-links">
+					<li><a href="/" class="active">Tools</a></li>
+					<li><a href="about.html">About</a></li>
+					<li>
+						<a
+							href="https://github.com/adityanatraj"
+							target="_blank"
+							rel="noopener noreferrer"
+							>GitHub</a
+						>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div class="container">
+			<header>
+				<h1>Tools & Projects</h1>
+				<p class="subtitle">A collection of simple, useful web applications</p>
+			</header>
+
+			<main>
+				<div class="section-header">
+					<h2 class="section-title">All Tools</h2>
+					<div class="search-box">
+						<input
+							type="text"
+							id="searchInput"
+							placeholder="Search tools..."
+							autocomplete="off"
+						/>
+					</div>
+				</div>
+
+				<div class="tools-list" id="toolsList">
+					<a
+						href="tools/web/vietnamese_conversations.html"
+						class="tool-row"
+						data-title="Vietnamese Conversations"
+						data-description="Learn practical Vietnamese dialogues for food vendors, shopping, and everyday situations. Interactive pronunciation with click-to-listen audio."
+						data-tags="language learning vietnamese"
+					>
+						<div class="tool-icon-row">🇻🇳</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">Vietnamese Conversations</h3>
+								<span class="tag">Language</span>
+							</div>
+							<p class="tool-description-row">
+								Learn practical Vietnamese dialogues for food vendors, shopping,
+								and everyday situations. Interactive pronunciation with
+								click-to-listen audio.
+							</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>
+
+					<a
+						href="tools/web/vietnamese_hotel.html"
+						class="tool-row"
+						data-title="Vietnamese Hotel Guide"
+						data-description="Essential Vietnamese phrases for hotels and accommodation. From check-in to check-out, handle any hotel situation with confidence."
+						data-tags="language learning vietnamese hotel travel"
+					>
+						<div class="tool-icon-row">🏨</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">Vietnamese Hotel Guide</h3>
+								<span class="tag">Language</span>
+							</div>
+							<p class="tool-description-row">
+								Essential Vietnamese phrases for hotels and accommodation. From
+								check-in to check-out, handle any hotel situation with
+								confidence.
+							</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>
+
+					<a
+						href="tools/web/qr_coder.html"
+						class="tool-row"
+						data-title="QR Code Generator"
+						data-description="Generate QR codes from any URL instantly. Real-time preview as you type, with high-quality downloads ready for sharing."
+						data-tags="utility qr code generator url"
+					>
+						<div class="tool-icon-row">📱</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">QR Code Generator</h3>
+								<span class="tag">Utility</span>
+							</div>
+							<p class="tool-description-row">
+								Generate QR codes from any URL instantly. Real-time preview as
+								you type, with high-quality downloads ready for sharing.
+							</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>
+
+					<div
+						class="tool-row coming-soon"
+						data-title="More Tools Coming Soon"
+						data-description="Additional utilities and web apps are on the way. Check back soon for more helpful tools."
+						data-tags="coming soon"
+					>
+						<div class="tool-icon-row">🛠️</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">More Tools</h3>
+								<span class="coming-soon-badge">Coming Soon</span>
+							</div>
+							<p class="tool-description-row">
+								Additional utilities and web apps are on the way. Check back
+								soon for more helpful tools.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div id="noResults" class="no-results" style="display: none">
+					<div class="no-results-icon">🔍</div>
+					<div class="no-results-text">No tools found matching your search</div>
+				</div>
+			</main>
+
+			<footer>
+				<p>(c) Aditya Natraj</p>
+			</footer>
+		</div>
+
+		<script>
+			const searchInput = document.getElementById("searchInput");
+			const toolsList = document.getElementById("toolsList");
+			const noResults = document.getElementById("noResults");
+			const toolRows = toolsList.querySelectorAll(".tool-row");
+
+			searchInput.addEventListener("input", function () {
+				const searchTerm = this.value.toLowerCase().trim();
+				let visibleCount = 0;
+
+				toolRows.forEach((row) => {
+					const title = row.dataset.title.toLowerCase();
+					const description = row.dataset.description.toLowerCase();
+					const tags = row.dataset.tags.toLowerCase();
+					const searchText = title + " " + description + " " + tags;
+
+					if (searchText.includes(searchTerm)) {
+						row.classList.remove("hidden");
+						visibleCount++;
+					} else {
+						row.classList.add("hidden");
+					}
+				});
+
+				if (visibleCount === 0) {
+					toolsList.style.display = "none";
+					noResults.style.display = "block";
+				} else {
+					toolsList.style.display = "flex";
+					noResults.style.display = "none";
+				}
+			});
+		</script>
+	</body>
 </html>
