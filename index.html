@@ -127,11 +127,41 @@
 				flex-wrap: wrap;
 			}
 
+			.section-title-wrapper {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+			}
+
 			.section-title {
 				font-size: 1.75em;
 				font-weight: 600;
 				color: var(--text-primary);
 				letter-spacing: -1px;
+			}
+
+			.add-tool-btn {
+				width: 36px;
+				height: 36px;
+				border-radius: 8px;
+				background: var(--accent);
+				border: none;
+				color: var(--text-primary);
+				font-size: 1.5em;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.2s ease;
+			}
+
+			.add-tool-btn:hover {
+				background: var(--accent-hover);
+				transform: scale(1.05);
+			}
+
+			.add-tool-btn:active {
+				transform: scale(0.95);
 			}
 
 			.search-box {
@@ -319,6 +349,227 @@
 				font-size: 1.1em;
 			}
 
+			/* Modal Styles */
+			.modal-overlay {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.8);
+				z-index: 1000;
+				backdrop-filter: blur(4px);
+			}
+
+			.modal-overlay.active {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 20px;
+			}
+
+			.modal {
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				border-radius: 16px;
+				width: 100%;
+				max-width: 900px;
+				max-height: 90vh;
+				display: flex;
+				flex-direction: column;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+
+			.modal-header {
+				padding: 24px 28px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-shrink: 0;
+			}
+
+			.modal-title {
+				font-size: 1.5em;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
+
+			.modal-close {
+				width: 32px;
+				height: 32px;
+				border-radius: 6px;
+				background: transparent;
+				border: 1px solid var(--border);
+				color: var(--text-secondary);
+				font-size: 1.2em;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.2s ease;
+			}
+
+			.modal-close:hover {
+				background: rgba(255, 255, 255, 0.05);
+				border-color: var(--text-secondary);
+				color: var(--text-primary);
+			}
+
+			.modal-body {
+				padding: 28px;
+				overflow-y: auto;
+				flex: 1;
+			}
+
+			.form-group {
+				margin-bottom: 20px;
+			}
+
+			.form-group:last-child {
+				margin-bottom: 0;
+			}
+
+			.form-label {
+				display: block;
+				margin-bottom: 8px;
+				color: var(--text-primary);
+				font-weight: 500;
+				font-size: 0.95em;
+			}
+
+			.form-label.required::after {
+				content: " *";
+				color: #ef4444;
+			}
+
+			.form-input,
+			.form-textarea {
+				width: 100%;
+				padding: 12px 16px;
+				background: var(--bg-primary);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				color: var(--text-primary);
+				font-size: 0.95em;
+				font-family: inherit;
+				transition: all 0.2s ease;
+			}
+
+			.form-input:focus,
+			.form-textarea:focus {
+				outline: none;
+				border-color: var(--accent);
+				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+			}
+
+			.form-input:invalid:not(:placeholder-shown),
+			.form-textarea:invalid:not(:placeholder-shown) {
+				border-color: #ef4444;
+			}
+
+			.form-input:valid:not(:placeholder-shown),
+			.form-textarea:valid:not(:placeholder-shown) {
+				border-color: #22c55e;
+			}
+
+			.form-textarea {
+				min-height: 300px;
+				resize: vertical;
+				font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+				font-size: 0.9em;
+				line-height: 1.5;
+			}
+
+			.form-hint {
+				margin-top: 6px;
+				font-size: 0.85em;
+				color: var(--text-secondary);
+			}
+
+			.modal-footer {
+				padding: 20px 28px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: flex-end;
+				gap: 12px;
+				flex-shrink: 0;
+			}
+
+			.btn {
+				padding: 10px 20px;
+				border-radius: 8px;
+				border: none;
+				font-size: 0.95em;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.btn-secondary {
+				background: transparent;
+				border: 1px solid var(--border);
+				color: var(--text-secondary);
+			}
+
+			.btn-secondary:hover {
+				background: rgba(255, 255, 255, 0.05);
+				color: var(--text-primary);
+			}
+
+			.btn-primary {
+				background: var(--accent);
+				color: var(--text-primary);
+			}
+
+			.btn-primary:hover {
+				background: var(--accent-hover);
+			}
+
+			.btn-primary:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			/* Toast notification */
+			.toast {
+				position: fixed;
+				bottom: 24px;
+				right: 24px;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				border-left: 4px solid var(--accent);
+				padding: 16px 20px;
+				border-radius: 8px;
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+				transform: translateY(120%);
+				opacity: 0;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				z-index: 2000;
+				max-width: 400px;
+			}
+
+			.toast.show {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			.toast-content {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.toast-icon {
+				font-size: 1.5em;
+			}
+
+			.toast-message {
+				color: var(--text-primary);
+				font-size: 0.95em;
+			}
+
 			footer {
 				border-top: 1px solid var(--border);
 				padding: 40px 0;
@@ -362,6 +613,10 @@
 					align-items: stretch;
 				}
 
+				.section-title-wrapper {
+					justify-content: space-between;
+				}
+
 				.search-box {
 					max-width: 100%;
 				}
@@ -380,6 +635,18 @@
 
 				.tool-arrow {
 					align-self: flex-end;
+				}
+
+				.modal {
+					max-height: 95vh;
+				}
+
+				.modal-body {
+					padding: 20px;
+				}
+
+				.modal-footer {
+					padding: 16px 20px;
 				}
 			}
 
@@ -427,13 +694,18 @@
 
 		<div class="container">
 			<header>
-				<h1>Tools & Projects</h1>
-				<p class="subtitle">A collection of simple, useful web applications</p>
+				<h1>Tools</h1>
+				<p class="subtitle">A collection of simple, (useful?) web toys</p>
 			</header>
 
 			<main>
 				<div class="section-header">
-					<h2 class="section-title">All Tools</h2>
+					<div class="section-title-wrapper">
+						<h2 class="section-title">All Tools</h2>
+						<button class="add-tool-btn" id="addToolBtn" title="Add new tool">
+							+
+						</button>
+					</div>
 					<div class="search-box">
 						<input
 							type="text"
@@ -510,6 +782,46 @@
 						<div class="tool-arrow">→</div>
 					</a>
 
+					<a
+						href="tools/web/walkie_talkie.html"
+						class="tool-row"
+						data-title="P2P Walkie Talkie"
+						data-description="Peer-to-peer voice communication over local network. Connect with QR codes and talk in real-time using WebRTC technology."
+						data-tags="communication voice p2p webrtc"
+					>
+						<div class="tool-icon-row">🔊</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">P2P Walkie Talkie</h3>
+								<span class="tag">Communication</span>
+							</div>
+							<p class="tool-description-row">
+								Peer-to-peer voice communication over local network. Connect with QR codes and talk in real-time using WebRTC technology.
+							</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>
+
+					<a
+						href="tools/web/yahtzee.html"
+						class="tool-row"
+						data-title="Yahtzee P2P"
+						data-description="Play Yahtzee with a friend over peer-to-peer connection. Full dice game with scoring, turns, and real-time multiplayer."
+						data-tags="game dice yahtzee multiplayer p2p"
+					>
+						<div class="tool-icon-row">🎲</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">Yahtzee P2P</h3>
+								<span class="tag">Game</span>
+							</div>
+							<p class="tool-description-row">
+								Play Yahtzee with a friend over peer-to-peer connection. Full dice game with scoring, turns, and real-time multiplayer.
+							</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>
+
 					<div
 						class="tool-row coming-soon"
 						data-title="More Tools Coming Soon"
@@ -541,20 +853,145 @@
 			</footer>
 		</div>
 
+		<!-- Toast Notification -->
+		<div class="toast" id="toast">
+			<div class="toast-content">
+				<span class="toast-icon">✓</span>
+				<span class="toast-message" id="toastMessage"></span>
+			</div>
+		</div>
+
+		<!-- Add Tool Modal -->
+		<div class="modal-overlay" id="modalOverlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Add New Tool</h3>
+					<button class="modal-close" id="modalClose">✕</button>
+				</div>
+				<div class="modal-body">
+					<form id="addToolForm">
+						<div class="form-group">
+							<label class="form-label required" for="toolName">Tool Name</label>
+							<input
+								type="text"
+								id="toolName"
+								class="form-input"
+								placeholder="e.g., QR Code Generator"
+								required
+							/>
+							<div class="form-hint">
+								The display name for your tool as it will appear in the list
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="form-label required" for="toolFilename">Filename</label>
+							<input
+								type="text"
+								id="toolFilename"
+								class="form-input"
+								placeholder="e.g., qr_generator.html"
+								required
+							/>
+							<div class="form-hint">
+								The HTML filename (will be saved in tools/web/)
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="form-label" for="toolDescription"
+								>Description
+								<span style="color: var(--text-secondary); font-weight: 400"
+									>(optional)</span
+								></label
+							>
+							<input
+								type="text"
+								id="toolDescription"
+								class="form-input"
+								placeholder="Brief description of what this tool does"
+							/>
+						</div>
+
+						<div class="form-group">
+							<label class="form-label" for="toolTag"
+								>Category Tag
+								<span style="color: var(--text-secondary); font-weight: 400"
+									>(optional)</span
+								></label
+							>
+							<input
+								type="text"
+								id="toolTag"
+								class="form-input"
+								placeholder="e.g., Utility, Language, etc."
+							/>
+						</div>
+
+						<div class="form-group">
+							<label class="form-label required" for="toolContent">HTML Content</label>
+							<textarea
+								id="toolContent"
+								class="form-textarea"
+								placeholder="Paste your HTML code here..."
+								required
+							></textarea>
+							<div class="form-hint">
+								The complete HTML content for your tool (including
+								&lt;!DOCTYPE&gt;, &lt;html&gt;, etc.)
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" id="modalCancel">
+						Cancel
+					</button>
+					<button type="submit" form="addToolForm" class="btn btn-primary">
+						Add Tool
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<script>
 			const searchInput = document.getElementById("searchInput");
 			const toolsList = document.getElementById("toolsList");
 			const noResults = document.getElementById("noResults");
-			const toolRows = toolsList.querySelectorAll(".tool-row");
 
-			searchInput.addEventListener("input", function () {
-				const searchTerm = this.value.toLowerCase().trim();
+			// Modal elements
+			const addToolBtn = document.getElementById("addToolBtn");
+			const modalOverlay = document.getElementById("modalOverlay");
+			const modalClose = document.getElementById("modalClose");
+			const modalCancel = document.getElementById("modalCancel");
+			const addToolForm = document.getElementById("addToolForm");
+
+			// Default emoji for all new tools
+			const DEFAULT_EMOJI = "🛠️";
+
+			// Toast notification
+			const toast = document.getElementById("toast");
+			const toastMessage = document.getElementById("toastMessage");
+
+			function showToast(message, duration = 3000) {
+				toastMessage.textContent = message;
+				toast.classList.add("show");
+
+				setTimeout(() => {
+					toast.classList.remove("show");
+				}, duration);
+			}
+
+			// Search functionality
+			function updateSearch() {
+				const searchTerm = searchInput.value.toLowerCase().trim();
 				let visibleCount = 0;
+				const allToolRows = toolsList.querySelectorAll(".tool-row");
 
-				toolRows.forEach((row) => {
-					const title = row.dataset.title.toLowerCase();
-					const description = row.dataset.description.toLowerCase();
-					const tags = row.dataset.tags.toLowerCase();
+				allToolRows.forEach((row) => {
+					const title = row.dataset.title?.toLowerCase() || "";
+					const description = row.dataset.description?.toLowerCase() || "";
+					const tags = row.dataset.tags?.toLowerCase() || "";
 					const searchText = title + " " + description + " " + tags;
 
 					if (searchText.includes(searchTerm)) {
@@ -572,6 +1009,118 @@
 					toolsList.style.display = "flex";
 					noResults.style.display = "none";
 				}
+			}
+
+			searchInput.addEventListener("input", updateSearch);
+
+			// Modal functionality
+			function openModal() {
+				modalOverlay.classList.add("active");
+				document.body.style.overflow = "hidden";
+			}
+
+			function closeModal() {
+				modalOverlay.classList.remove("active");
+				document.body.style.overflow = "";
+				addToolForm.reset();
+			}
+
+			addToolBtn.addEventListener("click", openModal);
+			modalClose.addEventListener("click", closeModal);
+			modalCancel.addEventListener("click", closeModal);
+
+			// Close modal when clicking outside
+			modalOverlay.addEventListener("click", (e) => {
+				if (e.target === modalOverlay) {
+					closeModal();
+				}
+			});
+
+			// Close modal on Escape key
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape" && modalOverlay.classList.contains("active")) {
+					closeModal();
+				}
+			});
+
+			// Form submission
+			addToolForm.addEventListener("submit", (e) => {
+				e.preventDefault();
+
+				// Get form values
+				const toolName = document.getElementById("toolName").value.trim();
+				const toolFilename = document
+					.getElementById("toolFilename")
+					.value.trim();
+				const toolDescription =
+					document.getElementById("toolDescription").value.trim() ||
+					"No description provided";
+				const toolTag =
+					document.getElementById("toolTag").value.trim() || "Tool";
+				const toolContent = document.getElementById("toolContent").value.trim();
+
+				// Ensure filename ends with .html
+				const filename = toolFilename.endsWith(".html")
+					? toolFilename
+					: toolFilename + ".html";
+				const toolUrl = `tools/web/${filename}`;
+
+				// Create tags string (could be enhanced based on category)
+				const tags = toolTag.toLowerCase();
+
+				// Create new tool row
+				const newToolRow = document.createElement("a");
+				newToolRow.href = toolUrl;
+				newToolRow.className = "tool-row";
+				newToolRow.dataset.title = toolName;
+				newToolRow.dataset.description = toolDescription;
+				newToolRow.dataset.tags = tags;
+
+				newToolRow.innerHTML = `
+					<div class="tool-icon-row">${DEFAULT_EMOJI}</div>
+					<div class="tool-content">
+						<div class="tool-header">
+							<h3 class="tool-title-row">${toolName}</h3>
+							<span class="tag">${toolTag}</span>
+						</div>
+						<p class="tool-description-row">
+							${toolDescription}
+						</p>
+					</div>
+					<div class="tool-arrow">→</div>
+				`;
+
+				// Remove "coming soon" placeholder if it exists
+				const comingSoon = toolsList.querySelector(".coming-soon");
+				if (comingSoon) {
+					comingSoon.remove();
+				}
+
+				// Add the new tool to the list (before any remaining elements)
+				toolsList.appendChild(newToolRow);
+
+				// Close modal and reset form
+				closeModal();
+
+				// Update search functionality to include new tool
+				updateSearch();
+
+				// Show success toast
+				showToast(`Tool "${toolName}" added successfully!`);
+
+				// Log for debugging
+				console.log("Tool added:", {
+					name: toolName,
+					filename: filename,
+					url: toolUrl,
+					description: toolDescription,
+					icon: DEFAULT_EMOJI,
+					tag: toolTag,
+					contentLength: toolContent.length,
+				});
+
+				// In a real implementation, you would save the file here
+				// For now, we're just adding it to the UI
 			});
 		</script>
 	</body>
