@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Yahtzee – Two Players</title>
+
+<!--
+===============================================================================
+PLAN (READ FIRST)
+===============================================================================
+1. Architecture
+   - Single HTML file with embedded CSS + JS
+   - Central immutable-ish gameState object
+   - Pure functions for scoring logic
+   - UI rendering functions that re-render from state
+
+2. Game State
+   {
+     players: [
+       { name, scores: { category: number|null }, yahtzeeBonus },
+       { name, scores: { category: number|null }, yahtzeeBonus }
+     ],
+     currentPlayer: 0|1,
+     dice: [{value:1-6, held:boolean} x5],
+     rollsLeft: 3,
+     gameOver: false
+   }
+
+3. Flow
+   - Roll dice (up to 3 times)
+   - Click dice to hold/unhold
+   - Click score cell to lock score and end turn
+   - Auto-calc bonuses and totals
+   - Switch players
+   - Detect game over
+
+4. UI
+   - Responsive CSS Grid
+   - Desktop/tablet: scorecards left, dice right
+   - Phone: scorecards top, dice bottom
+   - Active player highlighted
+   - Touch-friendly dice
+
+5. Persistence
+   - Save gameState as JSON file
+   - Load JSON file to restore gameState fully
+
+6. Constraints
+   - No external libraries
+   - Clear comments
+===============================================================================
+-->
+
+<style>
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --card: #1f2933;
+  --accent: #38bdf8;
+  --accent2: #22c55e;
+  --danger: #ef4444;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #020617, #020617);
+  color: var(--text);
+}
+
+header {
+  padding: 12px 16px;
+  background: #020617;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+header .controls button {
+  margin-left: 8px;
+}
+
+button {
+  background: var(--accent);
+  border: none;
+  color: #020617;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #334155;
+  color: var(--text);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scorecards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .scorecards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scorecard {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 10px;
+  border: 2px solid transparent;
+}
+
+.scorecard.active {
+  border-color: var(--accent);
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.player-name input {
+  width: 100%;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-weight: 700;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+td {
+  padding: 4px;
+  border-bottom: 1px solid #334155;
+}
+
+td.label {
+  color: var(--muted);
+}
+
+td.score {
+  text-align: right;
+  cursor: pointer;
+}
+
+td.score.used {
+  color: var(--accent2);
+  cursor: default;
+}
+
+td.total {
+  font-weight: 700;
+}
+
+.play-area {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.turn-indicator {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dice-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.die {
+  width: 64px;
+  height: 64px;
+  background: #f8fafc;
+  color: #020617;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.die.held {
+  box-shadow: 0 0 0 4px var(--accent);
+  transform: scale(0.95);
+}
+
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.roll-info {
+  color: var(--muted);
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>Yahtzee (2 Players)</h1>
+  <div class="controls">
+    <button class="secondary" onclick="saveGame()">Save</button>
+    <button class="secondary" onclick="loadGame()">Load</button>
+    <button onclick="newGame()">New Game</button>
+  </div>
+</header>
+
+<main>
+  <div class="scorecards" id="scorecards"></div>
+
+  <div class="play-area">
+    <div class="turn-indicator" id="turnIndicator"></div>
+
+    <div class="dice-container" id="diceContainer"></div>
+
+    <div class="controls-row">
+      <div class="roll-info" id="rollInfo"></div>
+      <button id="rollBtn" onclick="rollDice()">Roll Dice</button>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ============================================================================
+   GAME DATA & CONSTANTS
+============================================================================ */
+const CATEGORIES = [
+  { key: "ones", label: "Ones", upper: true },
+  { key: "twos", label: "Twos", upper: true },
+  { key: "threes", label: "Threes", upper: true },
+  { key: "fours", label: "Fours", upper: true },
+  { key: "fives", label: "Fives", upper: true },
+  { key: "sixes", label: "Sixes", upper: true },
+  { key: "threeKind", label: "3 of a Kind" },
+  { key: "fourKind", label: "4 of a Kind" },
+  { key: "fullHouse", label: "Full House" },
+  { key: "smallStraight", label: "Small Straight" },
+  { key: "largeStraight", label: "Large Straight" },
+  { key: "yahtzee", label: "Yahtzee" },
+  { key: "chance", label: "Chance" }
+];
+
+let gameState;
+
+/* ============================================================================
+   INITIALIZATION
+============================================================================ */
+function newGame() {
+  gameState = {
+    players: [
+      { name: "Player 1", scores: {}, yahtzeeBonus: 0 },
+      { name: "Player 2", scores: {}, yahtzeeBonus: 0 }
+    ],
+    currentPlayer: 0,
+    dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
+    rollsLeft: 3,
+    gameOver: false
+  };
+  render();
+}
+
+newGame();
+
+/* ============================================================================
+   RENDERING
+============================================================================ */
+function render() {
+  renderScorecards();
+  renderDice();
+  renderControls();
+}
+
+function renderScorecards() {
+  const container = document.getElementById("scorecards");
+  container.innerHTML = "";
+
+  gameState.players.forEach((player, idx) => {
+    const card = document.createElement("div");
+    card.className = "scorecard" + (idx === gameState.currentPlayer ? " active" : "");
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "player-name";
+    const nameInput = document.createElement("input");
+    nameInput.value = player.name;
+    nameInput.onchange = e => player.name = e.target.value;
+    nameDiv.appendChild(nameInput);
+    card.appendChild(nameDiv);
+
+    const table = document.createElement("table");
+
+    CATEGORIES.forEach(cat => {
+      const tr = document.createElement("tr");
+      const tdLabel = document.createElement("td");
+      tdLabel.className = "label";
+      tdLabel.textContent = cat.label;
+
+      const tdScore = document.createElement("td");
+      tdScore.className = "score";
+      const val = player.scores[cat.key];
+
+      if (val != null) {
+        tdScore.textContent = val;
+        tdScore.classList.add("used");
+      } else if (idx === gameState.currentPlayer && gameState.rollsLeft < 3) {
+        tdScore.textContent = previewScore(cat.key);
+        tdScore.onclick = () => assignScore(cat.key);
+      } else {
+        tdScore.textContent = "";
+      }
+
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdScore);
+      table.appendChild(tr);
+    });
+
+    const totals = calculateTotals(player);
+    [
+      ["Upper Total", totals.upper],
+      ["Upper Bonus", totals.upperBonus],
+      ["Lower Total", totals.lower],
+      ["Grand Total", totals.grand]
+    ].forEach(([label, value]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="label total">${label}</td><td class="score total">${value}</td>`;
+      table.appendChild(tr);
+    });
+
+    card.appendChild(table);
+    container.appendChild(card);
+  });
+}
+
+function renderDice() {
+  const container = document.getElementById("diceContainer");
+  container.innerHTML = "";
+
+  gameState.dice.forEach((die, i) => {
+    const div = document.createElement("div");
+    div.className = "die" + (die.held ? " held" : "");
+    div.textContent = die.value;
+    div.onclick = () => {
+      if (gameState.rollsLeft < 3) {
+        die.held = !die.held;
+        renderDice();
+      }
+    };
+    container.appendChild(div);
+  });
+}
+
+function renderControls() {
+  document.getElementById("turnIndicator").textContent =
+    `${gameState.players[gameState.currentPlayer].name}'s Turn`;
+
+  document.getElementById("rollInfo").textContent =
+    `Rolls left: ${gameState.rollsLeft}`;
+
+  document.getElementById("rollBtn").disabled =
+    gameState.rollsLeft === 0;
+}
+
+/* ============================================================================
+   GAME ACTIONS
+============================================================================ */
+function rollDice() {
+  if (gameState.rollsLeft === 0) return;
+
+  gameState.dice.forEach(d => {
+    if (!d.held) {
+      d.value = Math.floor(Math.random() * 6) + 1;
+    }
+  });
+
+  gameState.rollsLeft--;
+  render();
+}
+
+function assignScore(category) {
+  const player = gameState.players[gameState.currentPlayer];
+  if (player.scores[category] != null) return;
+
+  const score = calculateScore(category);
+  player.scores[category] = score;
+
+  if (category === "yahtzee" && score === 50) {
+    if (player.scores.yahtzee === 50 && player.yahtzeeBonus != null) {
+      player.yahtzeeBonus += 100;
+    }
+  }
+
+  endTurn();
+}
+
+function endTurn() {
+  gameState.dice.forEach(d => d.held = false);
+  gameState.rollsLeft = 3;
+  gameState.currentPlayer = 1 - gameState.currentPlayer;
+  render();
+}
+
+/* ============================================================================
+   SCORING LOGIC
+============================================================================ */
+function calculateScore(category) {
+  const values = gameState.dice.map(d => d.value);
+  const counts = countDice(values);
+  const sum = values.reduce((a,b)=>a+b,0);
+
+  switch (category) {
+    case "ones": return counts[1]*1;
+    case "twos": return counts[2]*2;
+    case "threes": return counts[3]*3;
+    case "fours": return counts[4]*4;
+    case "fives": return counts[5]*5;
+    case "sixes": return counts[6]*6;
+    case "threeKind": return hasKind(counts,3)?sum:0;
+    case "fourKind": return hasKind(counts,4)?sum:0;
+    case "fullHouse": return isFullHouse(counts)?25:0;
+    case "smallStraight": return isSmallStraight(values)?30:0;
+    case "largeStraight": return isLargeStraight(values)?40:0;
+    case "yahtzee": return hasKind(counts,5)?50:0;
+    case "chance": return sum;
+  }
+}
+
+function previewScore(category) {
+  return calculateScore(category);
+}
+
+function countDice(values) {
+  const c = {};
+  values.forEach(v => c[v] = (c[v]||0)+1);
+  return c;
+}
+
+function hasKind(counts,n) {
+  return Object.values(counts).some(c=>c>=n);
+}
+
+function isFullHouse(counts) {
+  const vals = Object.values(counts);
+  return vals.includes(3) && vals.includes(2);
+}
+
+function isSmallStraight(values) {
+  const set = [...new Set(values)].sort();
+  return (
+    [1,2,3,4].every(v=>set.includes(v)) ||
+    [2,3,4,5].every(v=>set.includes(v)) ||
+    [3,4,5,6].every(v=>set.includes(v))
+  );
+}
+
+function isLargeStraight(values) {
+  const set = [...new Set(values)].sort().join();
+  return set === "1,2,3,4,5" || set === "2,3,4,5,6";
+}
+
+function calculateTotals(player) {
+  let upper = 0, lower = 0;
+  CATEGORIES.forEach(c=>{
+    const v = player.scores[c.key];
+    if (v != null) {
+      if (c.upper) upper += v;
+      else lower += v;
+    }
+  });
+  const upperBonus = upper >= 63 ? 35 : 0;
+  return {
+    upper,
+    upperBonus,
+    lower,
+    grand: upper + upperBonus + lower + (player.yahtzeeBonus||0)
+  };
+}
+
+/* ============================================================================
+   SAVE / LOAD
+============================================================================ */
+function saveGame() {
+  const data = JSON.stringify(gameState, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "yahtzee-game.json";
+  a.click();
+}
+
+function loadGame() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      gameState = JSON.parse(reader.result);
+      render();
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+</script>
+</body>
+</html>
