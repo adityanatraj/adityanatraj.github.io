@@ -7,61 +7,40 @@
 
 <!--
 ===============================================================================
-PLAN (READ FIRST)
+PLAN
 ===============================================================================
-1. Architecture
-   - Single HTML file with embedded CSS + JS
-   - Central immutable-ish gameState object
-   - Pure functions for scoring logic
-   - UI rendering functions that re-render from state
+1. Consolidate both players into a single shared score table
+   - Categories as rows
+   - Player 1 + Player 2 as columns
+   - Active player column highlighted
 
-2. Game State
-   {
-     players: [
-       { name, scores: { category: number|null }, yahtzeeBonus },
-       { name, scores: { category: number|null }, yahtzeeBonus }
-     ],
-     currentPlayer: 0|1,
-     dice: [{value:1-6, held:boolean} x5],
-     rollsLeft: 3,
-     gameOver: false
-   }
+2. Improve scorecard visual hierarchy
+   - Upper section and lower section clearly separated
+   - Section headers
+   - Totals bolded and visually distinct
 
-3. Flow
-   - Roll dice (up to 3 times)
-   - Click dice to hold/unhold
-   - Click score cell to lock score and end turn
-   - Auto-calc bonuses and totals
-   - Switch players
-   - Detect game over
+3. Layout polish
+   - Vertical stack of Save / Load / New buttons
+   - Slightly softer, more board-game-like look
+   - Clear affordances for clickable score cells
 
-4. UI
-   - Responsive CSS Grid
-   - Desktop/tablet: scorecards left, dice right
-   - Phone: scorecards top, dice bottom
-   - Active player highlighted
-   - Touch-friendly dice
-
-5. Persistence
-   - Save gameState as JSON file
-   - Load JSON file to restore gameState fully
-
-6. Constraints
-   - No external libraries
-   - Clear comments
+4. Functional improvements
+   - Better disabled states
+   - Cleaner turn indication
+   - Minor animation polish
 ===============================================================================
 -->
 
 <style>
 :root {
-  --bg: #0f172a;
-  --panel: #111827;
-  --card: #1f2933;
+  --bg: #020617;
+  --panel: #0f172a;
+  --card: #111827;
+  --line: #334155;
   --accent: #38bdf8;
   --accent2: #22c55e;
-  --danger: #ef4444;
   --text: #e5e7eb;
-  --muted: #9ca3af;
+  --muted: #94a3b8;
 }
 
 * { box-sizing: border-box; }
@@ -69,7 +48,7 @@ PLAN (READ FIRST)
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #020617, #020617);
+  background: radial-gradient(circle at top, #020617, #020617);
   color: var(--text);
 }
 
@@ -86,8 +65,10 @@ header h1 {
   margin: 0;
 }
 
-header .controls button {
-  margin-left: 8px;
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 button {
@@ -112,7 +93,7 @@ button:disabled {
 
 main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 0.8fr;
   gap: 12px;
   padding: 12px;
 }
@@ -123,77 +104,72 @@ main {
   }
 }
 
-.scorecards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 600px) {
-  .scorecards {
-    grid-template-columns: 1fr;
-  }
-}
-
 .scorecard {
   background: var(--card);
-  border-radius: 12px;
-  padding: 10px;
-  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 12px;
 }
 
-.scorecard.active {
-  border-color: var(--accent);
-}
-
-.player-name {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.player-name input {
-  width: 100%;
-  font-size: 16px;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-weight: 700;
-}
-
-table {
+.scorecard table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-td {
-  padding: 4px;
-  border-bottom: 1px solid #334155;
+.scorecard th,
+.scorecard td {
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
 }
 
-td.label {
+.scorecard th {
+  text-align: center;
+  font-weight: 700;
+}
+
+.scorecard th.player.active {
+  color: var(--accent);
+}
+
+.scorecard td.label {
   color: var(--muted);
 }
 
-td.score {
-  text-align: right;
+.scorecard td.score {
+  text-align: center;
   cursor: pointer;
 }
 
-td.score.used {
+.scorecard td.score.used {
   color: var(--accent2);
   cursor: default;
 }
 
-td.total {
+.scorecard tr.section td {
+  padding-top: 10px;
   font-weight: 700;
+  color: var(--text);
+  border-bottom: 2px solid var(--line);
+}
+
+.scorecard tr.total td {
+  font-weight: 800;
+  border-top: 2px solid var(--line);
+}
+
+.player-name {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
 }
 
 .play-area {
   background: var(--panel);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -202,34 +178,35 @@ td.total {
 .turn-indicator {
   font-weight: 700;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .dice-container {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
   margin: 16px 0;
 }
 
 .die {
-  width: 64px;
-  height: 64px;
+  width: 70px;
+  height: 70px;
   background: #f8fafc;
   color: #020617;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .die.held {
   box-shadow: 0 0 0 4px var(--accent);
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 .controls-row {
@@ -255,13 +232,11 @@ td.total {
 </header>
 
 <main>
-  <div class="scorecards" id="scorecards"></div>
+  <div class="scorecard" id="scorecard"></div>
 
   <div class="play-area">
     <div class="turn-indicator" id="turnIndicator"></div>
-
     <div class="dice-container" id="diceContainer"></div>
-
     <div class="controls-row">
       <div class="roll-info" id="rollInfo"></div>
       <button id="rollBtn" onclick="rollDice()">Roll Dice</button>
@@ -271,7 +246,7 @@ td.total {
 
 <script>
 /* ============================================================================
-   GAME DATA & CONSTANTS
+   GAME DATA
 ============================================================================ */
 const CATEGORIES = [
   { key: "ones", label: "Ones", upper: true },
@@ -292,7 +267,7 @@ const CATEGORIES = [
 let gameState;
 
 /* ============================================================================
-   INITIALIZATION
+   INIT
 ============================================================================ */
 function newGame() {
   gameState = {
@@ -302,253 +277,204 @@ function newGame() {
     ],
     currentPlayer: 0,
     dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
-    rollsLeft: 3,
-    gameOver: false
+    rollsLeft: 3
   };
   render();
 }
-
 newGame();
 
 /* ============================================================================
-   RENDERING
+   RENDER
 ============================================================================ */
 function render() {
-  renderScorecards();
+  renderScorecard();
   renderDice();
   renderControls();
 }
 
-function renderScorecards() {
-  const container = document.getElementById("scorecards");
-  container.innerHTML = "";
+function renderScorecard() {
+  const el = document.getElementById("scorecard");
+  el.innerHTML = "";
 
-  gameState.players.forEach((player, idx) => {
-    const card = document.createElement("div");
-    card.className = "scorecard" + (idx === gameState.currentPlayer ? " active" : "");
+  const table = document.createElement("table");
 
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "player-name";
-    const nameInput = document.createElement("input");
-    nameInput.value = player.name;
-    nameInput.onchange = e => player.name = e.target.value;
-    nameDiv.appendChild(nameInput);
-    card.appendChild(nameDiv);
+  // Header
+  const head = document.createElement("tr");
+  head.innerHTML = `
+    <th></th>
+    <th class="player ${gameState.currentPlayer===0?"active":""}">
+      <input class="player-name" value="${gameState.players[0].name}"
+        onchange="gameState.players[0].name=this.value">
+    </th>
+    <th class="player ${gameState.currentPlayer===1?"active":""}">
+      <input class="player-name" value="${gameState.players[1].name}"
+        onchange="gameState.players[1].name=this.value">
+    </th>`;
+  table.appendChild(head);
 
-    const table = document.createElement("table");
+  table.appendChild(sectionRow("Upper Section"));
 
-    CATEGORIES.forEach(cat => {
-      const tr = document.createElement("tr");
-      const tdLabel = document.createElement("td");
-      tdLabel.className = "label";
-      tdLabel.textContent = cat.label;
+  CATEGORIES.filter(c=>c.upper).forEach(c=>addCategoryRow(table,c));
 
-      const tdScore = document.createElement("td");
-      tdScore.className = "score";
-      const val = player.scores[cat.key];
+  table.appendChild(totalRow("Upper Total", p=>calcTotals(p).upper));
+  table.appendChild(totalRow("Upper Bonus", p=>calcTotals(p).upperBonus));
 
-      if (val != null) {
-        tdScore.textContent = val;
-        tdScore.classList.add("used");
-      } else if (idx === gameState.currentPlayer && gameState.rollsLeft < 3) {
-        tdScore.textContent = previewScore(cat.key);
-        tdScore.onclick = () => assignScore(cat.key);
-      } else {
-        tdScore.textContent = "";
-      }
+  table.appendChild(sectionRow("Lower Section"));
 
-      tr.appendChild(tdLabel);
-      tr.appendChild(tdScore);
-      table.appendChild(tr);
-    });
+  CATEGORIES.filter(c=>!c.upper).forEach(c=>addCategoryRow(table,c));
 
-    const totals = calculateTotals(player);
-    [
-      ["Upper Total", totals.upper],
-      ["Upper Bonus", totals.upperBonus],
-      ["Lower Total", totals.lower],
-      ["Grand Total", totals.grand]
-    ].forEach(([label, value]) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td class="label total">${label}</td><td class="score total">${value}</td>`;
-      table.appendChild(tr);
-    });
+  table.appendChild(totalRow("Lower Total", p=>calcTotals(p).lower));
+  table.appendChild(totalRow("Grand Total", p=>calcTotals(p).grand));
 
-    card.appendChild(table);
-    container.appendChild(card);
+  el.appendChild(table);
+}
+
+function sectionRow(label) {
+  const tr = document.createElement("tr");
+  tr.className = "section";
+  tr.innerHTML = `<td colspan="3">${label}</td>`;
+  return tr;
+}
+
+function totalRow(label, fn) {
+  const tr = document.createElement("tr");
+  tr.className = "total";
+  tr.innerHTML = `
+    <td>${label}</td>
+    <td style="text-align:center">${fn(gameState.players[0])}</td>
+    <td style="text-align:center">${fn(gameState.players[1])}</td>`;
+  return tr;
+}
+
+function addCategoryRow(table, cat) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="label">${cat.label}</td>`;
+  gameState.players.forEach((p, i) => {
+    const td = document.createElement("td");
+    td.className = "score";
+    const val = p.scores[cat.key];
+    if (val != null) {
+      td.textContent = val;
+      td.classList.add("used");
+    } else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
+      td.textContent = previewScore(cat.key);
+      td.onclick = () => assignScore(cat.key);
+    }
+    tr.appendChild(td);
   });
+  table.appendChild(tr);
 }
 
 function renderDice() {
-  const container = document.getElementById("diceContainer");
-  container.innerHTML = "";
-
-  gameState.dice.forEach((die, i) => {
-    const div = document.createElement("div");
-    div.className = "die" + (die.held ? " held" : "");
-    div.textContent = die.value;
-    div.onclick = () => {
-      if (gameState.rollsLeft < 3) {
-        die.held = !die.held;
+  const c = document.getElementById("diceContainer");
+  c.innerHTML = "";
+  gameState.dice.forEach(d=>{
+    const el = document.createElement("div");
+    el.className = "die" + (d.held?" held":"");
+    el.textContent = d.value;
+    el.onclick = ()=>{
+      if (gameState.rollsLeft<3) {
+        d.held=!d.held;
         renderDice();
       }
     };
-    container.appendChild(div);
+    c.appendChild(el);
   });
 }
 
 function renderControls() {
   document.getElementById("turnIndicator").textContent =
     `${gameState.players[gameState.currentPlayer].name}'s Turn`;
-
   document.getElementById("rollInfo").textContent =
     `Rolls left: ${gameState.rollsLeft}`;
-
-  document.getElementById("rollBtn").disabled =
-    gameState.rollsLeft === 0;
+  document.getElementById("rollBtn").disabled = gameState.rollsLeft===0;
 }
 
 /* ============================================================================
-   GAME ACTIONS
+   GAMEPLAY
 ============================================================================ */
 function rollDice() {
-  if (gameState.rollsLeft === 0) return;
-
-  gameState.dice.forEach(d => {
-    if (!d.held) {
-      d.value = Math.floor(Math.random() * 6) + 1;
-    }
+  if (!gameState.rollsLeft) return;
+  gameState.dice.forEach(d=>{
+    if(!d.held) d.value = Math.floor(Math.random()*6)+1;
   });
-
   gameState.rollsLeft--;
   render();
 }
 
-function assignScore(category) {
-  const player = gameState.players[gameState.currentPlayer];
-  if (player.scores[category] != null) return;
-
-  const score = calculateScore(category);
-  player.scores[category] = score;
-
-  if (category === "yahtzee" && score === 50) {
-    if (player.scores.yahtzee === 50 && player.yahtzeeBonus != null) {
-      player.yahtzeeBonus += 100;
-    }
-  }
-
+function assignScore(cat) {
+  const p = gameState.players[gameState.currentPlayer];
+  if (p.scores[cat]!=null) return;
+  p.scores[cat] = calcScore(cat);
   endTurn();
 }
 
 function endTurn() {
-  gameState.dice.forEach(d => d.held = false);
-  gameState.rollsLeft = 3;
-  gameState.currentPlayer = 1 - gameState.currentPlayer;
+  gameState.dice.forEach(d=>d.held=false);
+  gameState.rollsLeft=3;
+  gameState.currentPlayer=1-gameState.currentPlayer;
   render();
 }
 
 /* ============================================================================
-   SCORING LOGIC
+   SCORING
 ============================================================================ */
-function calculateScore(category) {
-  const values = gameState.dice.map(d => d.value);
-  const counts = countDice(values);
-  const sum = values.reduce((a,b)=>a+b,0);
-
-  switch (category) {
-    case "ones": return counts[1]*1;
-    case "twos": return counts[2]*2;
-    case "threes": return counts[3]*3;
-    case "fours": return counts[4]*4;
-    case "fives": return counts[5]*5;
-    case "sixes": return counts[6]*6;
-    case "threeKind": return hasKind(counts,3)?sum:0;
-    case "fourKind": return hasKind(counts,4)?sum:0;
-    case "fullHouse": return isFullHouse(counts)?25:0;
-    case "smallStraight": return isSmallStraight(values)?30:0;
-    case "largeStraight": return isLargeStraight(values)?40:0;
-    case "yahtzee": return hasKind(counts,5)?50:0;
-    case "chance": return sum;
+function calcScore(cat) {
+  const v = gameState.dice.map(d=>d.value);
+  const c = count(v);
+  const s = v.reduce((a,b)=>a+b,0);
+  switch(cat){
+    case"ones":return c[1]*1;
+    case"twos":return c[2]*2;
+    case"threes":return c[3]*3;
+    case"fours":return c[4]*4;
+    case"fives":return c[5]*5;
+    case"sixes":return c[6]*6;
+    case"threeKind":return has(c,3)?s:0;
+    case"fourKind":return has(c,4)?s:0;
+    case"fullHouse":return fh(c)?25:0;
+    case"smallStraight":return ss(v)?30:0;
+    case"largeStraight":return ls(v)?40:0;
+    case"yahtzee":return has(c,5)?50:0;
+    case"chance":return s;
   }
 }
+const previewScore = calcScore;
+const count = v => v.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{});
+const has = (c,n)=>Object.values(c).some(x=>x>=n);
+const fh = c=>Object.values(c).includes(3)&&Object.values(c).includes(2);
+const ss = v=>[[1,2,3,4],[2,3,4,5],[3,4,5,6]].some(s=>s.every(x=>v.includes(x)));
+const ls = v=>["1,2,3,4,5","2,3,4,5,6"].includes([...new Set(v)].sort().join());
 
-function previewScore(category) {
-  return calculateScore(category);
-}
-
-function countDice(values) {
-  const c = {};
-  values.forEach(v => c[v] = (c[v]||0)+1);
-  return c;
-}
-
-function hasKind(counts,n) {
-  return Object.values(counts).some(c=>c>=n);
-}
-
-function isFullHouse(counts) {
-  const vals = Object.values(counts);
-  return vals.includes(3) && vals.includes(2);
-}
-
-function isSmallStraight(values) {
-  const set = [...new Set(values)].sort();
-  return (
-    [1,2,3,4].every(v=>set.includes(v)) ||
-    [2,3,4,5].every(v=>set.includes(v)) ||
-    [3,4,5,6].every(v=>set.includes(v))
-  );
-}
-
-function isLargeStraight(values) {
-  const set = [...new Set(values)].sort().join();
-  return set === "1,2,3,4,5" || set === "2,3,4,5,6";
-}
-
-function calculateTotals(player) {
-  let upper = 0, lower = 0;
+function calcTotals(p){
+  let u=0,l=0;
   CATEGORIES.forEach(c=>{
-    const v = player.scores[c.key];
-    if (v != null) {
-      if (c.upper) upper += v;
-      else lower += v;
-    }
+    const v=p.scores[c.key];
+    if(v!=null) c.upper?u+=v:l+=v;
   });
-  const upperBonus = upper >= 63 ? 35 : 0;
-  return {
-    upper,
-    upperBonus,
-    lower,
-    grand: upper + upperBonus + lower + (player.yahtzeeBonus||0)
-  };
+  const ub=u>=63?35:0;
+  return {upper:u,upperBonus:ub,lower:l,grand:u+ub+l};
 }
 
 /* ============================================================================
    SAVE / LOAD
 ============================================================================ */
 function saveGame() {
-  const data = JSON.stringify(gameState, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "yahtzee-game.json";
+  const blob=new Blob([JSON.stringify(gameState,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="yahtzee-game.json";
   a.click();
 }
-
 function loadGame() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-  input.onchange = e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      gameState = JSON.parse(reader.result);
-      render();
-    };
-    reader.readAsText(file);
+  const i=document.createElement("input");
+  i.type="file";i.accept="application/json";
+  i.onchange=e=>{
+    const r=new FileReader();
+    r.onload=()=>{gameState=JSON.parse(r.result);render();};
+    r.readAsText(e.target.files[0]);
   };
-  input.click();
+  i.click();
 }
 </script>
 </body>
