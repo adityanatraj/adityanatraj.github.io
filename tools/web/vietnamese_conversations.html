@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vietnamese Conversations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .poster {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 60px 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a1a1a;
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .flag {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        
+        .audio-notice {
+            text-align: center;
+            background: transparent;
+            padding: 20px;
+            margin-bottom: 60px;
+            color: #999;
+            font-weight: 300;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .section {
+            margin-bottom: 80px;
+        }
+        
+        h2 {
+            color: #1a1a1a;
+            padding: 0;
+            margin-bottom: 40px;
+            font-size: 1.3em;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 15px;
+        }
+        
+        .conversation {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .conversation-title {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        
+        .exchange {
+            margin-bottom: 25px;
+            display: grid;
+            gap: 1px;
+            background: #e0e0e0;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .line {
+            background: white;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .line:hover {
+            background: #f5f5f5;
+        }
+        
+        .line::after {
+            content: '○';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9em;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+            color: #1a1a1a;
+        }
+        
+        .line:hover::after {
+            opacity: 0.6;
+        }
+        
+        .speaker {
+            font-size: 0.75em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+        
+        .vietnamese {
+            font-size: 1.3em;
+            font-weight: 300;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .english {
+            color: #999;
+            font-size: 0.95em;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .pronunciation {
+            color: #666;
+            font-size: 0.85em;
+            font-style: italic;
+            font-weight: 300;
+        }
+        
+        .note {
+            background: white;
+            border-left: 2px solid #1a1a1a;
+            padding: 20px 25px;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.95em;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+        
+        .playing {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @media (max-width: 768px) {
+            .poster {
+                padding: 40px 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                letter-spacing: 4px;
+            }
+            
+            .subtitle {
+                font-size: 0.9em;
+            }
+            
+            .section {
+                margin-bottom: 60px;
+            }
+            
+            h2 {
+                font-size: 1.1em;
+                margin-bottom: 30px;
+            }
+            
+            .conversation {
+                padding: 25px 20px;
+            }
+            
+            .line {
+                padding: 20px;
+            }
+            
+            .vietnamese {
+                font-size: 1.15em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const synth = window.speechSynthesis;
+        let vietnameseVoice = null;
+        
+        function loadVoices() {
+            const voices = synth.getVoices();
+            vietnameseVoice = voices.find(voice => voice.lang.startsWith('vi')) || voices[0];
+        }
+        
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        
+        function speak(text, element) {
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'vi-VN';
+            utterance.rate = 0.8;
+            
+            if (vietnameseVoice) {
+                utterance.voice = vietnameseVoice;
+            }
+            
+            element.classList.add('playing');
+            utterance.onend = () => {
+                element.classList.remove('playing');
+            };
+            
+            synth.speak(utterance);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.line').forEach(line => {
+                line.addEventListener('click', function() {
+                    const vietnamese = this.querySelector('.vietnamese').textContent;
+                    speak(vietnamese, this);
+                });
+            });
+        });
+    </script>
+    <div class="poster">
+        <div class="flag">🇻🇳</div>
+        <h1>Conversations</h1>
+        <div class="subtitle">Practical Vietnamese Dialogues</div>
+        <div class="audio-notice">Click any line to hear pronunciation</div>
+        
+        <div class="section">
+            <h2>At the Food Vendor</h2>
+            
+            <div class="conversation">
+                <div class="conversation-title">Asking What They Have</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Chào chị, chị có gì?</div>
+                        <div class="english">Hello, what do you have?</div>
+                        <div class="pronunciation">chow chee, chee go zee</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Vendor</div>
+                        <div class="vietnamese">Em có phở, bún chả, bánh mì</div>
+                        <div class="english">I have pho, bun cha, banh mi</div>
+                        <div class="pronunciation">em go fuh, boon cha, ban mee</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Asking What It's Made Of</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cái này làm từ gì?</div>
+                        <div class="english">What is this made of?</div>
+                        <div class="pronunciation">kai nai lam tu zee</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Vendor</div>
+                        <div class="vietnamese">Cái này làm từ thịt gà</div>
+                        <div class="english">This is made from chicken</div>
+                        <div class="pronunciation">kai nai lam tu tit ga</div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    Common ingredients: thịt bò (beef / tit bo), thịt heo (pork / tit heh-o), tôm (shrimp / tom), cá (fish / ga), rau (vegetables / zow)
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Asking About Spiciness</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cái này có cay không?</div>
+                        <div class="english">Is this spicy?</div>
+                        <div class="pronunciation">kai nai go kai kohm</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Làm không cay giúp em</div>
+                        <div class="english">Please make it not spicy</div>
+                        <div class="pronunciation">lam kohm kai yoop em</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cay một chút thôi</div>
+                        <div class="english">Just a little spicy</div>
+                        <div class="pronunciation">kai mot choot toy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Ordering to Try</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cho em một cái này</div>
+                        <div class="english">Give me one of these</div>
+                        <div class="pronunciation">cho em mot kai nai</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Em muốn thử cái đó</div>
+                        <div class="english">I want to try that one</div>
+                        <div class="pronunciation">em moo-on tu kai do</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Chị nghĩ em nên ăn gì?</div>
+                        <div class="english">What do you think I should eat?</div>
+                        <div class="pronunciation">chee ngee em nen an zee</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Món nào ngon nhất?</div>
+                        <div class="english">Which dish is the best?</div>
+                        <div class="pronunciation">mon now ngon nyut</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Special Requests</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Không có hành được không?</div>
+                        <div class="english">Can I have it without onions?</div>
+                        <div class="pronunciation">kohm go han duck kohm</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cho nhiều rau</div>
+                        <div class="english">Lots of vegetables please</div>
+                        <div class="pronunciation">cho nyew zow</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Ít đường thôi</div>
+                        <div class="english">Less sugar please</div>
+                        <div class="pronunciation">it doo-ung toy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Shopping & Negotiating</h2>
+            
+            <div class="conversation">
+                <div class="conversation-title">Asking the Price</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Cái này bao nhiêu tiền?</div>
+                        <div class="english">How much is this?</div>
+                        <div class="pronunciation">kai nai bow nyew tyen</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Seller</div>
+                        <div class="vietnamese">Cái này hai trăm nghìn</div>
+                        <div class="english">This is 200,000</div>
+                        <div class="pronunciation">kai nai hai tram ngin</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Price Too High - Negotiating</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Đắt quá!</div>
+                        <div class="english">Too expensive!</div>
+                        <div class="pronunciation">dat gwa</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Giảm giá được không?</div>
+                        <div class="english">Can you give a discount?</div>
+                        <div class="pronunciation">zam za duck kohm</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Rẻ hơn đi chị</div>
+                        <div class="english">Make it cheaper please</div>
+                        <div class="pronunciation">zeh hun dee chee</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Seller</div>
+                        <div class="vietnamese">Vậy một trăm tám mươi</div>
+                        <div class="english">Okay, 180,000</div>
+                        <div class="pronunciation">vay mot tram tam moo-ee</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Making a Counter Offer</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Một trăm nghìn được không?</div>
+                        <div class="english">How about 100,000?</div>
+                        <div class="pronunciation">mot tram ngin duck kohm</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Em chỉ có một trăm lăm</div>
+                        <div class="english">I only have 150,000</div>
+                        <div class="pronunciation">em chee go mot tram lam</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Seller</div>
+                        <div class="vietnamese">Không được, thấp quá</div>
+                        <div class="english">No, that's too low</div>
+                        <div class="pronunciation">kohm duck, tap gwa</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Seller</div>
+                        <div class="vietnamese">Được rồi, một trăm sáu mươi</div>
+                        <div class="english">Okay, 160,000</div>
+                        <div class="pronunciation">duck zoy, mot tram sow moo-ee</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Closing the Deal</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Được, em lấy</div>
+                        <div class="english">Okay, I'll take it</div>
+                        <div class="pronunciation">duck, em lay</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Em mua hai cái</div>
+                        <div class="english">I'll buy two</div>
+                        <div class="pronunciation">em moo-a hai kai</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Mua nhiều rẻ hơn không?</div>
+                        <div class="english">Is it cheaper if I buy more?</div>
+                        <div class="pronunciation">moo-a nyew zeh hun kohm</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conversation">
+                <div class="conversation-title">Walking Away Strategy</div>
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">You</div>
+                        <div class="vietnamese">Thôi, em đi chỗ khác</div>
+                        <div class="english">Never mind, I'll go somewhere else</div>
+                        <div class="pronunciation">toy, em dee cho kak</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Seller</div>
+                        <div class="vietnamese">Đợi đã! Giá cuối cùng!</div>
+                        <div class="english">Wait! Final price!</div>
+                        <div class="pronunciation">dur da! za kwee kung</div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    Tip: In markets, vendors often expect negotiation. Start at 50-60% of the asking price. Be friendly and smile. Walking away often brings the best offer.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Useful Food Vocabulary</h2>
+            
+            <div class="conversation">
+                <div class="exchange">
+                    <div class="line">
+                        <div class="speaker">Phrase</div>
+                        <div class="vietnamese">Ăn ở đây / Mang về</div>
+                        <div class="english">Eat here / Take away</div>
+                        <div class="pronunciation">an ur day / mang veh</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Phrase</div>
+                        <div class="vietnamese">Có chỗ ngồi không?</div>
+                        <div class="english">Is there a place to sit?</div>
+                        <div class="pronunciation">go cho ngoy kohm</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Phrase</div>
+                        <div class="vietnamese">Cho em thêm...</div>
+                        <div class="english">Give me more...</div>
+                        <div class="pronunciation">cho em tem</div>
+                    </div>
+                    <div class="line">
+                        <div class="speaker">Phrase</div>
+                        <div class="vietnamese">Đủ rồi, cảm ơn</div>
+                        <div class="english">That's enough, thank you</div>
+                        <div class="pronunciation">doo zoy, gam un</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
