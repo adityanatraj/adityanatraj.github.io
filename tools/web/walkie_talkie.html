@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>P2P Walkie Talkie</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 100vh;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				margin: 0;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+				padding: 10px;
+			}
+
+			.container {
+				width: 100%;
+				max-width: 500px;
+				padding: 30px;
+				background-color: #fff;
+				border-radius: 16px;
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+				text-align: center;
+			}
+
+			h1 {
+				margin: 0 0 10px 0;
+				font-weight: 700;
+				font-size: 1.8em;
+				color: #333;
+			}
+
+			.subtitle {
+				margin: 0 0 25px 0;
+				font-size: 0.9em;
+				color: #666;
+			}
+
+			.status {
+				padding: 12px;
+				margin: 15px 0;
+				border-radius: 8px;
+				font-weight: 500;
+				font-size: 0.95em;
+			}
+
+			.status.disconnected {
+				background-color: #fee;
+				color: #c33;
+			}
+
+			.status.connecting {
+				background-color: #fef8e7;
+				color: #b8860b;
+			}
+
+			.status.connected {
+				background-color: #e8f5e9;
+				color: #2e7d32;
+			}
+
+			.btn {
+				width: 100%;
+				padding: 14px 20px;
+				margin: 8px 0;
+				font-size: 1em;
+				font-weight: 600;
+				background-color: #667eea;
+				color: #fff;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.3s;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.btn:hover:not(:disabled) {
+				background-color: #5568d3;
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+			}
+
+			.btn:disabled {
+				background-color: #ccc;
+				cursor: not-allowed;
+				transform: none;
+			}
+
+			.btn.secondary {
+				background-color: #764ba2;
+			}
+
+			.btn.secondary:hover:not(:disabled) {
+				background-color: #643a8c;
+			}
+
+			.btn.success {
+				background-color: #2e7d32;
+			}
+
+			.btn.success:hover:not(:disabled) {
+				background-color: #1b5e20;
+			}
+
+			.btn-talk {
+				width: 200px;
+				height: 200px;
+				border-radius: 50%;
+				font-size: 1.2em;
+				margin: 20px auto;
+				background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				border: 5px solid #fff;
+				box-shadow: 0 8px 24px rgba(245, 87, 108, 0.3);
+				touch-action: none;
+			}
+
+			.btn-talk:active:not(:disabled) {
+				transform: scale(0.95);
+				box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+			}
+
+			.btn-talk.talking {
+				background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+				animation: pulse 0.8s infinite;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+			}
+
+			#qrcode,
+			#answerQrcode {
+				margin: 20px 0;
+				display: flex;
+				justify-content: center;
+				min-height: 50px;
+			}
+
+			#qrcode canvas,
+			#answerQrcode canvas {
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+
+			.section {
+				margin: 25px 0;
+				padding: 20px;
+				background-color: #f8f9fa;
+				border-radius: 8px;
+			}
+
+			.section h3 {
+				margin: 0 0 15px 0;
+				font-size: 1.1em;
+				color: #555;
+			}
+
+			.step {
+				margin: 20px 0;
+				padding: 15px;
+				background-color: #f8f9fa;
+				border-radius: 8px;
+				border-left: 4px solid #667eea;
+			}
+
+			.step h3 {
+				margin: 0 0 10px 0;
+				font-size: 1em;
+				color: #667eea;
+				font-weight: 600;
+			}
+
+			.step.completed {
+				border-left-color: #2e7d32;
+				background-color: #e8f5e9;
+			}
+
+			.step.completed h3 {
+				color: #2e7d32;
+			}
+
+			.step.completed h3::before {
+				content: "✓ ";
+			}
+
+			.step.pending h3::before {
+				content: "⏳ ";
+			}
+
+			textarea {
+				width: 100%;
+				min-height: 80px;
+				padding: 10px;
+				font-family: monospace;
+				font-size: 0.75em;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				resize: vertical;
+				margin: 8px 0;
+			}
+
+			textarea:focus {
+				outline: none;
+				border-color: #667eea;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			.video-container {
+				margin: 15px 0;
+				position: relative;
+			}
+
+			#reader,
+			#hostReader {
+				width: 100%;
+				border-radius: 8px;
+				overflow: hidden;
+			}
+
+			.peer-info {
+				font-size: 0.85em;
+				color: #666;
+				margin: 10px 0;
+			}
+
+			.audio-indicator {
+				display: inline-block;
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+				margin-left: 8px;
+				background-color: #ccc;
+			}
+
+			.audio-indicator.active {
+				background-color: #4caf50;
+				animation: blink 0.5s infinite;
+			}
+
+			@keyframes blink {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.3;
+				}
+			}
+
+			.mode-selector {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 20px;
+			}
+
+			.mode-selector .btn {
+				flex: 1;
+			}
+
+			.collapsible {
+				margin-top: 15px;
+				padding-top: 15px;
+				border-top: 1px solid #ddd;
+			}
+
+			.collapsible-toggle {
+				background: none;
+				border: none;
+				color: #667eea;
+				cursor: pointer;
+				font-size: 0.85em;
+				padding: 5px;
+				text-decoration: underline;
+			}
+
+			.collapsible-content {
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>🔊 Walkie Talkie</h1>
+			<p class="subtitle">
+				Peer-to-peer voice communication over local network
+			</p>
+
+			<div class="status disconnected" id="status">Ready to start</div>
+
+			<div id="setupScreen">
+				<div class="mode-selector">
+					<button class="btn" id="btnHost">Host Session</button>
+					<button class="btn secondary" id="btnJoin">Join Session</button>
+				</div>
+			</div>
+
+			<div id="hostScreen" class="hidden">
+				<div class="step completed">
+					<h3>Step 1: Show QR to peer</h3>
+					<p style="font-size: 0.9em; margin: 10px 0">
+						Have your peer scan this code with their camera:
+					</p>
+					<div id="qrcode"></div>
+				</div>
+
+				<div class="step pending" id="hostStep2">
+					<h3>Step 2: Scan their answer QR</h3>
+					<p style="font-size: 0.9em; margin: 10px 0">
+						After they scan your code, scan theirs:
+					</p>
+					<button class="btn success" id="btnScanAnswer">Scan Answer QR</button>
+					<div id="hostReader" class="video-container hidden"></div>
+				</div>
+
+				<div class="collapsible">
+					<button class="collapsible-toggle" id="toggleHostManual">
+						Show manual connection option
+					</button>
+					<div class="collapsible-content hidden" id="hostManualContent">
+						<p style="font-size: 0.85em; color: #666; margin: 10px 0">
+							If camera doesn't work, use manual exchange:
+						</p>
+						<textarea id="offerText" readonly></textarea>
+						<button class="btn" id="btnCopyOffer">Copy Offer</button>
+						<p style="font-size: 0.85em; color: #666; margin: 15px 0 5px 0">
+							Paste answer from peer:
+						</p>
+						<textarea
+							id="answerInput"
+							placeholder="Paste answer here..."
+						></textarea>
+						<button class="btn secondary" id="btnSetAnswer">Connect</button>
+					</div>
+				</div>
+
+				<button
+					class="btn secondary"
+					id="btnCancelHost"
+					style="margin-top: 20px"
+				>
+					Cancel
+				</button>
+			</div>
+
+			<div id="joinScreen" class="hidden">
+				<div class="step pending" id="joinStep1">
+					<h3>Step 1: Scan host's QR code</h3>
+					<p style="font-size: 0.9em; margin: 10px 0">
+						Point your camera at the host's QR code:
+					</p>
+					<button class="btn success" id="btnStartScan">Start Camera</button>
+					<div id="reader" class="video-container hidden"></div>
+				</div>
+
+				<div class="step pending hidden" id="joinStep2">
+					<h3>Step 2: Show your answer QR</h3>
+					<p style="font-size: 0.9em; margin: 10px 0">
+						Show this code to the host so they can scan it:
+					</p>
+					<div id="answerQrcode"></div>
+					<p style="font-size: 0.85em; color: #666; margin-top: 10px">
+						Waiting for host to scan...
+					</p>
+				</div>
+
+				<div class="collapsible">
+					<button class="collapsible-toggle" id="toggleJoinManual">
+						Show manual connection option
+					</button>
+					<div class="collapsible-content hidden" id="joinManualContent">
+						<p style="font-size: 0.85em; color: #666; margin: 10px 0">
+							Paste offer from host:
+						</p>
+						<textarea
+							id="offerInput"
+							placeholder="Paste offer here..."
+						></textarea>
+						<button class="btn secondary" id="btnConnect">Connect</button>
+						<div class="hidden" id="answerSection" style="margin-top: 15px">
+							<p style="font-size: 0.85em; color: #666; margin: 5px 0">
+								Copy this answer to host:
+							</p>
+							<textarea id="answerText" readonly></textarea>
+							<button class="btn" id="btnCopyAnswer">Copy Answer</button>
+						</div>
+					</div>
+				</div>
+
+				<button
+					class="btn secondary"
+					id="btnCancelJoin"
+					style="margin-top: 20px"
+				>
+					Cancel
+				</button>
+			</div>
+
+			<div id="talkScreen" class="hidden">
+				<div class="peer-info">
+					<span id="peerCount">Connected!</span>
+					<span class="audio-indicator" id="audioIndicator"></span>
+				</div>
+
+				<button class="btn btn-talk" id="btnTalk">
+					<span id="talkText">HOLD TO TALK</span>
+				</button>
+
+				<button class="btn secondary" id="btnDisconnect">Disconnect</button>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+		<script>
+			(function () {
+				"use strict";
+
+				let peerConnection = null;
+				let localStream = null;
+				let remoteAudio = new Audio();
+				let isHost = false;
+				let isTalking = false;
+				let html5QrCodeScanner = null;
+
+				const config = {
+					iceServers: [
+						{ urls: "stun:stun.l.google.com:19302" },
+						{ urls: "stun:stun1.l.google.com:19302" },
+					],
+				};
+
+				const elements = {
+					status: document.getElementById("status"),
+					setupScreen: document.getElementById("setupScreen"),
+					hostScreen: document.getElementById("hostScreen"),
+					joinScreen: document.getElementById("joinScreen"),
+					talkScreen: document.getElementById("talkScreen"),
+					btnHost: document.getElementById("btnHost"),
+					btnJoin: document.getElementById("btnJoin"),
+					btnTalk: document.getElementById("btnTalk"),
+					btnDisconnect: document.getElementById("btnDisconnect"),
+					qrcode: document.getElementById("qrcode"),
+					answerQrcode: document.getElementById("answerQrcode"),
+					btnStartScan: document.getElementById("btnStartScan"),
+					btnScanAnswer: document.getElementById("btnScanAnswer"),
+					reader: document.getElementById("reader"),
+					hostReader: document.getElementById("hostReader"),
+					joinStep1: document.getElementById("joinStep1"),
+					joinStep2: document.getElementById("joinStep2"),
+					hostStep2: document.getElementById("hostStep2"),
+					peerCount: document.getElementById("peerCount"),
+					audioIndicator: document.getElementById("audioIndicator"),
+					talkText: document.getElementById("talkText"),
+					offerText: document.getElementById("offerText"),
+					answerInput: document.getElementById("answerInput"),
+					offerInput: document.getElementById("offerInput"),
+					answerText: document.getElementById("answerText"),
+					btnCopyOffer: document.getElementById("btnCopyOffer"),
+					btnCopyAnswer: document.getElementById("btnCopyAnswer"),
+					btnSetAnswer: document.getElementById("btnSetAnswer"),
+					btnConnect: document.getElementById("btnConnect"),
+					answerSection: document.getElementById("answerSection"),
+					toggleHostManual: document.getElementById("toggleHostManual"),
+					hostManualContent: document.getElementById("hostManualContent"),
+					toggleJoinManual: document.getElementById("toggleJoinManual"),
+					joinManualContent: document.getElementById("joinManualContent"),
+					btnCancelHost: document.getElementById("btnCancelHost"),
+					btnCancelJoin: document.getElementById("btnCancelJoin"),
+				};
+
+				function setStatus(message, type) {
+					elements.status.textContent = message;
+					elements.status.className = `status ${type}`;
+				}
+
+				function showScreen(screen) {
+					elements.setupScreen.classList.add("hidden");
+					elements.hostScreen.classList.add("hidden");
+					elements.joinScreen.classList.add("hidden");
+					elements.talkScreen.classList.add("hidden");
+
+					if (screen) screen.classList.remove("hidden");
+				}
+
+				async function initAudio() {
+					try {
+						localStream = await navigator.mediaDevices.getUserMedia({
+							audio: {
+								echoCancellation: true,
+								noiseSuppression: true,
+								autoGainControl: true,
+							},
+							video: false,
+						});
+						localStream.getTracks().forEach((track) => (track.enabled = false));
+						return true;
+					} catch (err) {
+						alert(
+							"Microphone access denied. Please allow microphone access and refresh.",
+						);
+						return false;
+					}
+				}
+
+				function createPeerConnection(onIceComplete) {
+					peerConnection = new RTCPeerConnection(config);
+
+					peerConnection.onicecandidate = (event) => {
+						if (event.candidate === null && onIceComplete) {
+							onIceComplete(peerConnection.localDescription);
+						}
+					};
+
+					peerConnection.ontrack = (event) => {
+						remoteAudio.srcObject = event.streams[0];
+						remoteAudio.play();
+					};
+
+					peerConnection.onconnectionstatechange = () => {
+						const state = peerConnection.connectionState;
+						if (state === "connected") {
+							setStatus("Connected", "connected");
+							showScreen(elements.talkScreen);
+						} else if (state === "disconnected" || state === "failed") {
+							setStatus("Connection lost", "disconnected");
+							disconnect();
+						} else if (state === "connecting") {
+							setStatus("Connecting...", "connecting");
+						}
+					};
+
+					if (localStream) {
+						localStream.getTracks().forEach((track) => {
+							peerConnection.addTrack(track, localStream);
+						});
+					}
+				}
+
+				async function hostSession() {
+					isHost = true;
+
+					if (!(await initAudio())) return;
+
+					createPeerConnection((offer) => {
+						const offerData = JSON.stringify(offer);
+						elements.offerText.value = offerData;
+
+						const currentUrl = window.location.href.split("#")[0].split("?")[0];
+						const encodedOffer = btoa(offerData);
+						const shareUrl = `${currentUrl}#offer=${encodedOffer}`;
+
+						elements.qrcode.innerHTML = "";
+						const canvas = document.createElement("canvas");
+						QRCode.toCanvas(
+							canvas,
+							shareUrl,
+							{
+								width: 280,
+								margin: 2,
+								errorCorrectionLevel: "L",
+								color: {
+									dark: "#667eea",
+									light: "#ffffff",
+								},
+							},
+							(error) => {
+								if (error) {
+									console.error(error);
+									alert("QR code generation failed. Use manual connection.");
+									return;
+								}
+								elements.qrcode.appendChild(canvas);
+							},
+						);
+					});
+
+					const offer = await peerConnection.createOffer();
+					await peerConnection.setLocalDescription(offer);
+
+					setStatus("Waiting for peer...", "connecting");
+					showScreen(elements.hostScreen);
+				}
+
+				async function joinSession() {
+					isHost = false;
+
+					if (!(await initAudio())) return;
+
+					showScreen(elements.joinScreen);
+					setStatus("Ready to join", "connecting");
+
+					checkForOfferInUrl();
+				}
+
+				function checkForOfferInUrl() {
+					const hash = window.location.hash;
+					if (hash.startsWith("#offer=")) {
+						const encodedOffer = hash.substring(7);
+						try {
+							const offerData = atob(encodedOffer);
+							connectToOffer(offerData, true);
+							elements.joinStep1.classList.add("completed");
+							elements.joinStep1.querySelector("h3").textContent =
+								"Step 1: Scan host's QR code";
+						} catch (err) {
+							console.error("Failed to parse offer from URL:", err);
+						}
+					}
+				}
+
+				async function connectToOffer(offerJson, autoScanned = false) {
+					try {
+						createPeerConnection((answer) => {
+							const answerData = JSON.stringify(answer);
+							elements.answerText.value = answerData;
+
+							const currentUrl = window.location.href
+								.split("#")[0]
+								.split("?")[0];
+							const encodedAnswer = btoa(answerData);
+							const answerUrl = `${currentUrl}#answer=${encodedAnswer}`;
+
+							elements.answerQrcode.innerHTML = "";
+							const answerCanvas = document.createElement("canvas");
+							QRCode.toCanvas(
+								answerCanvas,
+								answerUrl,
+								{
+									width: 280,
+									margin: 2,
+									errorCorrectionLevel: "L",
+									color: {
+										dark: "#2e7d32",
+										light: "#ffffff",
+									},
+								},
+								(error) => {
+									if (error) {
+										console.error(error);
+										return;
+									}
+									elements.answerQrcode.appendChild(answerCanvas);
+								},
+							);
+
+							elements.joinStep2.classList.remove("hidden");
+							elements.answerSection.classList.remove("hidden");
+						});
+
+						const offer = JSON.parse(offerJson);
+						await peerConnection.setRemoteDescription(
+							new RTCSessionDescription(offer),
+						);
+
+						const answer = await peerConnection.createAnswer();
+						await peerConnection.setLocalDescription(answer);
+
+						setStatus("Answer generated. Show QR to host.", "connecting");
+					} catch (err) {
+						alert("Invalid offer data. Please check and try again.");
+						console.error(err);
+					}
+				}
+
+				async function setAnswer(answerJson) {
+					try {
+						const answer = JSON.parse(answerJson);
+						await peerConnection.setRemoteDescription(
+							new RTCSessionDescription(answer),
+						);
+						setStatus("Connecting...", "connecting");
+						elements.hostStep2.classList.add("completed");
+					} catch (err) {
+						alert("Invalid answer data. Please check and try again.");
+						console.error(err);
+					}
+				}
+
+				function startTalking() {
+					if (!localStream || isTalking) return;
+
+					isTalking = true;
+					elements.btnTalk.classList.add("talking");
+					elements.talkText.textContent = "TALKING...";
+					elements.audioIndicator.classList.add("active");
+
+					localStream.getTracks().forEach((track) => (track.enabled = true));
+				}
+
+				function stopTalking() {
+					if (!localStream || !isTalking) return;
+
+					isTalking = false;
+					elements.btnTalk.classList.remove("talking");
+					elements.talkText.textContent = "HOLD TO TALK";
+					elements.audioIndicator.classList.remove("active");
+
+					localStream.getTracks().forEach((track) => (track.enabled = false));
+				}
+
+				function stopScanner() {
+					if (html5QrCodeScanner) {
+						html5QrCodeScanner.stop().catch((err) => console.error(err));
+						html5QrCodeScanner = null;
+					}
+				}
+
+				function disconnect() {
+					stopScanner();
+
+					if (peerConnection) {
+						peerConnection.close();
+						peerConnection = null;
+					}
+
+					if (localStream) {
+						localStream.getTracks().forEach((track) => track.stop());
+						localStream = null;
+					}
+
+					if (remoteAudio.srcObject) {
+						remoteAudio.srcObject.getTracks().forEach((track) => track.stop());
+						remoteAudio.srcObject = null;
+					}
+
+					isHost = false;
+					isTalking = false;
+
+					setStatus("Ready to start", "disconnected");
+					showScreen(elements.setupScreen);
+
+					elements.offerText.value = "";
+					elements.answerInput.value = "";
+					elements.offerInput.value = "";
+					elements.answerText.value = "";
+					elements.qrcode.innerHTML = "";
+					elements.answerQrcode.innerHTML = "";
+					elements.reader.classList.add("hidden");
+					elements.hostReader.classList.add("hidden");
+					elements.joinStep1.classList.remove("completed");
+					elements.joinStep2.classList.add("hidden");
+					elements.hostStep2.classList.remove("completed");
+					elements.answerSection.classList.add("hidden");
+
+					window.location.hash = "";
+				}
+
+				elements.btnHost.addEventListener("click", hostSession);
+				elements.btnJoin.addEventListener("click", joinSession);
+				elements.btnCancelHost.addEventListener("click", disconnect);
+				elements.btnCancelJoin.addEventListener("click", disconnect);
+
+				elements.btnStartScan.addEventListener("click", () => {
+					elements.reader.classList.remove("hidden");
+					elements.btnStartScan.disabled = true;
+
+					html5QrCodeScanner = new Html5Qrcode("reader");
+
+					html5QrCodeScanner
+						.start(
+							{ facingMode: "environment" },
+							{ fps: 10, qrbox: 250 },
+							(decodedText) => {
+								stopScanner();
+								elements.reader.classList.add("hidden");
+								elements.btnStartScan.disabled = false;
+
+								if (decodedText.includes("#offer=")) {
+									const hash = decodedText.split("#")[1];
+									if (hash.startsWith("offer=")) {
+										const encodedOffer = hash.substring(6);
+										try {
+											const offerData = atob(encodedOffer);
+											connectToOffer(offerData, true);
+											elements.joinStep1.classList.add("completed");
+										} catch (err) {
+											alert("Invalid QR code format.");
+										}
+									}
+								} else {
+									alert("Invalid QR code. Please scan the host's QR code.");
+								}
+							},
+							(errorMessage) => {
+								// Ignore scanning errors
+							},
+						)
+						.catch((err) => {
+							alert("Camera access denied or error: " + err);
+							elements.reader.classList.add("hidden");
+							elements.btnStartScan.disabled = false;
+						});
+				});
+
+				elements.btnScanAnswer.addEventListener("click", () => {
+					elements.hostReader.classList.remove("hidden");
+					elements.btnScanAnswer.disabled = true;
+
+					html5QrCodeScanner = new Html5Qrcode("hostReader");
+
+					html5QrCodeScanner
+						.start(
+							{ facingMode: "environment" },
+							{ fps: 10, qrbox: 250 },
+							(decodedText) => {
+								stopScanner();
+								elements.hostReader.classList.add("hidden");
+								elements.btnScanAnswer.disabled = false;
+
+								if (decodedText.includes("#answer=")) {
+									const hash = decodedText.split("#")[1];
+									if (hash.startsWith("answer=")) {
+										const encodedAnswer = hash.substring(7);
+										try {
+											const answerData = atob(encodedAnswer);
+											setAnswer(answerData);
+										} catch (err) {
+											alert("Invalid QR code format.");
+										}
+									}
+								} else {
+									alert(
+										"Invalid QR code. Please scan the joiner's answer QR code.",
+									);
+								}
+							},
+							(errorMessage) => {
+								// Ignore scanning errors
+							},
+						)
+						.catch((err) => {
+							alert("Camera access denied or error: " + err);
+							elements.hostReader.classList.add("hidden");
+							elements.btnScanAnswer.disabled = false;
+						});
+				});
+
+				elements.btnConnect.addEventListener("click", () => {
+					const offer = elements.offerInput.value.trim();
+					if (offer) {
+						connectToOffer(offer);
+					}
+				});
+
+				elements.btnSetAnswer.addEventListener("click", () => {
+					const answer = elements.answerInput.value.trim();
+					if (answer) {
+						setAnswer(answer);
+					}
+				});
+
+				elements.btnCopyOffer.addEventListener("click", () => {
+					elements.offerText.select();
+					navigator.clipboard.writeText(elements.offerText.value);
+					elements.btnCopyOffer.textContent = "Copied!";
+					setTimeout(() => {
+						elements.btnCopyOffer.textContent = "Copy Offer";
+					}, 2000);
+				});
+
+				elements.btnCopyAnswer.addEventListener("click", () => {
+					elements.answerText.select();
+					navigator.clipboard.writeText(elements.answerText.value);
+					elements.btnCopyAnswer.textContent = "Copied!";
+					setTimeout(() => {
+						elements.btnCopyAnswer.textContent = "Copy Answer";
+					}, 2000);
+				});
+
+				elements.toggleHostManual.addEventListener("click", () => {
+					elements.hostManualContent.classList.toggle("hidden");
+					elements.toggleHostManual.textContent =
+						elements.hostManualContent.classList.contains("hidden")
+							? "Show manual connection option"
+							: "Hide manual connection option";
+				});
+
+				elements.toggleJoinManual.addEventListener("click", () => {
+					elements.joinManualContent.classList.toggle("hidden");
+					elements.toggleJoinManual.textContent =
+						elements.joinManualContent.classList.contains("hidden")
+							? "Show manual connection option"
+							: "Hide manual connection option";
+				});
+
+				elements.btnTalk.addEventListener("mousedown", startTalking);
+				elements.btnTalk.addEventListener("mouseup", stopTalking);
+				elements.btnTalk.addEventListener("mouseleave", stopTalking);
+
+				elements.btnTalk.addEventListener("touchstart", (e) => {
+					e.preventDefault();
+					startTalking();
+				});
+				elements.btnTalk.addEventListener("touchend", (e) => {
+					e.preventDefault();
+					stopTalking();
+				});
+				elements.btnTalk.addEventListener("touchcancel", (e) => {
+					e.preventDefault();
+					stopTalking();
+				});
+
+				elements.btnDisconnect.addEventListener("click", disconnect);
+
+				window.addEventListener("beforeunload", () => {
+					disconnect();
+				});
+
+				setStatus("Ready to start", "disconnected");
+			})();
+		</script>
+	</body>
+</html>
