@@ -96,6 +96,7 @@ main {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 12px;
   padding: 12px;
+  padding-bottom: 80px;
 }
 
 @media (max-width: 900px) {
@@ -118,7 +119,7 @@ main {
 
 .scorecard th,
 .scorecard td {
-  padding: 6px;
+  padding: 12px 8px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -218,6 +219,61 @@ main {
 .roll-info {
   color: var(--muted);
 }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  color: var(--accent);
+  font-size: 28px;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+#winnerScores {
+  margin: 20px 0;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.score-line {
+  padding: 8px;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+
+.score-line.winner {
+  background: rgba(56, 189, 248, 0.2);
+  font-weight: 700;
+}
 </style>
 </head>
 
@@ -243,6 +299,14 @@ main {
     </div>
   </div>
 </main>
+
+<div id="winnerModal" class="modal">
+  <div class="modal-content">
+    <h2 id="winnerTitle"></h2>
+    <div id="winnerScores"></div>
+    <button onclick="startNewGameFromModal()">Start New Game</button>
+  </div>
+</div>
 
 <script>
 /* ============================================================================
@@ -270,14 +334,28 @@ let gameState;
    INIT
 ============================================================================ */
 function newGame() {
+  let playerNames = ["Player 1", "Player 2"];
+
+  // Preserve and reorder players if there's an existing game
+  if (gameState && gameState.players) {
+    const scores = gameState.players.map((p, i) => ({
+      name: p.name,
+      score: calcTotals(p).grand,
+      index: i
+    })).sort((a, b) => b.score - a.score);
+
+    playerNames = scores.map(s => s.name);
+  }
+
   gameState = {
     players: [
-      { name: "Player 1", scores: {}, yahtzeeBonus: 0 },
-      { name: "Player 2", scores: {}, yahtzeeBonus: 0 }
+      { name: playerNames[0], scores: {}, yahtzeeBonus: 0 },
+      { name: playerNames[1], scores: {}, yahtzeeBonus: 0 }
     ],
     currentPlayer: 0,
     dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
-    rollsLeft: 3
+    rollsLeft: 3,
+    gameEnded: false
   };
   render();
 }
@@ -394,7 +472,7 @@ function renderControls() {
    GAMEPLAY
 ============================================================================ */
 function rollDice() {
-  if (!gameState.rollsLeft) return;
+  if (gameState.gameEnded || !gameState.rollsLeft) return;
   gameState.dice.forEach(d=>{
     if(!d.held) d.value = Math.floor(Math.random()*6)+1;
   });
@@ -403,9 +481,13 @@ function rollDice() {
 }
 
 function assignScore(cat) {
+  if (gameState.gameEnded) return;
   const p = gameState.players[gameState.currentPlayer];
   if (p.scores[cat]!=null) return;
-  p.scores[cat] = calcScore(cat);
+  const score = calcScore(cat);
+  const catLabel = CATEGORIES.find(c => c.key === cat).label;
+  if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
+  p.scores[cat] = score;
   endTurn();
 }
 
@@ -414,6 +496,43 @@ function endTurn() {
   gameState.rollsLeft=3;
   gameState.currentPlayer=1-gameState.currentPlayer;
   render();
+  checkGameEnd();
+}
+
+function checkGameEnd() {
+  const allScored = gameState.players.every(p =>
+    CATEGORIES.every(c => p.scores[c.key] != null)
+  );
+  if (allScored) {
+    gameState.gameEnded = true;
+    showWinnerModal();
+  }
+}
+
+function showWinnerModal() {
+  const scores = gameState.players.map((p, i) => ({
+    name: p.name,
+    score: calcTotals(p).grand,
+    index: i
+  })).sort((a, b) => b.score - a.score);
+
+  const winner = scores[0];
+  document.getElementById('winnerTitle').textContent =
+    `🏆 ${winner.name} Wins! 🏆`;
+
+  const scoresHtml = scores.map((s, i) => `
+    <div class="score-line ${i === 0 ? 'winner' : ''}">
+      ${i + 1}. ${s.name}: ${s.score} points
+    </div>
+  `).join('');
+
+  document.getElementById('winnerScores').innerHTML = scoresHtml;
+  document.getElementById('winnerModal').classList.add('show');
+}
+
+function startNewGameFromModal() {
+  document.getElementById('winnerModal').classList.remove('show');
+  newGame();
 }
 
 /* ============================================================================
