@@ -79,11 +79,24 @@ button {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  touch-action: manipulation;
+  min-width: 48px;
+  min-height: 44px;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
 }
 
 button.secondary {
   background: #334155;
   color: var(--text);
+}
+
+button.secondary:active:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.4);
 }
 
 button:disabled {
@@ -139,6 +152,19 @@ main {
 .scorecard td.score {
   text-align: center;
   cursor: pointer;
+  transition: background-color 0.1s ease, transform 0.1s ease;
+  touch-action: manipulation;
+  min-width: 48px;
+  min-height: 44px;
+}
+
+.scorecard td.score:not(.used):hover {
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+.scorecard td.score:not(.used):active {
+  background-color: rgba(56, 189, 248, 0.2);
+  transform: scale(0.98);
 }
 
 .scorecard td.score.used {
@@ -191,23 +217,35 @@ main {
 }
 
 .die {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   background: #f8fafc;
   color: #020617;
   border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .die.held {
   box-shadow: 0 0 0 4px var(--accent);
   transform: scale(0.94);
+}
+
+.die:active {
+  transform: scale(0.88);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .controls-row {
@@ -281,6 +319,7 @@ main {
 <header>
   <h1>Yahtzee (2 Players)</h1>
   <div class="controls">
+    <button class="secondary" onclick="showStatsModal()">Stats</button>
     <button class="secondary" onclick="saveGame()">Save</button>
     <button class="secondary" onclick="loadGame()">Load</button>
     <button onclick="newGame()">New Game</button>
@@ -305,6 +344,16 @@ main {
     <h2 id="winnerTitle"></h2>
     <div id="winnerScores"></div>
     <button onclick="startNewGameFromModal()">Start New Game</button>
+  </div>
+</div>
+
+<div id="statsModal" class="modal">
+  <div class="modal-content">
+    <div id="statsContent"></div>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <button class="secondary" onclick="clearStats()">Clear Stats</button>
+      <button onclick="closeStatsModal()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -399,7 +448,23 @@ function renderScorecard() {
 
   table.appendChild(sectionRow("Lower Section"));
 
-  CATEGORIES.filter(c=>!c.upper).forEach(c=>addCategoryRow(table,c));
+  // Add categories up to and including yahtzee
+  CATEGORIES.filter(c=>!c.upper).forEach(c=>{
+    addCategoryRow(table,c);
+    // Add yahtzee bonus row after yahtzee
+    if(c.key==="yahtzee"){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td class="label">Yahtzee Bonus</td>`;
+      gameState.players.forEach(p=>{
+        const td = document.createElement("td");
+        td.className = "score used";
+        td.style.textAlign = "center";
+        td.textContent = p.yahtzeeBonus || 0;
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    }
+  });
 
   table.appendChild(totalRow("Lower Total", p=>calcTotals(p).lower));
   table.appendChild(totalRow("Grand Total", p=>calcTotals(p).grand));
@@ -488,6 +553,16 @@ function assignScore(cat) {
   const catLabel = CATEGORIES.find(c => c.key === cat).label;
   if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
   p.scores[cat] = score;
+
+  // Check for Yahtzee bonus: if yahtzee category is already filled and current dice show a yahtzee
+  const v = gameState.dice.map(d=>d.value);
+  const c = count(v);
+  const isYahtzee = has(c,5);
+  if (isYahtzee && p.scores.yahtzee != null) {
+    // Award 100 point bonus for additional yahtzee
+    p.yahtzeeBonus += 100;
+  }
+
   endTurn();
 }
 
@@ -517,6 +592,10 @@ function showWinnerModal() {
   })).sort((a, b) => b.score - a.score);
 
   const winner = scores[0];
+
+  // Update statistics
+  updateStats(winner.name, scores);
+
   document.getElementById('winnerTitle').textContent =
     `🏆 ${winner.name} Wins! 🏆`;
 
@@ -542,21 +621,25 @@ function calcScore(cat) {
   const v = gameState.dice.map(d=>d.value);
   const c = count(v);
   const s = v.reduce((a,b)=>a+b,0);
+  let result;
   switch(cat){
-    case"ones":return c[1]*1;
-    case"twos":return c[2]*2;
-    case"threes":return c[3]*3;
-    case"fours":return c[4]*4;
-    case"fives":return c[5]*5;
-    case"sixes":return c[6]*6;
-    case"threeKind":return has(c,3)?s:0;
-    case"fourKind":return has(c,4)?s:0;
-    case"fullHouse":return fh(c)?25:0;
-    case"smallStraight":return ss(v)?30:0;
-    case"largeStraight":return ls(v)?40:0;
-    case"yahtzee":return has(c,5)?50:0;
-    case"chance":return s;
+    case"ones":result=(c[1]||0)*1;break;
+    case"twos":result=(c[2]||0)*2;break;
+    case"threes":result=(c[3]||0)*3;break;
+    case"fours":result=(c[4]||0)*4;break;
+    case"fives":result=(c[5]||0)*5;break;
+    case"sixes":result=(c[6]||0)*6;break;
+    case"threeKind":result=has(c,3)?s:0;break;
+    case"fourKind":result=has(c,4)?s:0;break;
+    case"fullHouse":result=fh(c)?25:0;break;
+    case"smallStraight":result=ss(v)?30:0;break;
+    case"largeStraight":result=ls(v)?40:0;break;
+    case"yahtzee":result=has(c,5)?50:0;break;
+    case"chance":result=s;break;
+    default:result=0;
   }
+  // Ensure we always return a valid number, never NaN
+  return (typeof result === 'number' && !isNaN(result)) ? result : 0;
 }
 const previewScore = calcScore;
 const count = v => v.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{});
@@ -569,10 +652,24 @@ function calcTotals(p){
   let u=0,l=0;
   CATEGORIES.forEach(c=>{
     const v=p.scores[c.key];
-    if(v!=null) c.upper?u+=v:l+=v;
+    if(v!=null) {
+      // Ensure we're adding valid numbers only
+      const validValue = (typeof v === 'number' && !isNaN(v)) ? v : 0;
+      c.upper ? u+=validValue : l+=validValue;
+    }
   });
   const ub=u>=63?35:0;
-  return {upper:u,upperBonus:ub,lower:l,grand:u+ub+l};
+  // Include yahtzee bonus in lower section
+  const yahtzeeBonus = (typeof p.yahtzeeBonus === 'number' && !isNaN(p.yahtzeeBonus)) ? p.yahtzeeBonus : 0;
+  l += yahtzeeBonus;
+  const grand=u+ub+l;
+  // Defensive check to ensure totals are valid numbers
+  return {
+    upper:isNaN(u)?0:u,
+    upperBonus:isNaN(ub)?0:ub,
+    lower:isNaN(l)?0:l,
+    grand:isNaN(grand)?0:grand
+  };
 }
 
 /* ============================================================================
@@ -594,6 +691,119 @@ function loadGame() {
     r.readAsText(e.target.files[0]);
   };
   i.click();
+}
+
+/* ============================================================================
+   STATISTICS
+============================================================================ */
+function getStats() {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    const stored = localStorage.getItem('yahtzeeStats');
+    return stored ? JSON.parse(stored) : {
+      gamesPlayed: 0,
+      playerWins: {},
+      playerScores: {},
+      highestScore: { name: '', score: 0 }
+    };
+  } catch (e) {
+    console.warn('localStorage unavailable:', e);
+    return null;
+  }
+}
+
+function saveStats(stats) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem('yahtzeeStats', JSON.stringify(stats));
+  } catch (e) {
+    console.warn('Failed to save stats:', e);
+  }
+}
+
+function updateStats(winnerName, scores) {
+  const stats = getStats();
+  if (!stats) return;
+
+  stats.gamesPlayed++;
+
+  // Update wins
+  stats.playerWins[winnerName] = (stats.playerWins[winnerName] || 0) + 1;
+
+  // Update all scores for averaging
+  scores.forEach(s => {
+    if (!stats.playerScores[s.name]) {
+      stats.playerScores[s.name] = [];
+    }
+    stats.playerScores[s.name].push(s.score);
+  });
+
+  // Update highest score
+  const topScore = Math.max(...scores.map(s => s.score));
+  const topPlayer = scores.find(s => s.score === topScore);
+  if (topScore > stats.highestScore.score) {
+    stats.highestScore = { name: topPlayer.name, score: topScore };
+  }
+
+  saveStats(stats);
+}
+
+function clearStats() {
+  if (confirm('Clear all statistics? This cannot be undone.')) {
+    try {
+      localStorage.removeItem('yahtzeeStats');
+      alert('Statistics cleared!');
+      showStatsModal();
+    } catch (e) {
+      console.warn('Failed to clear stats:', e);
+    }
+  }
+}
+
+function showStatsModal() {
+  const stats = getStats();
+  if (!stats) {
+    alert('Statistics are not available (localStorage disabled)');
+    return;
+  }
+
+  const modal = document.getElementById('statsModal');
+  const content = document.getElementById('statsContent');
+
+  let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
+  html += `<p><strong>Total Games:</strong> ${stats.gamesPlayed}</p>`;
+
+  if (stats.highestScore.score > 0) {
+    html += `<p><strong>Highest Score:</strong> ${stats.highestScore.name} - ${stats.highestScore.score}</p>`;
+  }
+
+  if (Object.keys(stats.playerWins).length > 0) {
+    html += `<h4>Wins by Player</h4>`;
+    Object.entries(stats.playerWins)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([name, wins]) => {
+        html += `<p>${name}: ${wins} win${wins !== 1 ? 's' : ''}</p>`;
+      });
+  }
+
+  if (Object.keys(stats.playerScores).length > 0) {
+    html += `<h4>Average Scores</h4>`;
+    Object.entries(stats.playerScores).forEach(([name, scores]) => {
+      const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+      html += `<p>${name}: ${avg} (${scores.length} game${scores.length !== 1 ? 's' : ''})</p>`;
+    });
+  }
+
+  if (stats.gamesPlayed === 0) {
+    html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
+  }
+
+  content.innerHTML = html;
+  modal.classList.add('show');
+}
+
+function closeStatsModal() {
+  document.getElementById('statsModal').classList.remove('show');
 }
 </script>
 </body>
