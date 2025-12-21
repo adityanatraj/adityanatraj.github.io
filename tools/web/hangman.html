@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Hangman — Two Players</title>
+
+<style>
+:root {
+  --bg: #0f1220;
+  --panel: #171a2b;
+  --text: #e9ecf1;
+  --muted: #9aa0b4;
+  --accent: #7aa2ff;
+  --danger: #ff6b6b;
+  --success: #6bffb3;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+header {
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.hidden { display: none; }
+
+label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 6px;
+  font-size: 1rem;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: var(--accent);
+  color: #0b0e18;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #2a2f4a;
+  color: var(--text);
+}
+
+button.danger {
+  background: var(--danger);
+  color: #220b0b;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.word {
+  font-size: 1.8rem;
+  letter-spacing: 0.3em;
+  text-align: center;
+  margin: 12px 0;
+}
+
+.status {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
+  gap: 8px;
+}
+
+.keyboard button {
+  padding: 10px 0;
+  background: #22264a;
+  color: var(--text);
+}
+
+.keyboard button.used {
+  background: #14172a;
+  color: #555a7a;
+  cursor: default;
+}
+
+.keyboard button.correct {
+  background: var(--success);
+  color: #05331e;
+}
+
+.keyboard button.wrong {
+  background: var(--danger);
+  color: #2b0b0b;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hangman {
+  text-align: center;
+  font-family: monospace;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  white-space: pre;
+  margin-top: 8px;
+}
+
+@media (max-width: 420px) {
+  .word { font-size: 1.5rem; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header>
+    <h1>Hangman</h1>
+    <div class="status">Two players · offline</div>
+  </header>
+
+  <!-- Setup -->
+  <div class="card" id="setup">
+    <label>Player 1: enter a secret word</label>
+    <input type="text" id="secretInput" autocomplete="off" />
+    <div class="row" style="margin-top:12px;">
+      <button onclick="startGame()">Start Game</button>
+      <button class="secondary" onclick="loadGame()">Load Game</button>
+    </div>
+  </div>
+
+  <!-- Game -->
+  <div class="card hidden" id="game">
+    <div class="status" id="turnStatus"></div>
+    <div class="word" id="wordDisplay"></div>
+    <div class="hangman" id="hangmanArt"></div>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <div class="footer-actions" style="margin-top:12px;">
+      <button class="secondary" onclick="saveGame()">Save</button>
+      <button class="secondary" onclick="resetGame()">New Game</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="application/json" class="hidden" />
+
+<script>
+const MAX_WRONG = 6;
+
+let state = null;
+
+const hangmanStages = [
+` 
+  
+  
+  
+  
+====`,
+` 
+ |
+ |
+ |
+ |
+====`,
+` 
+ +---+
+ |
+ |
+ |
+====`,
+` 
+ +---+
+ |   O
+ |
+ |
+====`,
+` 
+ +---+
+ |   O
+ |   |
+ |
+====`,
+` 
+ +---+
+ |   O
+ |  /|\\
+ |
+====`,
+` 
+ +---+
+ |   O
+ |  /|\\
+ |  / \\
+====`
+];
+
+function startGame() {
+  const secret = document.getElementById('secretInput').value.trim().toLowerCase();
+  if (!secret) return;
+
+  state = {
+    secret,
+    guessed: [],
+    wrong: 0,
+    over: false
+  };
+
+  document.getElementById('secretInput').value = '';
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+
+  buildKeyboard();
+  render();
+}
+
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  for (let i = 97; i <= 122; i++) {
+    const letter = String.fromCharCode(i);
+    const btn = document.createElement('button');
+    btn.textContent = letter.toUpperCase();
+    btn.onclick = () => guess(letter);
+    kb.appendChild(btn);
+  }
+}
+
+function guess(letter) {
+  if (state.over || state.guessed.includes(letter)) return;
+
+  state.guessed.push(letter);
+  if (!state.secret.includes(letter)) {
+    state.wrong++;
+    if (state.wrong >= MAX_WRONG) state.over = true;
+  } else {
+    const won = [...state.secret].every(c => c === ' ' || state.guessed.includes(c));
+    if (won) state.over = true;
+  }
+  render();
+}
+
+function render() {
+  const word = [...state.secret].map(c =>
+    c === ' ' ? ' ' : (state.guessed.includes(c) ? c.toUpperCase() : '_')
+  ).join(' ');
+
+  document.getElementById('wordDisplay').textContent = word;
+  document.getElementById('hangmanArt').textContent = hangmanStages[state.wrong];
+
+  const status = document.getElementById('turnStatus');
+  if (state.over) {
+    if (state.wrong >= MAX_WRONG) {
+      status.textContent = `Game over · word was "${state.secret}"`;
+    } else {
+      status.textContent = 'You win!';
+    }
+  } else {
+    status.textContent = `Wrong guesses: ${state.wrong} / ${MAX_WRONG}`;
+  }
+
+  [...document.querySelectorAll('.keyboard button')].forEach(btn => {
+    const l = btn.textContent.toLowerCase();
+    if (state.guessed.includes(l)) {
+      btn.classList.add('used');
+      if (state.secret.includes(l)) btn.classList.add('correct');
+      else btn.classList.add('wrong');
+    }
+  });
+}
+
+function saveGame() {
+  if (!state) return;
+  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hangman-game.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function loadGame() {
+  const input = document.getElementById('fileInput');
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state = JSON.parse(reader.result);
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('game').classList.remove('hidden');
+      buildKeyboard();
+      render();
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetGame() {
+  state = null;
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('setup').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
