@@ -350,7 +350,10 @@ main {
   <div class="modal-content">
     <h2 id="winnerTitle"></h2>
     <div id="winnerScores"></div>
-    <button onclick="startNewGameFromModal()">Start New Game</button>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <button class="secondary" onclick="closeWinnerModal()">Close</button>
+      <button onclick="startNewGameFromModal()">Start New Game</button>
+    </div>
   </div>
 </div>
 
@@ -617,6 +620,10 @@ function showWinnerModal() {
 
   document.getElementById('winnerScores').innerHTML = scoresHtml;
   document.getElementById('winnerModal').classList.add('show');
+}
+
+function closeWinnerModal() {
+  document.getElementById('winnerModal').classList.remove('show');
 }
 
 function startNewGameFromModal() {
