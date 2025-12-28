@@ -168,8 +168,15 @@ main {
 }
 
 .scorecard td.score.used {
-  color: var(--accent2);
   cursor: default;
+}
+
+.scorecard td.score.used.at-par {
+  color: var(--accent2);
+}
+
+.scorecard td.score.used.below-par {
+  color: #ef4444;
 }
 
 .scorecard tr.section td {
@@ -343,7 +350,10 @@ main {
   <div class="modal-content">
     <h2 id="winnerTitle"></h2>
     <div id="winnerScores"></div>
-    <button onclick="startNewGameFromModal()">Start New Game</button>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <button class="secondary" onclick="closeWinnerModal()">Close</button>
+      <button onclick="startNewGameFromModal()">Start New Game</button>
+    </div>
   </div>
 </div>
 
@@ -375,12 +385,12 @@ main {
    GAME DATA
 ============================================================================ */
 const CATEGORIES = [
-  { key: "ones", label: "Ones", upper: true },
-  { key: "twos", label: "Twos", upper: true },
-  { key: "threes", label: "Threes", upper: true },
-  { key: "fours", label: "Fours", upper: true },
-  { key: "fives", label: "Fives", upper: true },
-  { key: "sixes", label: "Sixes", upper: true },
+  { key: "ones", label: "Ones", upper: true, par: 3 },
+  { key: "twos", label: "Twos", upper: true, par: 6 },
+  { key: "threes", label: "Threes", upper: true, par: 9 },
+  { key: "fours", label: "Fours", upper: true, par: 12 },
+  { key: "fives", label: "Fives", upper: true, par: 15 },
+  { key: "sixes", label: "Sixes", upper: true, par: 18 },
   { key: "threeKind", label: "3 of a Kind" },
   { key: "fourKind", label: "4 of a Kind" },
   { key: "fullHouse", label: "Full House" },
@@ -499,6 +509,18 @@ function addCategoryRow(table, cat) {
     if (val != null) {
       td.textContent = val;
       td.classList.add("used");
+
+      // Apply color coding based on par (only for upper section)
+      if (cat.par !== undefined) {
+        if (val >= cat.par) {
+          td.classList.add("at-par");
+        } else {
+          td.classList.add("below-par");
+        }
+      } else {
+        // Lower section scores default to green
+        td.classList.add("at-par");
+      }
     } else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
       td.textContent = previewScore(cat.key);
       td.onclick = () => assignScore(cat.key);
@@ -598,6 +620,10 @@ function showWinnerModal() {
 
   document.getElementById('winnerScores').innerHTML = scoresHtml;
   document.getElementById('winnerModal').classList.add('show');
+}
+
+function closeWinnerModal() {
+  document.getElementById('winnerModal').classList.remove('show');
 }
 
 function startNewGameFromModal() {
