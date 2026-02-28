@@ -2,7 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+		/>
 		<title>Yahtzee</title>
 
 		<style>
@@ -17,6 +20,7 @@
 				--muted: #94a3b8;
 				--danger: #ef4444;
 				--die-face: #f8fafc;
+				--die-accent: #fabc3cee;
 				--line-hover: #3d4f63;
 			}
 
@@ -46,12 +50,13 @@
 			.header-top {
 				display: flex;
 				align-items: center;
-				gap: 12px;
 			}
 
 			header h1 {
 				font-size: 18px;
 				margin: 0;
+				width: 100%;
+				text-align: center;
 			}
 
 			.back-link {
@@ -68,6 +73,7 @@
 			}
 
 			.controls {
+				margin-top: 6px;
 				display: flex;
 				gap: 8px;
 			}
@@ -80,8 +86,8 @@
 				background: var(--accent);
 				border: none;
 				color: var(--bg);
-				padding: 8px 12px;
-				border-radius: 8px;
+				/*padding: 4px 12px;*/
+				border-radius: 6px;
 				font-weight: 600;
 				cursor: pointer;
 				transition:
@@ -89,7 +95,7 @@
 					box-shadow 0.1s ease;
 				touch-action: manipulation;
 				min-width: 48px;
-				min-height: 44px;
+				min-height: 32px;
 			}
 
 			button:hover:not(:disabled) {
@@ -123,8 +129,8 @@
 			main {
 				display: grid;
 				grid-template-columns: 1.2fr 0.8fr;
-				gap: 12px;
-				padding: 12px;
+				gap: 8px;
+				padding: 8px;
 				padding-bottom: calc(16px + env(safe-area-inset-bottom));
 			}
 
@@ -137,7 +143,6 @@
 			.scorecard {
 				background: var(--card);
 				border-radius: 10px;
-				padding: 12px;
 			}
 
 			.scorecard table {
@@ -148,7 +153,7 @@
 
 			.scorecard th,
 			.scorecard td {
-				padding: 12px 8px;
+				padding: 10px 8px;
 				border-bottom: 1px dashed var(--line);
 			}
 
@@ -203,7 +208,7 @@
 			}
 
 			.scorecard tr.section td {
-				padding-top: 4px;
+				padding-top: 0px;
 				padding-bottom: 4px;
 				font-weight: 700;
 				color: var(--text);
@@ -258,7 +263,7 @@
 				justify-content: center;
 				gap: 14px;
 				flex-wrap: wrap;
-				margin: 16px 0;
+				margin: 0px 0;
 			}
 
 			.die {
@@ -266,11 +271,13 @@
 				height: 70px;
 				background: var(--die-face);
 				color: var(--bg);
-				border-radius: 14px;
+				border-radius: 8px;
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				font-size: 44px;
+				padding-bottom: 10px;
+				padding-right: 2px;
+				font-size: 80px;
 				cursor: pointer;
 				transition:
 					transform 0.15s ease,
@@ -280,7 +287,7 @@
 			}
 
 			.die.held {
-				box-shadow: 0 0 0 4px var(--accent);
+				background-color: var(--die-accent);
 				transform: scale(0.94);
 			}
 
@@ -290,9 +297,16 @@
 			}
 
 			@keyframes dieRoll {
-				0%, 100% { transform: rotate(0deg) scale(1); }
-				25% { transform: rotate(-10deg) scale(1.08); }
-				75% { transform: rotate(10deg) scale(1.08); }
+				0%,
+				100% {
+					transform: rotate(0deg) scale(1);
+				}
+				25% {
+					transform: rotate(-10deg) scale(1.08);
+				}
+				75% {
+					transform: rotate(10deg) scale(1.08);
+				}
 			}
 
 			.die.rolling {
@@ -391,7 +405,9 @@
 		<header>
 			<div class="header-top">
 				<a class="back-link" href="/">← Tools</a>
-				<h1>Yahtzee (2 Players)</h1>
+				<h1>
+					Yahtzee&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;
+				</h1>
 			</div>
 			<div class="controls">
 				<button class="secondary" onclick="showStatsModal()">Stats</button>
@@ -443,9 +459,13 @@
 				</p>
 				<div id="statsLoadPreview" class="stats-preview"></div>
 				<div class="modal-actions">
-					<button class="secondary" onclick="handleStatsLoad('replace')">Replace All Stats</button>
+					<button class="secondary" onclick="handleStatsLoad('replace')">
+						Replace All Stats
+					</button>
 					<button onclick="handleStatsLoad('merge')">Merge Stats</button>
-					<button class="secondary" onclick="handleStatsLoad('skip')">Keep Current Stats</button>
+					<button class="secondary" onclick="handleStatsLoad('skip')">
+						Keep Current Stats
+					</button>
 				</div>
 			</div>
 		</div>
@@ -476,10 +496,16 @@
    INIT
 ============================================================================ */
 			function newGame() {
-				const gameInProgress = gameState && gameState.players &&
+				const gameInProgress =
+					gameState &&
+					gameState.players &&
 					!gameState.gameEnded &&
-					gameState.players.some(p => Object.keys(p.scores).length > 0);
-				if (gameInProgress && !confirm('Start a new game? Current progress will be lost.')) return;
+					gameState.players.some((p) => Object.keys(p.scores).length > 0);
+				if (
+					gameInProgress &&
+					!confirm("Start a new game? Current progress will be lost.")
+				)
+					return;
 
 				let playerNames = ["Player 1", "Player 2"];
 
@@ -502,7 +528,11 @@
 						{ name: playerNames[1], scores: {} },
 					],
 					currentPlayer: 0,
-					dice: Array.from({ length: 5 }, () => ({ value: 1, held: false, rolling: false })),
+					dice: Array.from({ length: 5 }, () => ({
+						value: 1,
+						held: false,
+						rolling: false,
+					})),
 					rollsLeft: 3,
 					gameEnded: false,
 				};
@@ -523,7 +553,7 @@
 				const el = document.getElementById("scorecard");
 				el.innerHTML = "";
 
-				const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+				const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 				const table = document.createElement("table");
 
 				// Header
@@ -610,7 +640,7 @@
 				table.appendChild(tr);
 			}
 
-			const PIPS = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+			const PIPS = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
 			function renderDice() {
 				const c = document.getElementById("diceContainer");
@@ -618,7 +648,8 @@
 				const unrolled = gameState.rollsLeft === 3;
 				gameState.dice.forEach((d) => {
 					const el = document.createElement("div");
-					el.className = "die" +
+					el.className =
+						"die" +
 						(d.held ? " held" : "") +
 						(unrolled ? " unrolled" : "") +
 						(d.rolling ? " rolling" : "");
@@ -673,7 +704,10 @@
 			}
 
 			function endTurn() {
-				gameState.dice.forEach((d) => { d.held = false; d.rolling = false; });
+				gameState.dice.forEach((d) => {
+					d.held = false;
+					d.rolling = false;
+				});
 				gameState.rollsLeft = 3;
 				gameState.currentPlayer = 1 - gameState.currentPlayer;
 				render();
@@ -1180,10 +1214,10 @@
 				return merged;
 			}
 
-			document.addEventListener('keydown', (e) => {
-				if (e.key !== ' ' && e.key !== 'Enter') return;
-				if (document.querySelector('.modal.show')) return;
-				const btn = document.getElementById('rollBtn');
+			document.addEventListener("keydown", (e) => {
+				if (e.key !== " " && e.key !== "Enter") return;
+				if (document.querySelector(".modal.show")) return;
+				const btn = document.getElementById("rollBtn");
 				if (btn && !btn.disabled) {
 					e.preventDefault();
 					rollDice();
