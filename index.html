@@ -408,116 +408,7 @@
 					</div>
 				</div>
 
-				<div class="tools-list" id="toolsList">
-					<!-- QR Code Generator -->
-					<a
-						href="tools/web/qr_coder.html"
-						class="tool-row"
-						data-title="QR Code Generator"
-						data-description="Generate QR codes from URLs. Simple and fast QR code creation."
-						data-tags="utility qr code generator url"
-					>
-						<div class="tool-icon-row">📱</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">QR Code Generator</h3>
-								<span class="tag">Utility</span>
-							</div>
-							<p class="tool-description-row">
-								Generate QR codes from URLs. Simple and fast QR code creation.
-							</p>
-						</div>
-						<div class="tool-arrow">→</div>
-					</a>
-
-					<!-- Yahtzee P2P -->
-					<a
-						href="tools/web/yahtzee.html"
-						class="tool-row"
-						data-title="Yahtzee P2P"
-						data-description="Play Yahtzee with friends online. Multiplayer dice game with peer-to-peer connection."
-						data-tags="game dice multiplayer yahtzee p2p"
-					>
-						<div class="tool-icon-row">🎲</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">Yahtzee P2P</h3>
-								<span class="tag">Game</span>
-							</div>
-							<p class="tool-description-row">
-								Play Yahtzee with friends online. Multiplayer dice game with
-								peer-to-peer connection.
-							</p>
-						</div>
-						<div class="tool-arrow">→</div>
-					</a>
-
-					<!-- Hangman -->
-					<a
-						href="tools/web/hangman.html"
-						class="tool-row"
-						data-title="Hangman"
-						data-description="Classic word guessing game for two players. Guess the secret word before running out of tries."
-						data-tags="game word puzzle hangman two player offline"
-					>
-						<div class="tool-icon-row">🎯</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">Hangman</h3>
-								<span class="tag">Game</span>
-							</div>
-							<p class="tool-description-row">
-								Classic word guessing game for two players. Guess the secret
-								word before running out of tries.
-							</p>
-						</div>
-						<div class="tool-arrow">→</div>
-					</a>
-
-					<!-- Vietnamese Conversations -->
-					<a
-						href="tools/web/language/vietnamese_conversations.html"
-						class="tool-row"
-						data-title="Vietnamese Conversations"
-						data-description="Learn Vietnamese through common conversations. Practice everyday phrases and dialogues."
-						data-tags="language learning vietnamese education"
-					>
-						<div class="tool-icon-row">🇻🇳</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">Vietnamese Conversations</h3>
-								<span class="tag">Language</span>
-							</div>
-							<p class="tool-description-row">
-								Learn Vietnamese through common conversations. Practice everyday
-								phrases and dialogues.
-							</p>
-						</div>
-						<div class="tool-arrow">→</div>
-					</a>
-
-					<!-- Vietnamese Hotel -->
-					<a
-						href="tools/web/language/vietnamese_hotel.html"
-						class="tool-row"
-						data-title="Vietnamese Hotel Conversations"
-						data-description="Learn hotel-specific Vietnamese phrases. Essential conversations for travelers."
-						data-tags="language learning vietnamese hotel travel education"
-					>
-						<div class="tool-icon-row">🏨</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">Vietnamese Hotel Conversations</h3>
-								<span class="tag">Language</span>
-							</div>
-							<p class="tool-description-row">
-								Learn hotel-specific Vietnamese phrases. Essential conversations
-								for travelers.
-							</p>
-						</div>
-						<div class="tool-arrow">→</div>
-					</a>
-				</div>
+				<div class="tools-list" id="toolsList"></div>
 
 				<div id="noResults" class="no-results" style="display: none">
 					<div class="no-results-icon">🔍</div>
@@ -526,73 +417,66 @@
 			</main>
 
 			<footer>
-				<p>(c) Aditya N</p>
+				<p>(c) Aditya Natraj</p>
 			</footer>
 		</div>
 
 		<script>
-			// Search functionality
-			const searchInput = document.getElementById("searchInput");
-			const toolsList = document.getElementById("toolsList");
-			const noResults = document.getElementById("noResults");
-			const toolRows = document.querySelectorAll(".tool-row");
+			const tools = [
+				{ href: 'tools/web/qr_coder.html',                              icon: '📱', title: 'QR Code Generator',            tag: 'Utility',   description: 'Generate QR codes from URLs. Simple and fast QR code creation.',                                          tags: 'utility qr code generator url' },
+				{ href: 'tools/web/yahtzee.html',                                icon: '🎲', title: 'Yahtzee P2P',                  tag: 'Game',      description: 'Play Yahtzee with friends online. Multiplayer dice game with peer-to-peer connection.',                  tags: 'game dice multiplayer yahtzee p2p' },
+				{ href: 'tools/web/hangman.html',                                icon: '🎯', title: 'Hangman',                      tag: 'Game',      description: 'Classic word guessing game for two players. Guess the secret word before running out of tries.',          tags: 'game word puzzle hangman two player offline' },
+				{ href: 'tools/web/language/vietnamese_conversations.html',      icon: '🇻🇳', title: 'Vietnamese Conversations',     tag: 'Language',  description: 'Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.',                 tags: 'language learning vietnamese education' },
+				{ href: 'tools/web/language/vietnamese_hotel.html',              icon: '🏨', title: 'Vietnamese Hotel Conversations', tag: 'Language', description: 'Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.',                          tags: 'language learning vietnamese hotel travel education' },
+			];
 
-			// Debounce function for better performance
+			const toolsList = document.getElementById('toolsList');
+			const noResults = document.getElementById('noResults');
+			const searchInput = document.getElementById('searchInput');
+
+			toolsList.innerHTML = tools.map(t => `
+				<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
+					<div class="tool-icon-row">${t.icon}</div>
+					<div class="tool-content">
+						<div class="tool-header">
+							<h3 class="tool-title-row">${t.title}</h3>
+							<span class="tag">${t.tag}</span>
+						</div>
+						<p class="tool-description-row">${t.description}</p>
+					</div>
+					<div class="tool-arrow">→</div>
+				</a>`).join('');
+
+			const toolRows = toolsList.querySelectorAll('.tool-row');
+
 			function debounce(func, wait) {
 				let timeout;
-				return function executedFunction(...args) {
-					const later = () => {
-						clearTimeout(timeout);
-						func(...args);
-					};
+				return function (...args) {
 					clearTimeout(timeout);
-					timeout = setTimeout(later, wait);
+					timeout = setTimeout(() => func(...args), wait);
 				};
 			}
 
-			// Search filter function
 			function filterTools(searchTerm) {
 				const term = searchTerm.toLowerCase().trim();
 				let visibleCount = 0;
-
 				toolRows.forEach((row) => {
-					const title = row.dataset.title?.toLowerCase() || "";
-					const description = row.dataset.description?.toLowerCase() || "";
-					const tags = row.dataset.tags?.toLowerCase() || "";
-
-					const matches =
-						title.includes(term) ||
-						description.includes(term) ||
-						tags.includes(term);
-
-					if (matches || term === "") {
-						row.classList.remove("hidden");
+					const matches = ['title', 'description', 'tags'].some(
+						key => row.dataset[key]?.toLowerCase().includes(term)
+					);
+					if (matches || term === '') {
+						row.classList.remove('hidden');
 						visibleCount++;
 					} else {
-						row.classList.add("hidden");
+						row.classList.add('hidden');
 					}
 				});
-
-				// Show/hide no results message
-				if (visibleCount === 0 && term !== "") {
-					noResults.style.display = "block";
-					toolsList.style.display = "none";
-				} else {
-					noResults.style.display = "none";
-					toolsList.style.display = "grid";
-				}
+				noResults.style.display = visibleCount === 0 && term !== '' ? 'block' : 'none';
+				toolsList.style.display = visibleCount === 0 && term !== '' ? 'none' : 'grid';
 			}
 
-			// Add event listener with debounce
-			searchInput.addEventListener(
-				"input",
-				debounce((e) => {
-					filterTools(e.target.value);
-				}, 150),
-			);
-
-			// Initialize - ensure all tools are visible on load
-			filterTools("");
+			searchInput.addEventListener('input', debounce((e) => filterTools(e.target.value), 150));
+			filterTools('');
 		</script>
 	</body>
 </html>
