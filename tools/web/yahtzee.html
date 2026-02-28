@@ -17,6 +17,7 @@
 				--muted: #94a3b8;
 				--danger: #ef4444;
 				--die-face: #f8fafc;
+				--line-hover: #3d4f63;
 			}
 
 			* {
@@ -91,6 +92,10 @@
 				min-height: 44px;
 			}
 
+			button:hover:not(:disabled) {
+				opacity: 0.85;
+			}
+
 			button:active:not(:disabled) {
 				transform: scale(0.95);
 				box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
@@ -99,6 +104,11 @@
 			button.secondary {
 				background: var(--line);
 				color: var(--text);
+			}
+
+			button.secondary:hover:not(:disabled) {
+				opacity: 1;
+				background: var(--line-hover);
 			}
 
 			button.secondary:active:not(:disabled) {
@@ -203,8 +213,13 @@
 
 			.scorecard tr.total td {
 				font-weight: 800;
+				text-align: center;
 				border-top: 2px solid var(--line);
 				border-bottom: 2px solid var(--line);
+			}
+
+			.scorecard tr.total td:first-child {
+				text-align: left;
 			}
 
 			.player-name {
@@ -267,6 +282,21 @@
 			.die.held {
 				box-shadow: 0 0 0 4px var(--accent);
 				transform: scale(0.94);
+			}
+
+			.die.unrolled {
+				opacity: 0.3;
+				cursor: default;
+			}
+
+			@keyframes dieRoll {
+				0%, 100% { transform: rotate(0deg) scale(1); }
+				25% { transform: rotate(-10deg) scale(1.08); }
+				75% { transform: rotate(10deg) scale(1.08); }
+			}
+
+			.die.rolling {
+				animation: dieRoll 0.2s ease;
 			}
 
 			.die:active {
@@ -346,6 +376,14 @@
 				justify-content: center;
 				margin-top: 20px;
 			}
+
+			.stats-preview {
+				text-align: left;
+				margin: 20px 0;
+				padding: 16px;
+				background: var(--panel);
+				border-radius: 8px;
+			}
 		</style>
 	</head>
 
@@ -403,16 +441,7 @@
 				<p style="color: var(--muted); margin: 16px 0">
 					This save file contains statistics. What would you like to do?
 				</p>
-				<div
-					id="statsLoadPreview"
-					style="
-						text-align: left;
-						margin: 20px 0;
-						padding: 16px;
-						background: var(--panel);
-						border-radius: 8px;
-					"
-				></div>
+				<div id="statsLoadPreview" class="stats-preview"></div>
 				<div class="modal-actions">
 					<button class="secondary" onclick="handleStatsLoad('replace')">Replace All Stats</button>
 					<button onclick="handleStatsLoad('merge')">Merge Stats</button>
@@ -473,7 +502,7 @@
 						{ name: playerNames[1], scores: {} },
 					],
 					currentPlayer: 0,
-					dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
+					dice: Array.from({ length: 5 }, () => ({ value: 1, held: false, rolling: false })),
 					rollsLeft: 3,
 					gameEnded: false,
 				};
@@ -494,6 +523,7 @@
 				const el = document.getElementById("scorecard");
 				el.innerHTML = "";
 
+				const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 				const table = document.createElement("table");
 
 				// Header
@@ -501,11 +531,11 @@
 				head.innerHTML = `
     <th></th>
     <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
-      <input class="player-name" value="${gameState.players[0].name}"
+      <input class="player-name" value="${esc(gameState.players[0].name)}"
         onchange="gameState.players[0].name=this.value">
     </th>
     <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
-      <input class="player-name" value="${gameState.players[1].name}"
+      <input class="player-name" value="${esc(gameState.players[1].name)}"
         onchange="gameState.players[1].name=this.value">
     </th>`;
 				table.appendChild(head);
@@ -544,8 +574,8 @@
 				tr.className = "total";
 				tr.innerHTML = `
     <td>${label}</td>
-    <td style="text-align:center">${fn(gameState.players[0])}</td>
-    <td style="text-align:center">${fn(gameState.players[1])}</td>`;
+    <td>${fn(gameState.players[0])}</td>
+    <td>${fn(gameState.players[1])}</td>`;
 				return tr;
 			}
 
@@ -572,7 +602,7 @@
 							td.classList.add("at-par");
 						}
 					} else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
-						td.textContent = previewScore(cat.key);
+						td.textContent = calcScore(cat.key);
 						td.onclick = () => assignScore(cat.key);
 					}
 					tr.appendChild(td);
@@ -585,10 +615,14 @@
 			function renderDice() {
 				const c = document.getElementById("diceContainer");
 				c.innerHTML = "";
+				const unrolled = gameState.rollsLeft === 3;
 				gameState.dice.forEach((d) => {
 					const el = document.createElement("div");
-					el.className = "die" + (d.held ? " held" : "");
-					el.textContent = PIPS[d.value];
+					el.className = "die" +
+						(d.held ? " held" : "") +
+						(unrolled ? " unrolled" : "") +
+						(d.rolling ? " rolling" : "");
+					el.textContent = unrolled ? "·" : PIPS[d.value];
 					el.onclick = () => {
 						if (gameState.rollsLeft < 3) {
 							d.held = !d.held;
@@ -613,10 +647,17 @@
 			function rollDice() {
 				if (gameState.gameEnded || !gameState.rollsLeft) return;
 				gameState.dice.forEach((d) => {
-					if (!d.held) d.value = Math.floor(Math.random() * 6) + 1;
+					if (!d.held) {
+						d.value = Math.floor(Math.random() * 6) + 1;
+						d.rolling = true;
+					}
 				});
 				gameState.rollsLeft--;
 				render();
+				setTimeout(() => {
+					gameState.dice.forEach((d) => (d.rolling = false));
+					renderDice();
+				}, 220);
 			}
 
 			function assignScore(cat) {
@@ -632,7 +673,7 @@
 			}
 
 			function endTurn() {
-				gameState.dice.forEach((d) => (d.held = false));
+				gameState.dice.forEach((d) => { d.held = false; d.rolling = false; });
 				gameState.rollsLeft = 3;
 				gameState.currentPlayer = 1 - gameState.currentPlayer;
 				render();
@@ -743,7 +784,6 @@
 				// Ensure we always return a valid number, never NaN
 				return typeof result === "number" && !isNaN(result) ? result : 0;
 			}
-			const previewScore = calcScore;
 			const count = (v) =>
 				v.reduce((a, x) => ((a[x] = (a[x] || 0) + 1), a), {});
 			const has = (c, n) => Object.values(c).some((x) => x >= n);
@@ -903,7 +943,6 @@
 				if (confirm("Clear all statistics? This cannot be undone.")) {
 					try {
 						localStorage.removeItem("yahtzeeStats");
-						alert("Statistics cleared!");
 						showStatsModal();
 					} catch (e) {
 						console.warn("Failed to clear stats:", e);
@@ -913,13 +952,14 @@
 
 			function showStatsModal() {
 				const stats = getStats();
-				if (!stats) {
-					alert("Statistics are not available (localStorage disabled)");
-					return;
-				}
-
 				const modal = document.getElementById("statsModal");
 				const content = document.getElementById("statsContent");
+
+				if (!stats) {
+					content.innerHTML = `<p style="color:var(--muted)">Statistics unavailable — storage is disabled in this browser.</p>`;
+					modal.classList.add("show");
+					return;
+				}
 
 				let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
 				html += `<p><strong>Total Games:</strong> ${stats.gamesPlayed}</p>`;
