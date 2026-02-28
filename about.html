@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>About</title>
+		<title>About — Aditya N</title>
 		<style>
 			* {
 				margin: 0;
@@ -12,29 +12,35 @@
 			}
 
 			:root {
-				--bg-primary: #0a0a0a;
-				--bg-secondary: #1a1a1a;
-				--text-primary: #ffffff;
-				--text-secondary: #a0a0a0;
-				--accent: #3b82f6;
-				--accent-hover: #2563eb;
-				--border: #2a2a2a;
+				--bg-primary: #fafafa;
+				--bg-secondary: #ffffff;
+				--text-primary: #1a1a1a;
+				--text-secondary: #666666;
+				--text-tertiary: #999999;
+				--border-color: #e5e5e5;
+				--accent-color: #3b82f6;
+				--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+				--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+				--transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 
 			body {
-				font-family:
-					-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
-					Arial, sans-serif;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+					'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+					sans-serif;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
 				background: var(--bg-primary);
 				color: var(--text-primary);
 				line-height: 1.6;
 				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
 			}
 
-			/* Navigation */
 			nav {
-				background: var(--bg-secondary);
-				border-bottom: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.95);
+				border-bottom: 1px solid var(--border-color);
 				position: sticky;
 				top: 0;
 				z-index: 100;
@@ -44,101 +50,108 @@
 			.nav-container {
 				max-width: 1200px;
 				margin: 0 auto;
-				padding: 0 20px;
+				padding: 1rem 2rem;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				height: 64px;
 			}
 
 			.nav-brand {
-				font-size: 1.25em;
+				font-size: 1.25rem;
 				font-weight: 600;
 				color: var(--text-primary);
 				text-decoration: none;
-				letter-spacing: -0.5px;
+				letter-spacing: -0.02em;
+				transition: var(--transition);
+			}
+
+			.nav-brand:hover {
+				color: var(--accent-color);
 			}
 
 			.nav-links {
-				display: flex;
-				gap: 32px;
 				list-style: none;
+				display: flex;
+				gap: 2rem;
+				align-items: center;
 			}
 
 			.nav-links a {
 				color: var(--text-secondary);
 				text-decoration: none;
+				font-size: 0.95rem;
 				font-weight: 500;
-				font-size: 0.95em;
-				transition: color 0.2s ease;
+				transition: var(--transition);
+				position: relative;
 			}
 
-			.nav-links a:hover {
+			.nav-links a:hover,
+			.nav-links a.active {
 				color: var(--text-primary);
 			}
 
-			.nav-links a.active {
-				color: var(--accent);
+			.nav-links a.active::after {
+				content: '';
+				position: absolute;
+				bottom: -0.5rem;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: var(--accent-color);
 			}
 
 			.container {
 				max-width: 800px;
 				margin: 0 auto;
-				padding: 0 20px;
+				padding: 3rem 2rem;
+				flex: 1;
+				width: 100%;
 			}
 
 			header {
-				padding: 80px 0 40px;
 				text-align: center;
+				margin-bottom: 3rem;
 			}
 
 			h1 {
-				font-size: 3em;
+				font-size: 3rem;
 				font-weight: 700;
-				margin-bottom: 16px;
-				background: linear-gradient(
-					135deg,
-					var(--text-primary) 0%,
-					var(--text-secondary) 100%
-				);
+				letter-spacing: -0.03em;
+				margin-bottom: 0.5rem;
+				background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
 				background-clip: text;
-				letter-spacing: -2px;
 			}
 
 			.subtitle {
-				font-size: 1.2em;
+				font-size: 1.125rem;
 				color: var(--text-secondary);
-				font-weight: 300;
-				letter-spacing: 0.5px;
-			}
-
-			main {
-				padding: 40px 0 80px;
+				font-weight: 400;
 			}
 
 			.content-section {
 				background: var(--bg-secondary);
-				border: 1px solid var(--border);
+				border: 1px solid var(--border-color);
 				border-radius: 12px;
-				padding: 40px;
-				margin-bottom: 24px;
+				padding: 2.5rem;
+				margin-bottom: 1.5rem;
+				box-shadow: var(--shadow-sm);
 			}
 
 			.content-section h2 {
-				font-size: 1.75em;
+				font-size: 1.25rem;
 				font-weight: 600;
-				margin-bottom: 20px;
 				color: var(--text-primary);
-				letter-spacing: -1px;
+				letter-spacing: -0.02em;
+				margin-bottom: 1rem;
 			}
 
 			.content-section p {
 				color: var(--text-secondary);
-				margin-bottom: 16px;
-				font-size: 1.05em;
+				font-size: 1rem;
 				line-height: 1.7;
+				margin-bottom: 1rem;
 			}
 
 			.content-section p:last-child {
@@ -147,128 +160,104 @@
 
 			.content-section ul {
 				color: var(--text-secondary);
-				margin-left: 24px;
-				margin-bottom: 16px;
+				margin-left: 1.5rem;
+				margin-bottom: 1rem;
 			}
 
 			.content-section li {
-				margin-bottom: 8px;
-				font-size: 1.05em;
+				margin-bottom: 0.5rem;
+				font-size: 1rem;
 				line-height: 1.7;
 			}
 
 			.content-section a {
-				color: var(--accent);
+				color: var(--accent-color);
 				text-decoration: none;
-				transition: color 0.2s ease;
+				transition: var(--transition);
 			}
 
 			.content-section a:hover {
-				color: var(--accent-hover);
 				text-decoration: underline;
 			}
 
 			.links-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-				gap: 16px;
-				margin-top: 24px;
+				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+				gap: 1rem;
+				margin-top: 1.5rem;
 			}
 
 			.link-card {
-				background: rgba(59, 130, 246, 0.1);
-				border: 1px solid rgba(59, 130, 246, 0.2);
-				border-radius: 8px;
-				padding: 20px;
+				background: var(--bg-primary);
+				border: 1px solid var(--border-color);
+				border-radius: 10px;
+				padding: 1.25rem;
 				text-align: center;
 				text-decoration: none;
-				transition: all 0.2s ease;
+				transition: var(--transition);
 			}
 
 			.link-card:hover {
-				background: rgba(59, 130, 246, 0.15);
-				border-color: var(--accent);
+				border-color: var(--accent-color);
+				box-shadow: var(--shadow-md);
 				transform: translateY(-2px);
 			}
 
 			.link-card .icon {
-				font-size: 2em;
-				margin-bottom: 8px;
+				font-size: 1.75rem;
+				margin-bottom: 0.5rem;
 				display: block;
 			}
 
 			.link-card .label {
 				color: var(--text-primary);
 				font-weight: 500;
-				font-size: 0.95em;
+				font-size: 0.9rem;
 			}
 
 			footer {
-				border-top: 1px solid var(--border);
-				padding: 40px 0;
 				text-align: center;
-				color: var(--text-secondary);
-				font-size: 0.9em;
-			}
-
-			footer a {
-				color: var(--accent);
-				text-decoration: none;
-				transition: color 0.2s ease;
-			}
-
-			footer a:hover {
-				color: var(--accent-hover);
+				padding: 2rem;
+				margin-top: 4rem;
+				border-top: 1px solid var(--border-color);
+				color: var(--text-tertiary);
+				font-size: 0.875rem;
 			}
 
 			@media (max-width: 768px) {
 				.nav-container {
-					height: auto;
-					padding: 16px 20px;
-					flex-direction: column;
-					gap: 16px;
+					padding: 1rem 1.5rem;
 				}
 
 				.nav-links {
-					gap: 24px;
+					gap: 1.5rem;
+				}
+
+				.container {
+					padding: 2rem 1.5rem;
 				}
 
 				h1 {
-					font-size: 2.2em;
-				}
-
-				header {
-					padding: 60px 0 30px;
+					font-size: 2.25rem;
 				}
 
 				.content-section {
-					padding: 28px 24px;
+					padding: 1.75rem 1.5rem;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.nav-links {
+					gap: 1rem;
+					font-size: 0.875rem;
 				}
 
-				.content-section h2 {
-					font-size: 1.5em;
+				h1 {
+					font-size: 1.875rem;
 				}
 
 				.links-grid {
 					grid-template-columns: 1fr;
-				}
-			}
-
-			@media (prefers-color-scheme: light) {
-				:root {
-					--bg-primary: #ffffff;
-					--bg-secondary: #f8f9fa;
-					--text-primary: #0a0a0a;
-					--text-secondary: #6b7280;
-					--border: #e5e7eb;
-				}
-
-				nav {
-					background: rgba(255, 255, 255, 0.8);
-				}
-
-				.content-section {
-					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 				}
 			}
 		</style>
@@ -341,7 +330,7 @@
 			</main>
 
 			<footer>
-				<p>(c) Aditya N</p>
+				<p>(c) Aditya Natraj</p>
 			</footer>
 		</div>
 	</body>
