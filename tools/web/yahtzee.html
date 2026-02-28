@@ -16,6 +16,7 @@
 				--text: #e5e7eb;
 				--muted: #94a3b8;
 				--danger: #ef4444;
+				--die-face: #f8fafc;
 			}
 
 			* {
@@ -35,7 +36,7 @@
 
 			header {
 				padding: 12px 16px;
-				background: #020617;
+				background: var(--bg);
 				display: flex;
 				flex-direction: column;
 				gap: 10px;
@@ -77,7 +78,7 @@
 			button {
 				background: var(--accent);
 				border: none;
-				color: #020617;
+				color: var(--bg);
 				padding: 8px 12px;
 				border-radius: 8px;
 				font-weight: 600;
@@ -96,7 +97,7 @@
 			}
 
 			button.secondary {
-				background: #334155;
+				background: var(--line);
 				color: var(--text);
 			}
 
@@ -196,7 +197,7 @@
 				padding-bottom: 4px;
 				font-weight: 700;
 				color: var(--text);
-				background-color: #020617;
+				background-color: var(--bg);
 				border-bottom: 1px dashed var(--line);
 			}
 
@@ -248,14 +249,13 @@
 			.die {
 				width: 70px;
 				height: 70px;
-				background: #f8fafc;
-				color: #020617;
+				background: var(--die-face);
+				color: var(--bg);
 				border-radius: 14px;
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				font-size: 30px;
-				font-weight: 800;
+				font-size: 44px;
 				cursor: pointer;
 				transition:
 					transform 0.15s ease,
@@ -304,7 +304,7 @@
 				background: var(--card);
 				border-radius: 16px;
 				padding: 32px;
-				max-width: 500px;
+				width: min(500px, calc(100vw - 32px));
 				max-height: 85vh;
 				overflow-y: auto;
 				text-align: center;
@@ -435,8 +435,8 @@
 				{ key: "threeKind", label: "3 of a Kind" },
 				{ key: "fourKind", label: "4 of a Kind" },
 				{ key: "fullHouse", label: "Full House" },
-				{ key: "smallStraight", label: "Small" },
-				{ key: "largeStraight", label: "Large" },
+				{ key: "smallStraight", label: "Sm. Str." },
+				{ key: "largeStraight", label: "Lg. Str." },
 				{ key: "yahtzee", label: "Yahtzee" },
 				{ key: "chance", label: "Chance" },
 			];
@@ -447,6 +447,11 @@
    INIT
 ============================================================================ */
 			function newGame() {
+				const gameInProgress = gameState && gameState.players &&
+					!gameState.gameEnded &&
+					gameState.players.some(p => Object.keys(p.scores).length > 0);
+				if (gameInProgress && !confirm('Start a new game? Current progress will be lost.')) return;
+
 				let playerNames = ["Player 1", "Player 2"];
 
 				// Preserve and reorder players if there's an existing game
@@ -575,13 +580,15 @@
 				table.appendChild(tr);
 			}
 
+			const PIPS = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+
 			function renderDice() {
 				const c = document.getElementById("diceContainer");
 				c.innerHTML = "";
 				gameState.dice.forEach((d) => {
 					const el = document.createElement("div");
 					el.className = "die" + (d.held ? " held" : "");
-					el.textContent = d.value;
+					el.textContent = PIPS[d.value];
 					el.onclick = () => {
 						if (gameState.rollsLeft < 3) {
 							d.held = !d.held;
@@ -797,6 +804,7 @@
 				a.href = URL.createObjectURL(blob);
 				a.download = "yahtzee-game.json";
 				a.click();
+				setTimeout(() => URL.revokeObjectURL(a.href), 0);
 			}
 
 			function loadGame() {
@@ -821,7 +829,6 @@
 							} else {
 								// Old format - data IS the gameState
 								gameState = data;
-								console.log("Loaded legacy save file (no statistics included)");
 							}
 
 							render();
@@ -1075,7 +1082,6 @@
 					case "replace":
 						// Replace all stats with loaded stats
 						saveStats(pendingLoadedStats);
-						console.log("Statistics replaced with loaded data");
 						break;
 
 					case "merge":
@@ -1089,12 +1095,10 @@
 
 						const merged = mergeStats(currentStats, pendingLoadedStats);
 						saveStats(merged);
-						console.log("Statistics merged successfully");
 						break;
 
 					case "skip":
 						// Keep current stats, do nothing
-						console.log("Keeping current statistics");
 						break;
 				}
 
@@ -1135,6 +1139,16 @@
 
 				return merged;
 			}
+
+			document.addEventListener('keydown', (e) => {
+				if (e.key !== ' ' && e.key !== 'Enter') return;
+				if (document.querySelector('.modal.show')) return;
+				const btn = document.getElementById('rollBtn');
+				if (btn && !btn.disabled) {
+					e.preventDefault();
+					rollDice();
+				}
+			});
 		</script>
 	</body>
 </html>
