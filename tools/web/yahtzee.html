@@ -1,1052 +1,1155 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Yahtzee – Two Players</title>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Yahtzee</title>
 
-<!--
-===============================================================================
-PLAN
-===============================================================================
-1. Consolidate both players into a single shared score table
-   - Categories as rows
-   - Player 1 + Player 2 as columns
-   - Active player column highlighted
+		<style>
+			:root {
+				--bg: #020617;
+				--panel: #0f172a;
+				--card: #111827;
+				--line: #334155;
+				--accent: #38bdf8;
+				--accent2: #22c55e;
+				--text: #e5e7eb;
+				--muted: #94a3b8;
+			}
 
-2. Improve scorecard visual hierarchy
-   - Upper section and lower section clearly separated
-   - Section headers
-   - Totals bolded and visually distinct
+			* {
+				box-sizing: border-box;
+			}
 
-3. Layout polish
-   - Vertical stack of Save / Load / New buttons
-   - Slightly softer, more board-game-like look
-   - Clear affordances for clickable score cells
+			body {
+				margin: 0;
+				font-family:
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					sans-serif;
+				background: radial-gradient(circle at top, #020617, #020617);
+				color: var(--text);
+			}
 
-4. Functional improvements
-   - Better disabled states
-   - Cleaner turn indication
-   - Minor animation polish
-===============================================================================
--->
+			header {
+				padding: 12px 16px;
+				background: #020617;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
 
-<style>
-:root {
-  --bg: #020617;
-  --panel: #0f172a;
-  --card: #111827;
-  --line: #334155;
-  --accent: #38bdf8;
-  --accent2: #22c55e;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-}
+			.header-top {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
 
-* { box-sizing: border-box; }
+			header h1 {
+				font-size: 18px;
+				margin: 0;
+			}
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: radial-gradient(circle at top, #020617, #020617);
-  color: var(--text);
-}
+			.back-link {
+				color: var(--muted);
+				text-decoration: none;
+				font-size: 0.8rem;
+				font-weight: 500;
+				transition: color 0.2s;
+				white-space: nowrap;
+			}
 
-header {
-  padding: 12px 16px;
-  background: #020617;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+			.back-link:hover {
+				color: var(--accent);
+			}
 
-header h1 {
-  font-size: 18px;
-  margin: 0;
-}
+			.controls {
+				display: flex;
+				gap: 8px;
+			}
 
-.back-link {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: color 0.2s;
-  white-space: nowrap;
-}
+			.controls button {
+				flex: 1;
+			}
 
-.back-link:hover {
-  color: var(--accent);
-}
+			button {
+				background: var(--accent);
+				border: none;
+				color: #020617;
+				padding: 8px 12px;
+				border-radius: 8px;
+				font-weight: 600;
+				cursor: pointer;
+				transition:
+					transform 0.1s ease,
+					box-shadow 0.1s ease;
+				touch-action: manipulation;
+				min-width: 48px;
+				min-height: 44px;
+			}
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+			button:active:not(:disabled) {
+				transform: scale(0.95);
+				box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+			}
 
-button {
-  background: var(--accent);
-  border: none;
-  color: #020617;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  touch-action: manipulation;
-  min-width: 48px;
-  min-height: 44px;
-}
+			button.secondary {
+				background: #334155;
+				color: var(--text);
+			}
 
-button:active:not(:disabled) {
-  transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
-}
+			button.secondary:active:not(:disabled) {
+				box-shadow: 0 2px 8px rgba(51, 65, 85, 0.4);
+			}
 
-button.secondary {
-  background: #334155;
-  color: var(--text);
-}
+			button:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
 
-button.secondary:active:not(:disabled) {
-  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.4);
-}
+			main {
+				display: grid;
+				grid-template-columns: 1.2fr 0.8fr;
+				gap: 12px;
+				padding: 12px;
+				padding-bottom: 80px;
+			}
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+			@media (max-width: 900px) {
+				main {
+					grid-template-columns: 1fr;
+				}
+			}
 
-main {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 12px;
-  padding: 12px;
-  padding-bottom: 80px;
-}
+			.scorecard {
+				background: var(--card);
+				border-radius: 10px;
+				padding: 12px;
+			}
 
-@media (max-width: 900px) {
-  main {
-    grid-template-columns: 1fr;
-  }
-}
+			.scorecard table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 14px;
+			}
 
-.scorecard {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 12px;
-}
+			.scorecard th,
+			.scorecard td {
+				padding: 12px 8px;
+				border-bottom: 1px dashed var(--line);
+			}
 
-.scorecard table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
+			.scorecard th {
+				text-align: center;
+				font-weight: 700;
+			}
 
-.scorecard th,
-.scorecard td {
-  padding: 12px 8px;
-  border-bottom: 1px solid var(--line);
-}
+			.scorecard th.player.active {
+				color: var(--accent);
+			}
 
-.scorecard th {
-  text-align: center;
-  font-weight: 700;
-}
+			.scorecard td.label {
+				color: var(--muted);
+			}
 
-.scorecard th.player.active {
-  color: var(--accent);
-}
+			.scorecard td.score {
+				text-align: center;
+				cursor: pointer;
+				transition:
+					background-color 0.1s ease,
+					transform 0.1s ease;
+				touch-action: manipulation;
+				min-width: 48px;
+				min-height: 44px;
+			}
 
-.scorecard td.label {
-  color: var(--muted);
-}
+			.scorecard td.score:not(.used):hover {
+				background-color: rgba(56, 189, 248, 0.1);
+			}
 
-.scorecard td.score {
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.1s ease, transform 0.1s ease;
-  touch-action: manipulation;
-  min-width: 48px;
-  min-height: 44px;
-}
+			.scorecard td.score:not(.used):active {
+				background-color: rgba(56, 189, 248, 0.2);
+				transform: scale(0.98);
+			}
 
-.scorecard td.score:not(.used):hover {
-  background-color: rgba(56, 189, 248, 0.1);
-}
+			.scorecard td.score.used {
+				cursor: default;
+			}
 
-.scorecard td.score:not(.used):active {
-  background-color: rgba(56, 189, 248, 0.2);
-  transform: scale(0.98);
-}
+			.scorecard td.score.used.at-par {
+				color: var(--accent2);
+			}
 
-.scorecard td.score.used {
-  cursor: default;
-}
+			.scorecard td.score.used.below-par {
+				color: #ef4444;
+			}
 
-.scorecard td.score.used.at-par {
-  color: var(--accent2);
-}
+			.scorecard tr.section td {
+				padding-top: 4px;
+				padding-bottom: 4px;
+				font-weight: 700;
+				color: var(--text);
+				background-color: #020617;
+				border-bottom: 1px dashed var(--line);
+			}
 
-.scorecard td.score.used.below-par {
-  color: #ef4444;
-}
+			.scorecard tr.total td {
+				font-weight: 800;
+				border-top: 2px solid var(--line);
+				border-bottom: 2px solid var(--line);
+			}
 
-.scorecard tr.section td {
-  padding-top: 10px;
-  font-weight: 700;
-  color: var(--text);
-  border-bottom: 2px solid var(--line);
-}
+			.player-name {
+				background: transparent;
+				border: none;
+				color: var(--text);
+				font-weight: 700;
+				text-align: center;
+				width: 100%;
+			}
 
-.scorecard tr.total td {
-  font-weight: 800;
-  border-top: 2px solid var(--line);
-}
+			.play-area {
+				background: var(--panel);
+				border-radius: 10px;
+				padding: 14px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
 
-.player-name {
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-weight: 700;
-  text-align: center;
-  width: 100%;
-}
+			.turn-indicator {
+				font-weight: 700;
+				margin-bottom: 8px;
+				text-align: center;
+			}
 
-.play-area {
-  background: var(--panel);
-  border-radius: 14px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+			.dice-container {
+				display: flex;
+				justify-content: center;
+				gap: 14px;
+				flex-wrap: wrap;
+				margin: 16px 0;
+			}
 
-.turn-indicator {
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-align: center;
-}
+			.die {
+				width: 70px;
+				height: 70px;
+				background: #f8fafc;
+				color: #020617;
+				border-radius: 14px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 30px;
+				font-weight: 800;
+				cursor: pointer;
+				transition:
+					transform 0.15s ease,
+					box-shadow 0.15s ease;
+				touch-action: manipulation;
+				user-select: none;
+			}
 
-.dice-container {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin: 16px 0;
-}
+			.die.held {
+				box-shadow: 0 0 0 4px var(--accent);
+				transform: scale(0.94);
+			}
 
-.die {
-  width: 70px;
-  height: 70px;
-  background: #f8fafc;
-  color: #020617;
-  border-radius: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  touch-action: manipulation;
-  user-select: none;
-}
+			.die:active {
+				transform: scale(0.88);
+			}
 
-.die.held {
-  box-shadow: 0 0 0 4px var(--accent);
-  transform: scale(0.94);
-}
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
 
-.die:active {
-  transform: scale(0.88);
-}
+			.controls-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
+			.roll-info {
+				color: var(--muted);
+			}
 
-.controls-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+			.modal {
+				display: none;
+				position: fixed;
+				z-index: 1000;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				justify-content: center;
+				align-items: center;
+			}
 
-.roll-info {
-  color: var(--muted);
-}
+			.modal.show {
+				display: flex;
+			}
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  justify-content: center;
-  align-items: center;
-}
+			.modal-content {
+				background: var(--card);
+				border-radius: 16px;
+				padding: 32px;
+				max-width: 500px;
+				text-align: center;
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+			}
 
-.modal.show {
-  display: flex;
-}
+			.modal-content h2 {
+				margin: 0 0 20px 0;
+				color: var(--accent);
+				font-size: 28px;
+			}
 
-.modal-content {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 500px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
+			.modal-content button {
+				margin-top: 20px;
+				padding: 12px 24px;
+				font-size: 16px;
+			}
 
-.modal-content h2 {
-  margin: 0 0 20px 0;
-  color: var(--accent);
-  font-size: 28px;
-}
+			#winnerScores {
+				margin: 20px 0;
+				font-size: 18px;
+				line-height: 1.8;
+			}
 
-.modal-content button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 16px;
-}
+			.score-line {
+				padding: 8px;
+				border-radius: 8px;
+				margin: 4px 0;
+			}
 
-#winnerScores {
-  margin: 20px 0;
-  font-size: 18px;
-  line-height: 1.8;
-}
+			.score-line.winner {
+				background: rgba(56, 189, 248, 0.2);
+				font-weight: 700;
+			}
+		</style>
+	</head>
 
-.score-line {
-  padding: 8px;
-  border-radius: 8px;
-  margin: 4px 0;
-}
+	<body>
+		<header>
+			<div class="header-top">
+				<a class="back-link" href="/">← Tools</a>
+				<h1>Yahtzee (2 Players)</h1>
+			</div>
+			<div class="controls">
+				<button class="secondary" onclick="showStatsModal()">Stats</button>
+				<button class="secondary" onclick="saveGame()">Save</button>
+				<button class="secondary" onclick="loadGame()">Load</button>
+				<button onclick="newGame()">New Game</button>
+			</div>
+		</header>
 
-.score-line.winner {
-  background: rgba(56, 189, 248, 0.2);
-  font-weight: 700;
-}
-</style>
-</head>
+		<main>
+			<div class="scorecard" id="scorecard"></div>
 
-<body>
-<header>
-  <a class="back-link" href="/">← Tools</a>
-  <h1>Yahtzee (2 Players)</h1>
-  <div class="controls">
-    <button class="secondary" onclick="showStatsModal()">Stats</button>
-    <button class="secondary" onclick="saveGame()">Save</button>
-    <button class="secondary" onclick="loadGame()">Load</button>
-    <button onclick="newGame()">New Game</button>
-  </div>
-</header>
+			<div class="play-area">
+				<div class="turn-indicator" id="turnIndicator"></div>
+				<div class="dice-container" id="diceContainer"></div>
+				<div class="controls-row">
+					<div class="roll-info" id="rollInfo"></div>
+					<button id="rollBtn" onclick="rollDice()">{ Roll }</button>
+				</div>
+			</div>
+		</main>
 
-<main>
-  <div class="scorecard" id="scorecard"></div>
+		<div id="winnerModal" class="modal">
+			<div class="modal-content">
+				<h2 id="winnerTitle"></h2>
+				<div id="winnerScores"></div>
+				<div
+					style="
+						display: flex;
+						gap: 10px;
+						justify-content: center;
+						margin-top: 20px;
+					"
+				>
+					<button class="secondary" onclick="closeWinnerModal()">Close</button>
+					<button onclick="startNewGameFromModal()">Start New Game</button>
+				</div>
+			</div>
+		</div>
 
-  <div class="play-area">
-    <div class="turn-indicator" id="turnIndicator"></div>
-    <div class="dice-container" id="diceContainer"></div>
-    <div class="controls-row">
-      <div class="roll-info" id="rollInfo"></div>
-      <button id="rollBtn" onclick="rollDice()">Roll Dice</button>
-    </div>
-  </div>
-</main>
+		<div id="statsModal" class="modal">
+			<div class="modal-content">
+				<div id="statsContent"></div>
+				<div
+					style="
+						display: flex;
+						gap: 10px;
+						justify-content: center;
+						margin-top: 20px;
+					"
+				>
+					<button class="secondary" onclick="clearStats()">Clear Stats</button>
+					<button onclick="closeStatsModal()">Close</button>
+				</div>
+			</div>
+		</div>
 
-<div id="winnerModal" class="modal">
-  <div class="modal-content">
-    <h2 id="winnerTitle"></h2>
-    <div id="winnerScores"></div>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-      <button class="secondary" onclick="closeWinnerModal()">Close</button>
-      <button onclick="startNewGameFromModal()">Start New Game</button>
-    </div>
-  </div>
-</div>
+		<div id="statsLoadModal" class="modal">
+			<div class="modal-content">
+				<h2>Load Statistics</h2>
+				<p style="color: var(--muted); margin: 16px 0">
+					This save file contains statistics. What would you like to do?
+				</p>
+				<div
+					id="statsLoadPreview"
+					style="
+						text-align: left;
+						margin: 20px 0;
+						padding: 16px;
+						background: var(--panel);
+						border-radius: 8px;
+					"
+				></div>
+				<div
+					style="
+						display: flex;
+						gap: 10px;
+						justify-content: center;
+						margin-top: 20px;
+					"
+				>
+					<button class="secondary" onclick="handleStatsLoad('replace')">
+						Replace All Stats
+					</button>
+					<button onclick="handleStatsLoad('merge')">Merge Stats</button>
+					<button class="secondary" onclick="handleStatsLoad('skip')">
+						Keep Current Stats
+					</button>
+				</div>
+			</div>
+		</div>
 
-<div id="statsModal" class="modal">
-  <div class="modal-content">
-    <div id="statsContent"></div>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-      <button class="secondary" onclick="clearStats()">Clear Stats</button>
-      <button onclick="closeStatsModal()">Close</button>
-    </div>
-  </div>
-</div>
-
-<div id="statsLoadModal" class="modal">
-  <div class="modal-content">
-    <h2>Load Statistics</h2>
-    <p style="color: var(--muted); margin: 16px 0;">This save file contains statistics. What would you like to do?</p>
-    <div id="statsLoadPreview" style="text-align: left; margin: 20px 0; padding: 16px; background: var(--panel); border-radius: 8px;"></div>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-      <button class="secondary" onclick="handleStatsLoad('replace')">Replace All Stats</button>
-      <button onclick="handleStatsLoad('merge')">Merge Stats</button>
-      <button class="secondary" onclick="handleStatsLoad('skip')">Keep Current Stats</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ============================================================================
+		<script>
+			/* ============================================================================
    GAME DATA
 ============================================================================ */
-const CATEGORIES = [
-  { key: "ones", label: "Ones", upper: true, par: 3 },
-  { key: "twos", label: "Twos", upper: true, par: 6 },
-  { key: "threes", label: "Threes", upper: true, par: 9 },
-  { key: "fours", label: "Fours", upper: true, par: 12 },
-  { key: "fives", label: "Fives", upper: true, par: 15 },
-  { key: "sixes", label: "Sixes", upper: true, par: 18 },
-  { key: "threeKind", label: "3 of a Kind" },
-  { key: "fourKind", label: "4 of a Kind" },
-  { key: "fullHouse", label: "Full House" },
-  { key: "smallStraight", label: "Small Straight" },
-  { key: "largeStraight", label: "Large Straight" },
-  { key: "yahtzee", label: "Yahtzee" },
-  { key: "chance", label: "Chance" }
-];
+			const CATEGORIES = [
+				{ key: "ones", label: "Ones", upper: true, par: 3 },
+				{ key: "twos", label: "Twos", upper: true, par: 6 },
+				{ key: "threes", label: "Threes", upper: true, par: 9 },
+				{ key: "fours", label: "Fours", upper: true, par: 12 },
+				{ key: "fives", label: "Fives", upper: true, par: 15 },
+				{ key: "sixes", label: "Sixes", upper: true, par: 18 },
+				{ key: "threeKind", label: "3 of a Kind" },
+				{ key: "fourKind", label: "4 of a Kind" },
+				{ key: "fullHouse", label: "Full House" },
+				{ key: "smallStraight", label: "Small" },
+				{ key: "largeStraight", label: "Large" },
+				{ key: "yahtzee", label: "Yahtzee" },
+				{ key: "chance", label: "Chance" },
+			];
 
-let gameState;
+			let gameState;
 
-/* ============================================================================
+			/* ============================================================================
    INIT
 ============================================================================ */
-function newGame() {
-  let playerNames = ["Player 1", "Player 2"];
+			function newGame() {
+				let playerNames = ["Player 1", "Player 2"];
 
-  // Preserve and reorder players if there's an existing game
-  if (gameState && gameState.players) {
-    const scores = gameState.players.map((p, i) => ({
-      name: p.name,
-      score: calcTotals(p).grand,
-      index: i
-    })).sort((a, b) => b.score - a.score);
+				// Preserve and reorder players if there's an existing game
+				if (gameState && gameState.players) {
+					const scores = gameState.players
+						.map((p, i) => ({
+							name: p.name,
+							score: calcTotals(p).grand,
+							index: i,
+						}))
+						.sort((a, b) => b.score - a.score);
 
-    playerNames = scores.map(s => s.name);
-  }
+					playerNames = scores.map((s) => s.name);
+				}
 
-  gameState = {
-    players: [
-      { name: playerNames[0], scores: {} },
-      { name: playerNames[1], scores: {} }
-    ],
-    currentPlayer: 0,
-    dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
-    rollsLeft: 3,
-    gameEnded: false
-  };
-  render();
-}
-newGame();
+				gameState = {
+					players: [
+						{ name: playerNames[0], scores: {} },
+						{ name: playerNames[1], scores: {} },
+					],
+					currentPlayer: 0,
+					dice: Array.from({ length: 5 }, () => ({ value: 1, held: false })),
+					rollsLeft: 3,
+					gameEnded: false,
+				};
+				render();
+			}
+			newGame();
 
-/* ============================================================================
+			/* ============================================================================
    RENDER
 ============================================================================ */
-function render() {
-  renderScorecard();
-  renderDice();
-  renderControls();
-}
+			function render() {
+				renderScorecard();
+				renderDice();
+				renderControls();
+			}
 
-function renderScorecard() {
-  const el = document.getElementById("scorecard");
-  el.innerHTML = "";
+			function renderScorecard() {
+				const el = document.getElementById("scorecard");
+				el.innerHTML = "";
 
-  const table = document.createElement("table");
+				const table = document.createElement("table");
 
-  // Header
-  const head = document.createElement("tr");
-  head.innerHTML = `
+				// Header
+				const head = document.createElement("tr");
+				head.innerHTML = `
     <th></th>
-    <th class="player ${gameState.currentPlayer===0?"active":""}">
+    <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
       <input class="player-name" value="${gameState.players[0].name}"
         onchange="gameState.players[0].name=this.value">
     </th>
-    <th class="player ${gameState.currentPlayer===1?"active":""}">
+    <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
       <input class="player-name" value="${gameState.players[1].name}"
         onchange="gameState.players[1].name=this.value">
     </th>`;
-  table.appendChild(head);
+				table.appendChild(head);
 
-  table.appendChild(sectionRow("Upper Section"));
+				table.appendChild(sectionRow("Top"));
 
-  CATEGORIES.filter(c=>c.upper).forEach(c=>addCategoryRow(table,c));
+				CATEGORIES.filter((c) => c.upper).forEach((c) =>
+					addCategoryRow(table, c),
+				);
 
-  table.appendChild(totalRow("Upper Total", p=>calcTotals(p).upper));
-  table.appendChild(totalRow("Upper Bonus", p=>calcTotals(p).upperBonus));
+				table.appendChild(totalRow("Top Total", (p) => calcTotals(p).upper));
+				table.appendChild(totalRow("Bonus", (p) => calcTotals(p).upperBonus));
 
-  table.appendChild(sectionRow("Lower Section"));
+				table.appendChild(sectionRow("Bottom"));
 
-  // Add categories up to and including yahtzee
-  CATEGORIES.filter(c=>!c.upper).forEach(c=>{
-    addCategoryRow(table,c);
-  });
+				// Add categories up to and including yahtzee
+				CATEGORIES.filter((c) => !c.upper).forEach((c) => {
+					addCategoryRow(table, c);
+				});
 
-  table.appendChild(totalRow("Lower Total", p=>calcTotals(p).lower));
-  table.appendChild(totalRow("Grand Total", p=>calcTotals(p).grand));
+				table.appendChild(totalRow("Bottom Total", (p) => calcTotals(p).lower));
+				table.appendChild(totalRow("Grand Total", (p) => calcTotals(p).grand));
 
-  el.appendChild(table);
-}
+				el.appendChild(table);
+			}
 
-function sectionRow(label) {
-  const tr = document.createElement("tr");
-  tr.className = "section";
-  tr.innerHTML = `<td colspan="3">${label}</td>`;
-  return tr;
-}
+			function sectionRow(label) {
+				const tr = document.createElement("tr");
+				tr.className = "section";
+				tr.innerHTML = `<td colspan="3">${label}</td>`;
+				return tr;
+			}
 
-function totalRow(label, fn) {
-  const tr = document.createElement("tr");
-  tr.className = "total";
-  tr.innerHTML = `
+			function totalRow(label, fn) {
+				const tr = document.createElement("tr");
+				tr.className = "total";
+				tr.innerHTML = `
     <td>${label}</td>
     <td style="text-align:center">${fn(gameState.players[0])}</td>
     <td style="text-align:center">${fn(gameState.players[1])}</td>`;
-  return tr;
-}
+				return tr;
+			}
 
-function addCategoryRow(table, cat) {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `<td class="label">${cat.label}</td>`;
-  gameState.players.forEach((p, i) => {
-    const td = document.createElement("td");
-    td.className = "score";
-    const val = p.scores[cat.key];
-    if (val != null) {
-      td.textContent = val;
-      td.classList.add("used");
+			function addCategoryRow(table, cat) {
+				const tr = document.createElement("tr");
+				tr.innerHTML = `<td class="label">${cat.label}</td>`;
+				gameState.players.forEach((p, i) => {
+					const td = document.createElement("td");
+					td.className = "score";
+					const val = p.scores[cat.key];
+					if (val != null) {
+						td.textContent = val;
+						td.classList.add("used");
 
-      // Apply color coding based on par (only for upper section)
-      if (cat.par !== undefined) {
-        if (val >= cat.par) {
-          td.classList.add("at-par");
-        } else {
-          td.classList.add("below-par");
-        }
-      } else {
-        // Lower section scores default to green
-        td.classList.add("at-par");
-      }
-    } else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
-      td.textContent = previewScore(cat.key);
-      td.onclick = () => assignScore(cat.key);
-    }
-    tr.appendChild(td);
-  });
-  table.appendChild(tr);
-}
+						// Apply color coding based on par (only for upper section)
+						if (cat.par !== undefined) {
+							if (val >= cat.par) {
+								td.classList.add("at-par");
+							} else {
+								td.classList.add("below-par");
+							}
+						} else {
+							// Lower section scores default to green
+							td.classList.add("at-par");
+						}
+					} else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
+						td.textContent = previewScore(cat.key);
+						td.onclick = () => assignScore(cat.key);
+					}
+					tr.appendChild(td);
+				});
+				table.appendChild(tr);
+			}
 
-function renderDice() {
-  const c = document.getElementById("diceContainer");
-  c.innerHTML = "";
-  gameState.dice.forEach(d=>{
-    const el = document.createElement("div");
-    el.className = "die" + (d.held?" held":"");
-    el.textContent = d.value;
-    el.onclick = ()=>{
-      if (gameState.rollsLeft<3) {
-        d.held=!d.held;
-        renderDice();
-      }
-    };
-    c.appendChild(el);
-  });
-}
+			function renderDice() {
+				const c = document.getElementById("diceContainer");
+				c.innerHTML = "";
+				gameState.dice.forEach((d) => {
+					const el = document.createElement("div");
+					el.className = "die" + (d.held ? " held" : "");
+					el.textContent = d.value;
+					el.onclick = () => {
+						if (gameState.rollsLeft < 3) {
+							d.held = !d.held;
+							renderDice();
+						}
+					};
+					c.appendChild(el);
+				});
+			}
 
-function renderControls() {
-  document.getElementById("turnIndicator").textContent =
-    `${gameState.players[gameState.currentPlayer].name}'s Turn`;
-  document.getElementById("rollInfo").textContent =
-    `Rolls left: ${gameState.rollsLeft}`;
-  document.getElementById("rollBtn").disabled = gameState.rollsLeft===0;
-}
+			function renderControls() {
+				document.getElementById("turnIndicator").textContent =
+					`${gameState.players[gameState.currentPlayer].name}'s Turn`;
+				document.getElementById("rollInfo").textContent =
+					`Rolls left: ${gameState.rollsLeft}`;
+				document.getElementById("rollBtn").disabled = gameState.rollsLeft === 0;
+			}
 
-/* ============================================================================
+			/* ============================================================================
    GAMEPLAY
 ============================================================================ */
-function rollDice() {
-  if (gameState.gameEnded || !gameState.rollsLeft) return;
-  gameState.dice.forEach(d=>{
-    if(!d.held) d.value = Math.floor(Math.random()*6)+1;
-  });
-  gameState.rollsLeft--;
-  render();
-}
+			function rollDice() {
+				if (gameState.gameEnded || !gameState.rollsLeft) return;
+				gameState.dice.forEach((d) => {
+					if (!d.held) d.value = Math.floor(Math.random() * 6) + 1;
+				});
+				gameState.rollsLeft--;
+				render();
+			}
 
-function assignScore(cat) {
-  if (gameState.gameEnded) return;
-  const p = gameState.players[gameState.currentPlayer];
-  if (p.scores[cat]!=null) return;
-  const score = calcScore(cat);
-  const catLabel = CATEGORIES.find(c => c.key === cat).label;
-  if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
-  p.scores[cat] = score;
+			function assignScore(cat) {
+				if (gameState.gameEnded) return;
+				const p = gameState.players[gameState.currentPlayer];
+				if (p.scores[cat] != null) return;
+				const score = calcScore(cat);
+				const catLabel = CATEGORIES.find((c) => c.key === cat).label;
+				if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
+				p.scores[cat] = score;
 
-  endTurn();
-}
+				endTurn();
+			}
 
-function endTurn() {
-  gameState.dice.forEach(d=>d.held=false);
-  gameState.rollsLeft=3;
-  gameState.currentPlayer=1-gameState.currentPlayer;
-  render();
-  checkGameEnd();
-}
+			function endTurn() {
+				gameState.dice.forEach((d) => (d.held = false));
+				gameState.rollsLeft = 3;
+				gameState.currentPlayer = 1 - gameState.currentPlayer;
+				render();
+				checkGameEnd();
+			}
 
-function checkGameEnd() {
-  const allScored = gameState.players.every(p =>
-    CATEGORIES.every(c => p.scores[c.key] != null)
-  );
-  if (allScored) {
-    gameState.gameEnded = true;
-    showWinnerModal();
-  }
-}
+			function checkGameEnd() {
+				const allScored = gameState.players.every((p) =>
+					CATEGORIES.every((c) => p.scores[c.key] != null),
+				);
+				if (allScored) {
+					gameState.gameEnded = true;
+					showWinnerModal();
+				}
+			}
 
-function showWinnerModal() {
-  const scores = gameState.players.map((p, i) => ({
-    name: p.name,
-    score: calcTotals(p).grand,
-    index: i
-  })).sort((a, b) => b.score - a.score);
+			function showWinnerModal() {
+				const scores = gameState.players
+					.map((p, i) => ({
+						name: p.name,
+						score: calcTotals(p).grand,
+						index: i,
+					}))
+					.sort((a, b) => b.score - a.score);
 
-  const winner = scores[0];
+				const winner = scores[0];
 
-  // Update statistics
-  updateStats(winner.name, scores);
+				// Update statistics
+				updateStats(winner.name, scores);
 
-  document.getElementById('winnerTitle').textContent =
-    `🏆 ${winner.name} Wins! 🏆`;
+				document.getElementById("winnerTitle").textContent =
+					`🏆 ${winner.name} Wins! 🏆`;
 
-  const scoresHtml = scores.map((s, i) => `
-    <div class="score-line ${i === 0 ? 'winner' : ''}">
+				const scoresHtml = scores
+					.map(
+						(s, i) => `
+    <div class="score-line ${i === 0 ? "winner" : ""}">
       ${i + 1}. ${s.name}: ${s.score} points
     </div>
-  `).join('');
+  `,
+					)
+					.join("");
 
-  document.getElementById('winnerScores').innerHTML = scoresHtml;
-  document.getElementById('winnerModal').classList.add('show');
-}
+				document.getElementById("winnerScores").innerHTML = scoresHtml;
+				document.getElementById("winnerModal").classList.add("show");
+			}
 
-function closeWinnerModal() {
-  document.getElementById('winnerModal').classList.remove('show');
-}
+			function closeWinnerModal() {
+				document.getElementById("winnerModal").classList.remove("show");
+			}
 
-function startNewGameFromModal() {
-  document.getElementById('winnerModal').classList.remove('show');
-  newGame();
-}
+			function startNewGameFromModal() {
+				document.getElementById("winnerModal").classList.remove("show");
+				newGame();
+			}
 
-/* ============================================================================
+			/* ============================================================================
    SCORING
 ============================================================================ */
-function calcScore(cat) {
-  const v = gameState.dice.map(d=>d.value);
-  const c = count(v);
-  const s = v.reduce((a,b)=>a+b,0);
-  let result;
-  switch(cat){
-    case"ones":result=(c[1]||0)*1;break;
-    case"twos":result=(c[2]||0)*2;break;
-    case"threes":result=(c[3]||0)*3;break;
-    case"fours":result=(c[4]||0)*4;break;
-    case"fives":result=(c[5]||0)*5;break;
-    case"sixes":result=(c[6]||0)*6;break;
-    case"threeKind":result=has(c,3)?s:0;break;
-    case"fourKind":result=has(c,4)?s:0;break;
-    case"fullHouse":result=fh(c)?25:0;break;
-    case"smallStraight":result=ss(v)?30:0;break;
-    case"largeStraight":result=ls(v)?40:0;break;
-    case"yahtzee":result=has(c,5)?50:0;break;
-    case"chance":result=s;break;
-    default:result=0;
-  }
-  // Ensure we always return a valid number, never NaN
-  return (typeof result === 'number' && !isNaN(result)) ? result : 0;
-}
-const previewScore = calcScore;
-const count = v => v.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{});
-const has = (c,n)=>Object.values(c).some(x=>x>=n);
-const fh = c=>Object.values(c).includes(3)&&Object.values(c).includes(2);
-const ss = v=>[[1,2,3,4],[2,3,4,5],[3,4,5,6]].some(s=>s.every(x=>v.includes(x)));
-const ls = v=>["1,2,3,4,5","2,3,4,5,6"].includes([...new Set(v)].sort().join());
+			function calcScore(cat) {
+				const v = gameState.dice.map((d) => d.value);
+				const c = count(v);
+				const s = v.reduce((a, b) => a + b, 0);
+				let result;
+				switch (cat) {
+					case "ones":
+						result = (c[1] || 0) * 1;
+						break;
+					case "twos":
+						result = (c[2] || 0) * 2;
+						break;
+					case "threes":
+						result = (c[3] || 0) * 3;
+						break;
+					case "fours":
+						result = (c[4] || 0) * 4;
+						break;
+					case "fives":
+						result = (c[5] || 0) * 5;
+						break;
+					case "sixes":
+						result = (c[6] || 0) * 6;
+						break;
+					case "threeKind":
+						result = has(c, 3) ? s : 0;
+						break;
+					case "fourKind":
+						result = has(c, 4) ? s : 0;
+						break;
+					case "fullHouse":
+						result = fh(c) ? 25 : 0;
+						break;
+					case "smallStraight":
+						result = ss(v) ? 30 : 0;
+						break;
+					case "largeStraight":
+						result = ls(v) ? 40 : 0;
+						break;
+					case "yahtzee":
+						result = has(c, 5) ? 50 : 0;
+						break;
+					case "chance":
+						result = s;
+						break;
+					default:
+						result = 0;
+				}
+				// Ensure we always return a valid number, never NaN
+				return typeof result === "number" && !isNaN(result) ? result : 0;
+			}
+			const previewScore = calcScore;
+			const count = (v) =>
+				v.reduce((a, x) => ((a[x] = (a[x] || 0) + 1), a), {});
+			const has = (c, n) => Object.values(c).some((x) => x >= n);
+			const fh = (c) =>
+				Object.values(c).includes(3) && Object.values(c).includes(2);
+			const ss = (v) =>
+				[
+					[1, 2, 3, 4],
+					[2, 3, 4, 5],
+					[3, 4, 5, 6],
+				].some((s) => s.every((x) => v.includes(x)));
+			const ls = (v) =>
+				["1,2,3,4,5", "2,3,4,5,6"].includes([...new Set(v)].sort().join());
 
-function calcTotals(p){
-  let u=0,l=0;
-  CATEGORIES.forEach(c=>{
-    const v=p.scores[c.key];
-    if(v!=null) {
-      // Ensure we're adding valid numbers only
-      const validValue = (typeof v === 'number' && !isNaN(v)) ? v : 0;
-      c.upper ? u+=validValue : l+=validValue;
-    }
-  });
-  const ub=u>=63?35:0;
-  const grand=u+ub+l;
-  // Defensive check to ensure totals are valid numbers
-  return {
-    upper:isNaN(u)?0:u,
-    upperBonus:isNaN(ub)?0:ub,
-    lower:isNaN(l)?0:l,
-    grand:isNaN(grand)?0:grand
-  };
-}
+			function calcTotals(p) {
+				let u = 0,
+					l = 0;
+				CATEGORIES.forEach((c) => {
+					const v = p.scores[c.key];
+					if (v != null) {
+						// Ensure we're adding valid numbers only
+						const validValue = typeof v === "number" && !isNaN(v) ? v : 0;
+						c.upper ? (u += validValue) : (l += validValue);
+					}
+				});
+				const ub = u >= 63 ? 35 : 0;
+				const grand = u + ub + l;
+				// Defensive check to ensure totals are valid numbers
+				return {
+					upper: isNaN(u) ? 0 : u,
+					upperBonus: isNaN(ub) ? 0 : ub,
+					lower: isNaN(l) ? 0 : l,
+					grand: isNaN(grand) ? 0 : grand,
+				};
+			}
 
-/* ============================================================================
+			/* ============================================================================
    SAVE / LOAD
 ============================================================================ */
-function saveGame() {
-  // Create a comprehensive save object with both game state and statistics
-  const saveData = {
-    version: "1.1", // Version to track save file format
-    gameState: gameState,
-    statistics: getStats() || {
-      gamesPlayed: 0,
-      playerWins: {},
-      playerScores: {},
-      highestScore: { name: '', score: 0 }
-    },
-    savedAt: new Date().toISOString()
-  };
+			function saveGame() {
+				// Create a comprehensive save object with both game state and statistics
+				const saveData = {
+					version: "1.1", // Version to track save file format
+					gameState: gameState,
+					statistics: getStats() || {
+						gamesPlayed: 0,
+						playerWins: {},
+						playerScores: {},
+						highestScore: { name: "", score: 0 },
+					},
+					savedAt: new Date().toISOString(),
+				};
 
-  const blob = new Blob([JSON.stringify(saveData, null, 2)], {type: "application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "yahtzee-game.json";
-  a.click();
-}
+				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
+					type: "application/json",
+				});
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = "yahtzee-game.json";
+				a.click();
+			}
 
-function loadGame() {
-  const i = document.createElement("input");
-  i.type = "file";
-  i.accept = "application/json";
-  i.onchange = e => {
-    const r = new FileReader();
-    r.onload = () => {
-      try {
-        const data = JSON.parse(r.result);
+			function loadGame() {
+				const i = document.createElement("input");
+				i.type = "file";
+				i.accept = "application/json";
+				i.onchange = (e) => {
+					const r = new FileReader();
+					r.onload = () => {
+						try {
+							const data = JSON.parse(r.result);
 
-        // Handle backward compatibility - old saves just had gameState directly
-        if (data.version) {
-          // New format with gameState and statistics
-          gameState = data.gameState;
+							// Handle backward compatibility - old saves just had gameState directly
+							if (data.version) {
+								// New format with gameState and statistics
+								gameState = data.gameState;
 
-          // If there are statistics in the save file, ask user what to do
-          if (data.statistics && data.statistics.gamesPlayed > 0) {
-            showStatsLoadModal(data.statistics);
-          }
-        } else {
-          // Old format - data IS the gameState
-          gameState = data;
-          console.log('Loaded legacy save file (no statistics included)');
-        }
+								// If there are statistics in the save file, ask user what to do
+								if (data.statistics && data.statistics.gamesPlayed > 0) {
+									showStatsLoadModal(data.statistics);
+								}
+							} else {
+								// Old format - data IS the gameState
+								gameState = data;
+								console.log("Loaded legacy save file (no statistics included)");
+							}
 
-        render();
-      } catch (err) {
-        alert('Error loading save file: ' + err.message);
-        console.error('Load error:', err);
-      }
-    };
-    r.readAsText(e.target.files[0]);
-  };
-  i.click();
-}
+							render();
+						} catch (err) {
+							alert("Error loading save file: " + err.message);
+							console.error("Load error:", err);
+						}
+					};
+					r.readAsText(e.target.files[0]);
+				};
+				i.click();
+			}
 
-/* ============================================================================
+			/* ============================================================================
    STATISTICS
 ============================================================================ */
-function getStats() {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const stored = localStorage.getItem('yahtzeeStats');
-    return stored ? JSON.parse(stored) : {
-      gamesPlayed: 0,
-      playerWins: {},
-      playerScores: {},
-      highestScore: { name: '', score: 0 }
-    };
-  } catch (e) {
-    console.warn('localStorage unavailable:', e);
-    return null;
-  }
-}
+			function getStats() {
+				try {
+					if (typeof localStorage === "undefined") return null;
+					const stored = localStorage.getItem("yahtzeeStats");
+					return stored
+						? JSON.parse(stored)
+						: {
+								gamesPlayed: 0,
+								playerWins: {},
+								playerScores: {},
+								highestScore: { name: "", score: 0 },
+							};
+				} catch (e) {
+					console.warn("localStorage unavailable:", e);
+					return null;
+				}
+			}
 
-function saveStats(stats) {
-  try {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem('yahtzeeStats', JSON.stringify(stats));
-  } catch (e) {
-    console.warn('Failed to save stats:', e);
-  }
-}
+			function saveStats(stats) {
+				try {
+					if (typeof localStorage === "undefined") return;
+					localStorage.setItem("yahtzeeStats", JSON.stringify(stats));
+				} catch (e) {
+					console.warn("Failed to save stats:", e);
+				}
+			}
 
-function updateStats(winnerName, scores) {
-  const stats = getStats();
-  if (!stats) return;
+			function updateStats(winnerName, scores) {
+				const stats = getStats();
+				if (!stats) return;
 
-  stats.gamesPlayed++;
+				stats.gamesPlayed++;
 
-  // Update wins
-  stats.playerWins[winnerName] = (stats.playerWins[winnerName] || 0) + 1;
+				// Update wins
+				stats.playerWins[winnerName] = (stats.playerWins[winnerName] || 0) + 1;
 
-  // Update all scores for averaging
-  scores.forEach(s => {
-    if (!stats.playerScores[s.name]) {
-      stats.playerScores[s.name] = [];
-    }
-    stats.playerScores[s.name].push(s.score);
-  });
+				// Update all scores for averaging
+				scores.forEach((s) => {
+					if (!stats.playerScores[s.name]) {
+						stats.playerScores[s.name] = [];
+					}
+					stats.playerScores[s.name].push(s.score);
+				});
 
-  // Update highest score
-  const topScore = Math.max(...scores.map(s => s.score));
-  const topPlayer = scores.find(s => s.score === topScore);
-  if (topScore > stats.highestScore.score) {
-    stats.highestScore = { name: topPlayer.name, score: topScore };
-  }
+				// Update highest score
+				const topScore = Math.max(...scores.map((s) => s.score));
+				const topPlayer = scores.find((s) => s.score === topScore);
+				if (topScore > stats.highestScore.score) {
+					stats.highestScore = { name: topPlayer.name, score: topScore };
+				}
 
-  saveStats(stats);
-}
+				saveStats(stats);
+			}
 
-function clearStats() {
-  if (confirm('Clear all statistics? This cannot be undone.')) {
-    try {
-      localStorage.removeItem('yahtzeeStats');
-      alert('Statistics cleared!');
-      showStatsModal();
-    } catch (e) {
-      console.warn('Failed to clear stats:', e);
-    }
-  }
-}
+			function clearStats() {
+				if (confirm("Clear all statistics? This cannot be undone.")) {
+					try {
+						localStorage.removeItem("yahtzeeStats");
+						alert("Statistics cleared!");
+						showStatsModal();
+					} catch (e) {
+						console.warn("Failed to clear stats:", e);
+					}
+				}
+			}
 
-function showStatsModal() {
-  const stats = getStats();
-  if (!stats) {
-    alert('Statistics are not available (localStorage disabled)');
-    return;
-  }
+			function showStatsModal() {
+				const stats = getStats();
+				if (!stats) {
+					alert("Statistics are not available (localStorage disabled)");
+					return;
+				}
 
-  const modal = document.getElementById('statsModal');
-  const content = document.getElementById('statsContent');
+				const modal = document.getElementById("statsModal");
+				const content = document.getElementById("statsContent");
 
-  let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
-  html += `<p><strong>Total Games:</strong> ${stats.gamesPlayed}</p>`;
+				let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
+				html += `<p><strong>Total Games:</strong> ${stats.gamesPlayed}</p>`;
 
-  if (stats.highestScore.score > 0) {
-    html += `<p><strong>Highest Score:</strong> ${stats.highestScore.name} - ${stats.highestScore.score}</p>`;
-  }
+				if (stats.highestScore.score > 0) {
+					html += `<p><strong>Highest Score:</strong> ${stats.highestScore.name} - ${stats.highestScore.score}</p>`;
+				}
 
-  if (Object.keys(stats.playerWins).length > 0) {
-    html += `<h4>Wins by Player</h4>`;
-    Object.entries(stats.playerWins)
-      .sort((a, b) => b[1] - a[1])
-      .forEach(([name, wins]) => {
-        html += `<p>${name}: ${wins} win${wins !== 1 ? 's' : ''}</p>`;
-      });
-  }
+				if (Object.keys(stats.playerWins).length > 0) {
+					html += `<h4>Wins by Player</h4>`;
+					Object.entries(stats.playerWins)
+						.sort((a, b) => b[1] - a[1])
+						.forEach(([name, wins]) => {
+							html += `<p>${name}: ${wins} win${wins !== 1 ? "s" : ""}</p>`;
+						});
+				}
 
-  if (Object.keys(stats.playerScores).length > 0) {
-    html += `<h4>Average Scores</h4>`;
-    Object.entries(stats.playerScores).forEach(([name, scores]) => {
-      const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
-      html += `<p>${name}: ${avg} (${scores.length} game${scores.length !== 1 ? 's' : ''})</p>`;
-    });
-  }
+				if (Object.keys(stats.playerScores).length > 0) {
+					html += `<h4>Average Scores</h4>`;
+					Object.entries(stats.playerScores).forEach(([name, scores]) => {
+						const avg = Math.round(
+							scores.reduce((a, b) => a + b, 0) / scores.length,
+						);
+						html += `<p>${name}: ${avg} (${scores.length} game${scores.length !== 1 ? "s" : ""})</p>`;
+					});
+				}
 
-  if (stats.gamesPlayed === 0) {
-    html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
-  }
+				if (stats.gamesPlayed === 0) {
+					html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
+				}
 
-  content.innerHTML = html;
-  modal.classList.add('show');
-}
+				content.innerHTML = html;
+				modal.classList.add("show");
+			}
 
-function closeStatsModal() {
-  document.getElementById('statsModal').classList.remove('show');
-}
+			function closeStatsModal() {
+				document.getElementById("statsModal").classList.remove("show");
+			}
 
-/* ============================================================================
+			/* ============================================================================
    STATISTICS LOADING & MERGING
 ============================================================================ */
-let pendingLoadedStats = null;
+			let pendingLoadedStats = null;
 
-/**
- * Validates statistics object to ensure it has the correct structure
- */
-function validateStats(stats) {
-  if (!stats || typeof stats !== 'object') {
-    return false;
-  }
+			/**
+			 * Validates statistics object to ensure it has the correct structure
+			 */
+			function validateStats(stats) {
+				if (!stats || typeof stats !== "object") {
+					return false;
+				}
 
-  // Ensure required fields exist
-  if (typeof stats.gamesPlayed !== 'number' || stats.gamesPlayed < 0) {
-    stats.gamesPlayed = 0;
-  }
+				// Ensure required fields exist
+				if (typeof stats.gamesPlayed !== "number" || stats.gamesPlayed < 0) {
+					stats.gamesPlayed = 0;
+				}
 
-  if (!stats.playerWins || typeof stats.playerWins !== 'object') {
-    stats.playerWins = {};
-  }
+				if (!stats.playerWins || typeof stats.playerWins !== "object") {
+					stats.playerWins = {};
+				}
 
-  if (!stats.playerScores || typeof stats.playerScores !== 'object') {
-    stats.playerScores = {};
-  }
+				if (!stats.playerScores || typeof stats.playerScores !== "object") {
+					stats.playerScores = {};
+				}
 
-  if (!stats.highestScore || typeof stats.highestScore !== 'object') {
-    stats.highestScore = { name: '', score: 0 };
-  }
+				if (!stats.highestScore || typeof stats.highestScore !== "object") {
+					stats.highestScore = { name: "", score: 0 };
+				}
 
-  // Validate playerWins - ensure all values are numbers
-  Object.keys(stats.playerWins).forEach(key => {
-    if (typeof stats.playerWins[key] !== 'number' || stats.playerWins[key] < 0) {
-      stats.playerWins[key] = 0;
-    }
-  });
+				// Validate playerWins - ensure all values are numbers
+				Object.keys(stats.playerWins).forEach((key) => {
+					if (
+						typeof stats.playerWins[key] !== "number" ||
+						stats.playerWins[key] < 0
+					) {
+						stats.playerWins[key] = 0;
+					}
+				});
 
-  // Validate playerScores - ensure all values are arrays of numbers
-  Object.keys(stats.playerScores).forEach(key => {
-    if (!Array.isArray(stats.playerScores[key])) {
-      stats.playerScores[key] = [];
-    } else {
-      // Filter out non-numbers
-      stats.playerScores[key] = stats.playerScores[key].filter(s =>
-        typeof s === 'number' && !isNaN(s) && s >= 0
-      );
-    }
-  });
+				// Validate playerScores - ensure all values are arrays of numbers
+				Object.keys(stats.playerScores).forEach((key) => {
+					if (!Array.isArray(stats.playerScores[key])) {
+						stats.playerScores[key] = [];
+					} else {
+						// Filter out non-numbers
+						stats.playerScores[key] = stats.playerScores[key].filter(
+							(s) => typeof s === "number" && !isNaN(s) && s >= 0,
+						);
+					}
+				});
 
-  // Validate highestScore
-  if (typeof stats.highestScore.score !== 'number' || stats.highestScore.score < 0) {
-    stats.highestScore.score = 0;
-  }
-  if (typeof stats.highestScore.name !== 'string') {
-    stats.highestScore.name = '';
-  }
+				// Validate highestScore
+				if (
+					typeof stats.highestScore.score !== "number" ||
+					stats.highestScore.score < 0
+				) {
+					stats.highestScore.score = 0;
+				}
+				if (typeof stats.highestScore.name !== "string") {
+					stats.highestScore.name = "";
+				}
 
-  return true;
-}
+				return true;
+			}
 
-/**
- * Shows modal to let user choose how to handle loaded statistics
- */
-function showStatsLoadModal(loadedStats) {
-  // Validate the loaded stats
-  if (!validateStats(loadedStats)) {
-    console.error('Invalid statistics format in save file');
-    return;
-  }
+			/**
+			 * Shows modal to let user choose how to handle loaded statistics
+			 */
+			function showStatsLoadModal(loadedStats) {
+				// Validate the loaded stats
+				if (!validateStats(loadedStats)) {
+					console.error("Invalid statistics format in save file");
+					return;
+				}
 
-  pendingLoadedStats = loadedStats;
-  const currentStats = getStats();
+				pendingLoadedStats = loadedStats;
+				const currentStats = getStats();
 
-  // Build preview of what's being loaded
-  let preview = '<div style="font-size: 14px;">';
-  preview += '<p><strong>Save file contains:</strong></p>';
-  preview += `<p>Games Played: ${loadedStats.gamesPlayed}</p>`;
+				// Build preview of what's being loaded
+				let preview = '<div style="font-size: 14px;">';
+				preview += "<p><strong>Save file contains:</strong></p>";
+				preview += `<p>Games Played: ${loadedStats.gamesPlayed}</p>`;
 
-  if (loadedStats.highestScore.score > 0) {
-    preview += `<p>Highest Score: ${loadedStats.highestScore.name} - ${loadedStats.highestScore.score}</p>`;
-  }
+				if (loadedStats.highestScore.score > 0) {
+					preview += `<p>Highest Score: ${loadedStats.highestScore.name} - ${loadedStats.highestScore.score}</p>`;
+				}
 
-  const playerCount = Object.keys(loadedStats.playerWins).length;
-  if (playerCount > 0) {
-    preview += `<p>Players with stats: ${playerCount}</p>`;
-  }
+				const playerCount = Object.keys(loadedStats.playerWins).length;
+				if (playerCount > 0) {
+					preview += `<p>Players with stats: ${playerCount}</p>`;
+				}
 
-  preview += '<br><p><strong>Current stats:</strong></p>';
-  if (currentStats && currentStats.gamesPlayed > 0) {
-    preview += `<p>Games Played: ${currentStats.gamesPlayed}</p>`;
-    if (currentStats.highestScore.score > 0) {
-      preview += `<p>Highest Score: ${currentStats.highestScore.name} - ${currentStats.highestScore.score}</p>`;
-    }
-  } else {
-    preview += `<p style="color: var(--muted);">No current stats</p>`;
-  }
-  preview += '</div>';
+				preview += "<br><p><strong>Current stats:</strong></p>";
+				if (currentStats && currentStats.gamesPlayed > 0) {
+					preview += `<p>Games Played: ${currentStats.gamesPlayed}</p>`;
+					if (currentStats.highestScore.score > 0) {
+						preview += `<p>Highest Score: ${currentStats.highestScore.name} - ${currentStats.highestScore.score}</p>`;
+					}
+				} else {
+					preview += `<p style="color: var(--muted);">No current stats</p>`;
+				}
+				preview += "</div>";
 
-  document.getElementById('statsLoadPreview').innerHTML = preview;
-  document.getElementById('statsLoadModal').classList.add('show');
-}
+				document.getElementById("statsLoadPreview").innerHTML = preview;
+				document.getElementById("statsLoadModal").classList.add("show");
+			}
 
-/**
- * Handles user choice for loading statistics
- */
-function handleStatsLoad(action) {
-  const modal = document.getElementById('statsLoadModal');
-  modal.classList.remove('show');
+			/**
+			 * Handles user choice for loading statistics
+			 */
+			function handleStatsLoad(action) {
+				const modal = document.getElementById("statsLoadModal");
+				modal.classList.remove("show");
 
-  if (!pendingLoadedStats) {
-    return;
-  }
+				if (!pendingLoadedStats) {
+					return;
+				}
 
-  switch (action) {
-    case 'replace':
-      // Replace all stats with loaded stats
-      saveStats(pendingLoadedStats);
-      console.log('Statistics replaced with loaded data');
-      break;
+				switch (action) {
+					case "replace":
+						// Replace all stats with loaded stats
+						saveStats(pendingLoadedStats);
+						console.log("Statistics replaced with loaded data");
+						break;
 
-    case 'merge':
-      // Merge loaded stats with current stats
-      const currentStats = getStats() || {
-        gamesPlayed: 0,
-        playerWins: {},
-        playerScores: {},
-        highestScore: { name: '', score: 0 }
-      };
+					case "merge":
+						// Merge loaded stats with current stats
+						const currentStats = getStats() || {
+							gamesPlayed: 0,
+							playerWins: {},
+							playerScores: {},
+							highestScore: { name: "", score: 0 },
+						};
 
-      const merged = mergeStats(currentStats, pendingLoadedStats);
-      saveStats(merged);
-      console.log('Statistics merged successfully');
-      break;
+						const merged = mergeStats(currentStats, pendingLoadedStats);
+						saveStats(merged);
+						console.log("Statistics merged successfully");
+						break;
 
-    case 'skip':
-      // Keep current stats, do nothing
-      console.log('Keeping current statistics');
-      break;
-  }
+					case "skip":
+						// Keep current stats, do nothing
+						console.log("Keeping current statistics");
+						break;
+				}
 
-  pendingLoadedStats = null;
-}
+				pendingLoadedStats = null;
+			}
 
-/**
- * Merges two statistics objects
- */
-function mergeStats(current, loaded) {
-  const merged = {
-    gamesPlayed: current.gamesPlayed + loaded.gamesPlayed,
-    playerWins: { ...current.playerWins },
-    playerScores: { ...current.playerScores },
-    highestScore: { ...current.highestScore }
-  };
+			/**
+			 * Merges two statistics objects
+			 */
+			function mergeStats(current, loaded) {
+				const merged = {
+					gamesPlayed: current.gamesPlayed + loaded.gamesPlayed,
+					playerWins: { ...current.playerWins },
+					playerScores: { ...current.playerScores },
+					highestScore: { ...current.highestScore },
+				};
 
-  // Merge player wins
-  Object.keys(loaded.playerWins).forEach(player => {
-    merged.playerWins[player] = (merged.playerWins[player] || 0) + loaded.playerWins[player];
-  });
+				// Merge player wins
+				Object.keys(loaded.playerWins).forEach((player) => {
+					merged.playerWins[player] =
+						(merged.playerWins[player] || 0) + loaded.playerWins[player];
+				});
 
-  // Merge player scores
-  Object.keys(loaded.playerScores).forEach(player => {
-    if (!merged.playerScores[player]) {
-      merged.playerScores[player] = [];
-    }
-    merged.playerScores[player] = merged.playerScores[player].concat(loaded.playerScores[player]);
-  });
+				// Merge player scores
+				Object.keys(loaded.playerScores).forEach((player) => {
+					if (!merged.playerScores[player]) {
+						merged.playerScores[player] = [];
+					}
+					merged.playerScores[player] = merged.playerScores[player].concat(
+						loaded.playerScores[player],
+					);
+				});
 
-  // Update highest score if loaded one is higher
-  if (loaded.highestScore.score > merged.highestScore.score) {
-    merged.highestScore = { ...loaded.highestScore };
-  }
+				// Update highest score if loaded one is higher
+				if (loaded.highestScore.score > merged.highestScore.score) {
+					merged.highestScore = { ...loaded.highestScore };
+				}
 
-  return merged;
-}
-</script>
-</body>
+				return merged;
+			}
+		</script>
+	</body>
 </html>
