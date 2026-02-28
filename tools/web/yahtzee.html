@@ -65,6 +65,19 @@ header h1 {
   margin: 0;
 }
 
+.back-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
 .controls {
   display: flex;
   flex-direction: column;
@@ -324,6 +337,7 @@ main {
 
 <body>
 <header>
+  <a class="back-link" href="/">← Tools</a>
   <h1>Yahtzee (2 Players)</h1>
   <div class="controls">
     <button class="secondary" onclick="showStatsModal()">Stats</button>

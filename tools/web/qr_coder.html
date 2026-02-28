@@ -65,10 +65,24 @@
 			canvas {
 				/* For the QR code canvas */
 			}
+			.back-link {
+				display: block;
+				text-align: left;
+				color: #999;
+				text-decoration: none;
+				font-size: 0.875rem;
+				font-weight: 500;
+				margin-bottom: 20px;
+				transition: color 0.2s;
+			}
+			.back-link:hover {
+				color: #0066ff;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
+			<a class="back-link" href="/">← Tools</a>
 			<h1>URL QR Code Generator</h1>
 			<input type="url" id="urlInput" placeholder="Enter URL here" />
 			<br />

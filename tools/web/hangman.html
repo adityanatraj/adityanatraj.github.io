@@ -44,6 +44,19 @@ header {
   text-align: center;
 }
 
+.back-link {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
 h1 {
   margin: 0;
   font-weight: 600;
@@ -168,6 +181,7 @@ button.danger {
 
 <body>
 <div class="app">
+  <a class="back-link" href="/">← Tools</a>
   <header>
     <h1>Hangman</h1>
     <div class="status">Two players · offline</div>
