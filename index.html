@@ -26,8 +26,9 @@
 			}
 
 			body {
-				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-					'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+					"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
 					sans-serif;
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
@@ -94,7 +95,7 @@
 			}
 
 			.nav-links a.active::after {
-				content: '';
+				content: "";
 				position: absolute;
 				bottom: -0.5rem;
 				left: 0;
@@ -137,40 +138,12 @@
 				margin-bottom: 2rem;
 			}
 
-			.section-title-wrapper {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
-				margin-bottom: 1.5rem;
-			}
-
 			.section-title {
 				font-size: 1.5rem;
 				font-weight: 600;
 				color: var(--text-primary);
 				letter-spacing: -0.02em;
-			}
-
-			.add-tool-btn {
-				width: 32px;
-				height: 32px;
-				border-radius: 50%;
-				border: 2px solid var(--border-color);
-				background: var(--bg-secondary);
-				color: var(--text-secondary);
-				font-size: 1.25rem;
-				cursor: pointer;
-				transition: var(--transition);
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				padding: 0;
-			}
-
-			.add-tool-btn:hover {
-				border-color: var(--accent-color);
-				color: var(--accent-color);
-				transform: rotate(90deg);
+				margin-bottom: 1.5rem;
 			}
 
 			/* Search Box */
@@ -424,10 +397,7 @@
 
 			<main>
 				<div class="section-header">
-					<div class="section-title-wrapper">
-						<h2 class="section-title">All Tools</h2>
-						<button class="add-tool-btn" id="addToolBtn" title="Add new tool">+</button>
-					</div>
+					<h2 class="section-title">All Tools</h2>
 					<div class="search-box">
 						<input
 							type="text"
@@ -460,7 +430,6 @@
 						<div class="tool-arrow">→</div>
 					</a>
 
-
 					<!-- Yahtzee P2P -->
 					<a
 						href="tools/web/yahtzee.html"
@@ -476,12 +445,12 @@
 								<span class="tag">Game</span>
 							</div>
 							<p class="tool-description-row">
-								Play Yahtzee with friends online. Multiplayer dice game with peer-to-peer connection.
+								Play Yahtzee with friends online. Multiplayer dice game with
+								peer-to-peer connection.
 							</p>
 						</div>
 						<div class="tool-arrow">→</div>
 					</a>
-
 
 					<!-- Hangman -->
 					<a
@@ -498,7 +467,8 @@
 								<span class="tag">Game</span>
 							</div>
 							<p class="tool-description-row">
-								Classic word guessing game for two players. Guess the secret word before running out of tries.
+								Classic word guessing game for two players. Guess the secret
+								word before running out of tries.
 							</p>
 						</div>
 						<div class="tool-arrow">→</div>
@@ -519,7 +489,8 @@
 								<span class="tag">Language</span>
 							</div>
 							<p class="tool-description-row">
-								Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.
+								Learn Vietnamese through common conversations. Practice everyday
+								phrases and dialogues.
 							</p>
 						</div>
 						<div class="tool-arrow">→</div>
@@ -540,7 +511,8 @@
 								<span class="tag">Language</span>
 							</div>
 							<p class="tool-description-row">
-								Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.
+								Learn hotel-specific Vietnamese phrases. Essential conversations
+								for travelers.
 							</p>
 						</div>
 						<div class="tool-arrow">→</div>
@@ -554,16 +526,16 @@
 			</main>
 
 			<footer>
-				<p>(c) Aditya Natraj</p>
+				<p>(c) Aditya N</p>
 			</footer>
 		</div>
 
 		<script>
 			// Search functionality
-			const searchInput = document.getElementById('searchInput');
-			const toolsList = document.getElementById('toolsList');
-			const noResults = document.getElementById('noResults');
-			const toolRows = document.querySelectorAll('.tool-row');
+			const searchInput = document.getElementById("searchInput");
+			const toolsList = document.getElementById("toolsList");
+			const noResults = document.getElementById("noResults");
+			const toolRows = document.querySelectorAll(".tool-row");
 
 			// Debounce function for better performance
 			function debounce(func, wait) {
@@ -583,50 +555,44 @@
 				const term = searchTerm.toLowerCase().trim();
 				let visibleCount = 0;
 
-				toolRows.forEach(row => {
-					const title = row.dataset.title?.toLowerCase() || '';
-					const description = row.dataset.description?.toLowerCase() || '';
-					const tags = row.dataset.tags?.toLowerCase() || '';
+				toolRows.forEach((row) => {
+					const title = row.dataset.title?.toLowerCase() || "";
+					const description = row.dataset.description?.toLowerCase() || "";
+					const tags = row.dataset.tags?.toLowerCase() || "";
 
-					const matches = title.includes(term) ||
-					               description.includes(term) ||
-					               tags.includes(term);
+					const matches =
+						title.includes(term) ||
+						description.includes(term) ||
+						tags.includes(term);
 
-					if (matches || term === '') {
-						row.classList.remove('hidden');
+					if (matches || term === "") {
+						row.classList.remove("hidden");
 						visibleCount++;
 					} else {
-						row.classList.add('hidden');
+						row.classList.add("hidden");
 					}
 				});
 
 				// Show/hide no results message
-				if (visibleCount === 0 && term !== '') {
-					noResults.style.display = 'block';
-					toolsList.style.display = 'none';
+				if (visibleCount === 0 && term !== "") {
+					noResults.style.display = "block";
+					toolsList.style.display = "none";
 				} else {
-					noResults.style.display = 'none';
-					toolsList.style.display = 'grid';
+					noResults.style.display = "none";
+					toolsList.style.display = "grid";
 				}
 			}
 
 			// Add event listener with debounce
-			searchInput.addEventListener('input', debounce((e) => {
-				filterTools(e.target.value);
-			}, 150));
-
-			// Add tool button functionality (optional - could open a modal or navigate)
-			const addToolBtn = document.getElementById('addToolBtn');
-			if (addToolBtn) {
-				addToolBtn.addEventListener('click', () => {
-					// Placeholder for add tool functionality
-					// Could open a modal, navigate to a form, etc.
-					console.log('Add tool clicked');
-				});
-			}
+			searchInput.addEventListener(
+				"input",
+				debounce((e) => {
+					filterTools(e.target.value);
+				}, 150),
+			);
 
 			// Initialize - ensure all tools are visible on load
-			filterTools('');
+			filterTools("");
 		</script>
 	</body>
 </html>
