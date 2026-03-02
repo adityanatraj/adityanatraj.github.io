@@ -17,6 +17,7 @@
 				--accent: #38bdf8;
 				--accent2: #22c55e;
 				--text: #e5e7eb;
+				--text-accent: #efefef;
 				--muted: #94a3b8;
 				--danger: #ef4444;
 				--die-face: #f8fafc;
@@ -55,6 +56,7 @@
 			header h1 {
 				font-size: 18px;
 				margin: 0;
+				padding-right: 50px;
 				width: 100%;
 				text-align: center;
 			}
@@ -86,7 +88,6 @@
 				background: var(--accent);
 				border: none;
 				color: var(--bg);
-				/*padding: 4px 12px;*/
 				border-radius: 6px;
 				font-weight: 600;
 				cursor: pointer;
@@ -137,6 +138,9 @@
 			@media (max-width: 900px) {
 				main {
 					grid-template-columns: 1fr;
+				}
+				.play-area {
+					order: -1;
 				}
 			}
 
@@ -207,11 +211,29 @@
 				color: var(--danger);
 			}
 
+			.scorecard td.score.preview {
+				color: var(--muted);
+				font-style: italic;
+			}
+
+			@keyframes scoreFlash {
+				from {
+					background-color: rgba(56, 189, 248, 0.35);
+				}
+				to {
+					background-color: transparent;
+				}
+			}
+
+			.scorecard td.score.scored-flash {
+				animation: scoreFlash 0.5s ease-out forwards;
+			}
+
 			.scorecard tr.section td {
-				padding-top: 0px;
+				padding-top: 2px;
 				padding-bottom: 4px;
 				font-weight: 700;
-				color: var(--text);
+				color: var(--text-accent);
 				background-color: var(--bg);
 				border-bottom: 1px dashed var(--line);
 			}
@@ -233,6 +255,7 @@
 				border-bottom: 1px solid transparent;
 				color: var(--text);
 				font-weight: 700;
+				font-size: 16px;
 				text-align: center;
 				width: 100%;
 				outline: none;
@@ -247,9 +270,14 @@
 				background: var(--panel);
 				border-radius: 10px;
 				padding: 14px;
+				gap: 10px;
 				display: flex;
 				flex-direction: column;
 				justify-content: space-between;
+			}
+
+			.bottom-padding {
+				height: env(safe-area-inset-bottom);
 			}
 
 			.turn-indicator {
@@ -261,7 +289,7 @@
 			.dice-container {
 				display: flex;
 				justify-content: center;
-				gap: 14px;
+				gap: 10px;
 				flex-wrap: wrap;
 				margin: 0px 0;
 			}
@@ -275,8 +303,8 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding-bottom: 10px;
-				padding-right: 2px;
+				padding-bottom: 11px;
+				padding-right: 1px;
 				font-size: 80px;
 				cursor: pointer;
 				transition:
@@ -313,7 +341,7 @@
 				animation: dieRoll 0.2s ease;
 			}
 
-			.die:active {
+			.die:not(.unrolled):active {
 				transform: scale(0.88);
 			}
 
@@ -321,10 +349,6 @@
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-			}
-
-			.roll-info {
-				color: var(--muted);
 			}
 
 			.modal {
@@ -405,9 +429,7 @@
 		<header>
 			<div class="header-top">
 				<a class="back-link" href="/">← Tools</a>
-				<h1>
-					Yahtzee&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;
-				</h1>
+				<h1>Yahtzee</h1>
 			</div>
 			<div class="controls">
 				<button class="secondary" onclick="showStatsModal()">Stats</button>
@@ -424,7 +446,6 @@
 				<div class="turn-indicator" id="turnIndicator"></div>
 				<div class="dice-container" id="diceContainer"></div>
 				<div class="controls-row">
-					<div class="roll-info" id="rollInfo"></div>
 					<button id="rollBtn" onclick="rollDice()">Roll Dice</button>
 				</div>
 			</div>
@@ -472,8 +493,8 @@
 
 		<script>
 			/* ============================================================================
-   GAME DATA
-============================================================================ */
+			   GAME DATA
+			============================================================================ */
 			const CATEGORIES = [
 				{ key: "ones", label: "Ones", upper: true, par: 3 },
 				{ key: "twos", label: "Twos", upper: true, par: 6 },
@@ -491,10 +512,11 @@
 			];
 
 			let gameState;
+			let flashCell = null;
 
 			/* ============================================================================
-   INIT
-============================================================================ */
+			   INIT
+			============================================================================ */
 			function newGame() {
 				const gameInProgress =
 					gameState &&
@@ -541,8 +563,8 @@
 			newGame();
 
 			/* ============================================================================
-   RENDER
-============================================================================ */
+			   RENDER
+			============================================================================ */
 			function render() {
 				renderScorecard();
 				renderDice();
@@ -559,15 +581,15 @@
 				// Header
 				const head = document.createElement("tr");
 				head.innerHTML = `
-    <th></th>
-    <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
-      <input class="player-name" value="${esc(gameState.players[0].name)}"
-        onchange="gameState.players[0].name=this.value">
-    </th>
-    <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
-      <input class="player-name" value="${esc(gameState.players[1].name)}"
-        onchange="gameState.players[1].name=this.value">
-    </th>`;
+			    <th></th>
+			    <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
+			      <input class="player-name" value="${esc(gameState.players[0].name)}"
+			        onchange="gameState.players[0].name=this.value">
+			    </th>
+			    <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
+			      <input class="player-name" value="${esc(gameState.players[1].name)}"
+			        onchange="gameState.players[1].name=this.value">
+			    </th>`;
 				table.appendChild(head);
 
 				table.appendChild(sectionRow("Top"));
@@ -603,9 +625,9 @@
 				const tr = document.createElement("tr");
 				tr.className = "total";
 				tr.innerHTML = `
-    <td>${label}</td>
-    <td>${fn(gameState.players[0])}</td>
-    <td>${fn(gameState.players[1])}</td>`;
+			    <td>${label}</td>
+			    <td>${fn(gameState.players[0])}</td>
+			    <td>${fn(gameState.players[1])}</td>`;
 				return tr;
 			}
 
@@ -620,6 +642,15 @@
 						td.textContent = val;
 						td.classList.add("used");
 
+						if (
+							flashCell &&
+							flashCell.playerIndex === i &&
+							flashCell.catKey === cat.key
+						) {
+							td.classList.add("scored-flash");
+							flashCell = null;
+						}
+
 						// Apply color coding based on par (only for upper section)
 						if (cat.par !== undefined) {
 							if (val >= cat.par) {
@@ -628,11 +659,11 @@
 								td.classList.add("below-par");
 							}
 						} else {
-							// Lower section scores default to green
-							td.classList.add("at-par");
+							td.classList.add(val > 0 ? "at-par" : "below-par");
 						}
 					} else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
 						td.textContent = calcScore(cat.key);
+						td.classList.add("preview");
 						td.onclick = () => assignScore(cat.key);
 					}
 					tr.appendChild(td);
@@ -666,15 +697,15 @@
 
 			function renderControls() {
 				document.getElementById("turnIndicator").textContent =
-					`${gameState.players[gameState.currentPlayer].name}'s Turn`;
-				document.getElementById("rollInfo").textContent =
-					`Rolls left: ${gameState.rollsLeft}`;
+					`${gameState.players[gameState.currentPlayer].name}'s Turn (${gameState.rollsLeft} left)`;
+				// document.getElementById("rollInfo").textContent =
+				// 	`Rolls left: ${gameState.rollsLeft}`;
 				document.getElementById("rollBtn").disabled = gameState.rollsLeft === 0;
 			}
 
 			/* ============================================================================
-   GAMEPLAY
-============================================================================ */
+			   GAMEPLAY
+			============================================================================ */
 			function rollDice() {
 				if (gameState.gameEnded || !gameState.rollsLeft) return;
 				gameState.dice.forEach((d) => {
@@ -698,6 +729,7 @@
 				const score = calcScore(cat);
 				const catLabel = CATEGORIES.find((c) => c.key === cat).label;
 				if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
+				flashCell = { playerIndex: gameState.currentPlayer, catKey: cat };
 				p.scores[cat] = score;
 
 				endTurn();
@@ -744,10 +776,10 @@
 				const scoresHtml = scores
 					.map(
 						(s, i) => `
-    <div class="score-line ${i === 0 ? "winner" : ""}">
-      ${i + 1}. ${s.name}: ${s.score} points
-    </div>
-  `,
+			    <div class="score-line ${i === 0 ? "winner" : ""}">
+			      ${i + 1}. ${s.name}: ${s.score} points
+			    </div>
+			  `,
 					)
 					.join("");
 
@@ -765,8 +797,8 @@
 			}
 
 			/* ============================================================================
-   SCORING
-============================================================================ */
+			   SCORING
+			============================================================================ */
 			function calcScore(cat) {
 				const v = gameState.dice.map((d) => d.value);
 				const c = count(v);
@@ -822,7 +854,8 @@
 				v.reduce((a, x) => ((a[x] = (a[x] || 0) + 1), a), {});
 			const has = (c, n) => Object.values(c).some((x) => x >= n);
 			const fh = (c) =>
-				Object.values(c).includes(3) && Object.values(c).includes(2);
+				(Object.values(c).includes(3) && Object.values(c).includes(2)) ||
+				Object.values(c).includes(5);
 			const ss = (v) =>
 				[
 					[1, 2, 3, 4],
@@ -847,16 +880,16 @@
 				const grand = u + ub + l;
 				// Defensive check to ensure totals are valid numbers
 				return {
-					upper: isNaN(u) ? 0 : u,
-					upperBonus: isNaN(ub) ? 0 : ub,
-					lower: isNaN(l) ? 0 : l,
-					grand: isNaN(grand) ? 0 : grand,
+					upper: u,
+					upperBonus: ub,
+					lower: l,
+					grand: grand,
 				};
 			}
 
 			/* ============================================================================
-   SAVE / LOAD
-============================================================================ */
+			   SAVE / LOAD
+			============================================================================ */
 			function saveGame() {
 				// Create a comprehensive save object with both game state and statistics
 				const saveData = {
@@ -874,11 +907,26 @@
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
 					type: "application/json",
 				});
-				const a = document.createElement("a");
-				a.href = URL.createObjectURL(blob);
-				a.download = "yahtzee-game.json";
-				a.click();
-				setTimeout(() => URL.revokeObjectURL(a.href), 0);
+
+				const linkDownload = function () {
+					const a = document.createElement("a");
+					a.href = URL.createObjectURL(blob);
+					a.download = "yahtzee-game.json";
+					a.click();
+					setTimeout(() => URL.revokeObjectURL(a.href), 0);
+				};
+				try {
+					const file = new File([blob], "yahtzee-game.json", {
+						type: "application/json",
+					});
+					navigator.share({
+						title: "yahtzee-game.json",
+						text: "yahtzee game save state",
+						files: [file],
+					});
+				} catch (error) {
+					linkDownload();
+				}
 			}
 
 			function loadGame() {
@@ -917,8 +965,8 @@
 			}
 
 			/* ============================================================================
-   STATISTICS
-============================================================================ */
+			   STATISTICS
+			============================================================================ */
 			function getStats() {
 				try {
 					if (typeof localStorage === "undefined") return null;
@@ -1034,14 +1082,14 @@
 			}
 
 			/* ============================================================================
-   STATISTICS LOADING & MERGING
-============================================================================ */
+			   STATISTICS LOADING & MERGING
+			============================================================================ */
 			let pendingLoadedStats = null;
 
 			/**
 			 * Validates statistics object to ensure it has the correct structure
 			 */
-			function validateStats(stats) {
+			function sanitizeStats(stats) {
 				if (!stats || typeof stats !== "object") {
 					return false;
 				}
@@ -1104,7 +1152,7 @@
 			 */
 			function showStatsLoadModal(loadedStats) {
 				// Validate the loaded stats
-				if (!validateStats(loadedStats)) {
+				if (!sanitizeStats(loadedStats)) {
 					console.error("Invalid statistics format in save file");
 					return;
 				}
