@@ -56,8 +56,7 @@
 			header h1 {
 				font-size: 18px;
 				margin: 0;
-				padding-right: 50px;
-				width: 100%;
+				flex: 1;
 				text-align: center;
 			}
 
@@ -74,10 +73,34 @@
 				color: var(--accent);
 			}
 
+			.menu-toggle {
+				background: transparent;
+				color: var(--muted);
+				font-size: 18px;
+				font-weight: 400;
+				min-width: unset;
+				min-height: unset;
+				padding: 4px 6px;
+				line-height: 1;
+			}
+
+			.menu-toggle:hover:not(:disabled) {
+				color: var(--accent);
+				opacity: 1;
+			}
+
+			.menu-toggle:active:not(:disabled) {
+				box-shadow: none;
+			}
+
 			.controls {
 				margin-top: 6px;
-				display: flex;
+				display: none;
 				gap: 8px;
+			}
+
+			.controls.open {
+				display: flex;
 			}
 
 			.controls button {
@@ -133,6 +156,13 @@
 				gap: 8px;
 				padding: 8px;
 				padding-bottom: calc(16px + env(safe-area-inset-bottom));
+			}
+
+			footer {
+				text-align: center;
+				border-top: 1px solid var(--border-color);
+				color: var(--text-tertiary);
+				font-size: 0.875rem;
 			}
 
 			@media (max-width: 900px) {
@@ -430,6 +460,9 @@
 			<div class="header-top">
 				<a class="back-link" href="/">← Tools</a>
 				<h1>Yahtzee</h1>
+				<button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+					☰
+				</button>
 			</div>
 			<div class="controls">
 				<button class="secondary" onclick="showStatsModal()">Stats</button>
@@ -1262,6 +1295,13 @@
 				return merged;
 			}
 
+			function toggleMenu() {
+				const controls = document.querySelector(".controls");
+				controls.classList.toggle("open");
+				const btn = document.getElementById("menuToggle");
+				btn.textContent = controls.classList.contains("open") ? "✕" : "☰";
+			}
+
 			document.addEventListener("keydown", (e) => {
 				if (e.key !== " " && e.key !== "Enter") return;
 				if (document.querySelector(".modal.show")) return;
@@ -1273,4 +1313,7 @@
 			});
 		</script>
 	</body>
+	<footer>
+		<p>© Aditya N</p>
+	</footer>
 </html>

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Aditya N</title>
+		<title>aditya n</title>
 		<style>
 			* {
 				margin: 0;
@@ -12,16 +12,16 @@
 			}
 
 			:root {
-				--bg-primary: #fafafa;
-				--bg-secondary: #ffffff;
-				--text-primary: #1a1a1a;
-				--text-secondary: #666666;
-				--text-tertiary: #999999;
-				--border-color: #e5e5e5;
-				--accent-color: #3b82f6;
-				--hover-bg: #f5f5f5;
-				--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-				--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+				--bg-primary: #020617;
+				--bg-secondary: #0f172a;
+				--text-primary: #e5e7eb;
+				--text-secondary: #94a3b8;
+				--text-tertiary: #64748b;
+				--border-color: #334155;
+				--accent-color: #38bdf8;
+				--hover-bg: #1e293b;
+				--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+				--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
 				--transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 
@@ -48,7 +48,7 @@
 				top: 0;
 				z-index: 100;
 				backdrop-filter: blur(10px);
-				background: rgba(255, 255, 255, 0.95);
+				background: rgba(2, 6, 23, 0.95);
 			}
 
 			.nav-container {
@@ -165,7 +165,7 @@
 
 			.search-box input:focus {
 				border-color: var(--accent-color);
-				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+				box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
 			}
 
 			.search-box input::placeholder {
@@ -373,7 +373,7 @@
 	<body>
 		<nav>
 			<div class="nav-container">
-				<a href="/" class="nav-brand">Aditya N</a>
+				<a href="/" class="nav-brand">aditya n</a>
 				<ul class="nav-links">
 					<li><a href="/" class="active">Tools</a></li>
 					<li><a href="about.html">About</a></li>
@@ -417,24 +417,66 @@
 			</main>
 
 			<footer>
-				<p>(c) Aditya Natraj</p>
+				<p>© Aditya N</p>
 			</footer>
 		</div>
 
 		<script>
 			const tools = [
-				{ href: 'tools/web/qr_coder.html',                              icon: '📱', title: 'QR Code Generator',            tag: 'Utility',   description: 'Generate QR codes from URLs. Simple and fast QR code creation.',                                          tags: 'utility qr code generator url' },
-				{ href: 'tools/web/yahtzee.html',                                icon: '🎲', title: 'Yahtzee P2P',                  tag: 'Game',      description: 'Play Yahtzee with friends online. Multiplayer dice game with peer-to-peer connection.',                  tags: 'game dice multiplayer yahtzee p2p' },
-				{ href: 'tools/web/hangman.html',                                icon: '🎯', title: 'Hangman',                      tag: 'Game',      description: 'Classic word guessing game for two players. Guess the secret word before running out of tries.',          tags: 'game word puzzle hangman two player offline' },
-				{ href: 'tools/web/language/vietnamese_conversations.html',      icon: '🇻🇳', title: 'Vietnamese Conversations',     tag: 'Language',  description: 'Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.',                 tags: 'language learning vietnamese education' },
-				{ href: 'tools/web/language/vietnamese_hotel.html',              icon: '🏨', title: 'Vietnamese Hotel Conversations', tag: 'Language', description: 'Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.',                          tags: 'language learning vietnamese hotel travel education' },
+				{
+					href: "tools/web/qr_coder.html",
+					icon: "📱",
+					title: "QR Code Generator",
+					tag: "Utility",
+					description:
+						"Generate QR codes from URLs. Simple and fast QR code creation.",
+					tags: "utility qr code generator url",
+				},
+				{
+					href: "tools/web/yahtzee.html",
+					icon: "🎲",
+					title: "Yahtzee",
+					tag: "Game",
+					description:
+						"Play Yahtzee locally. Multiplayer dice game with peer-to-peer connection.",
+					tags: "game dice multiplayer yahtzee",
+				},
+				{
+					href: "tools/web/hangman.html",
+					icon: "🎯",
+					title: "Hangman",
+					tag: "Game",
+					description:
+						"Classic word guessing game for two players. Guess the secret word before running out of tries.",
+					tags: "game word puzzle hangman two player offline",
+				},
+				{
+					href: "tools/web/language/vietnamese_conversations.html",
+					icon: "🇻🇳",
+					title: "Vietnamese Conversations",
+					tag: "Language",
+					description:
+						"Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.",
+					tags: "language learning vietnamese education",
+				},
+				{
+					href: "tools/web/language/vietnamese_hotel.html",
+					icon: "🏨",
+					title: "Vietnamese Hotel Conversations",
+					tag: "Language",
+					description:
+						"Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.",
+					tags: "language learning vietnamese hotel travel education",
+				},
 			];
 
-			const toolsList = document.getElementById('toolsList');
-			const noResults = document.getElementById('noResults');
-			const searchInput = document.getElementById('searchInput');
+			const toolsList = document.getElementById("toolsList");
+			const noResults = document.getElementById("noResults");
+			const searchInput = document.getElementById("searchInput");
 
-			toolsList.innerHTML = tools.map(t => `
+			toolsList.innerHTML = tools
+				.map(
+					(t) => `
 				<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
 					<div class="tool-icon-row">${t.icon}</div>
 					<div class="tool-content">
@@ -445,9 +487,11 @@
 						<p class="tool-description-row">${t.description}</p>
 					</div>
 					<div class="tool-arrow">→</div>
-				</a>`).join('');
+				</a>`,
+				)
+				.join("");
 
-			const toolRows = toolsList.querySelectorAll('.tool-row');
+			const toolRows = toolsList.querySelectorAll(".tool-row");
 
 			function debounce(func, wait) {
 				let timeout;
@@ -461,22 +505,27 @@
 				const term = searchTerm.toLowerCase().trim();
 				let visibleCount = 0;
 				toolRows.forEach((row) => {
-					const matches = ['title', 'description', 'tags'].some(
-						key => row.dataset[key]?.toLowerCase().includes(term)
+					const matches = ["title", "description", "tags"].some((key) =>
+						row.dataset[key]?.toLowerCase().includes(term),
 					);
-					if (matches || term === '') {
-						row.classList.remove('hidden');
+					if (matches || term === "") {
+						row.classList.remove("hidden");
 						visibleCount++;
 					} else {
-						row.classList.add('hidden');
+						row.classList.add("hidden");
 					}
 				});
-				noResults.style.display = visibleCount === 0 && term !== '' ? 'block' : 'none';
-				toolsList.style.display = visibleCount === 0 && term !== '' ? 'none' : 'grid';
+				noResults.style.display =
+					visibleCount === 0 && term !== "" ? "block" : "none";
+				toolsList.style.display =
+					visibleCount === 0 && term !== "" ? "none" : "grid";
 			}
 
-			searchInput.addEventListener('input', debounce((e) => filterTools(e.target.value), 150));
-			filterTools('');
+			searchInput.addEventListener(
+				"input",
+				debounce((e) => filterTools(e.target.value), 150),
+			);
+			filterTools("");
 		</script>
 	</body>
 </html>
