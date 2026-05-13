@@ -239,7 +239,7 @@
 				cursor: pointer;
 				font-size: 1.1rem;
 				backdrop-filter: blur(8px);
-				transition: all 0.2s;
+				transition: color 0.2s, border-color 0.2s, background 0.2s;
 			}
 
 			.cam-btn:hover {
@@ -263,7 +263,7 @@
 				font-size: 0.9375rem;
 				font-weight: 600;
 				cursor: pointer;
-				transition: all 0.2s;
+				transition: opacity 0.2s, transform 0.2s;
 				letter-spacing: -0.01em;
 			}
 
@@ -363,7 +363,7 @@
 				font-size: 0.8125rem;
 				font-weight: 500;
 				cursor: pointer;
-				transition: all 0.2s;
+				transition: color 0.2s, border-color 0.2s;
 			}
 
 			.btn-ghost:hover {
@@ -393,6 +393,9 @@
 				border-radius: 10px;
 				padding: 0.875rem 1rem;
 				transition: border-color 0.3s, background 0.3s;
+			}
+
+			.code-entry.is-new {
 				animation: slideDown 0.22s ease-out;
 			}
 
@@ -458,7 +461,7 @@
 				justify-content: center;
 				cursor: pointer;
 				font-size: 0.8125rem;
-				transition: all 0.15s;
+				transition: color 0.15s, border-color 0.15s;
 				flex-shrink: 0;
 			}
 
@@ -549,7 +552,7 @@
 				<span class="last-value empty" id="lastValue">Waiting for scan…</span>
 				<span class="last-format" id="lastFormat" style="display:none"></span>
 				<button class="icon-btn" id="lastCopyBtn"
-					style="display:none" title="Copy">⎘</button>
+					style="display:none" title="Copy" aria-label="Copy code">⎘</button>
 			</div>
 
 			<!-- History -->
@@ -565,10 +568,14 @@
 		</main>
 
 		<script>
-		(() => {
+		(async () => {
 			// ── Constants & state ─────────────────────────────────────────────
 			const STORAGE_KEY = 'upc_scanner_v1';
 			const DEDUPE_MS = 3000;
+			const DESIRED_FORMATS = [
+				'upc_a', 'upc_e', 'ean_13', 'ean_8',
+				'code_128', 'code_39', 'itf', 'qr_code'
+			];
 
 			let codes = loadCodes();
 			let stream = null;
@@ -583,6 +590,8 @@
 			let torchSupported = false;
 			let videoDevices = [];
 			let deviceIndex = 0;
+			let detectGen = 0;
+			let pausedForHide = false;
 
 			// scan-line animation state
 			let scanY = 0;
@@ -614,14 +623,10 @@
 				startBtn.disabled = true;
 				startBtn.textContent = 'Not supported';
 			} else {
-				detector = new BarcodeDetector({
-					formats: [
-						'upc_a', 'upc_e',
-						'ean_13', 'ean_8',
-						'code_128', 'code_39',
-						'itf', 'qr_code'
-					]
-				});
+				// Filter to formats the browser actually supports to avoid throws on Safari
+				const supported = await BarcodeDetector.getSupportedFormats();
+				const formats   = DESIRED_FORMATS.filter(f => supported.includes(f));
+				detector = new BarcodeDetector({ formats: formats.length ? formats : supported });
 			}
 
 			// ── Initial render ────────────────────────────────────────────────
@@ -641,12 +646,24 @@
 				if (delBtn)  deleteCode(delBtn.dataset.id);
 			});
 
+			// Stop camera light when the tab is hidden; resume when visible again
+			document.addEventListener('visibilitychange', () => {
+				if (document.hidden) {
+					if (scanning) { stopLoops(); pausedForHide = true; }
+				} else if (pausedForHide) {
+					pausedForHide = false;
+					if (stream) startLoops();
+				}
+			});
+
+			// Release camera track so the indicator light goes off on navigation
+			window.addEventListener('beforeunload', () => {
+				stream?.getTracks().forEach(t => t.stop());
+			});
+
 			// ── Camera start ──────────────────────────────────────────────────
 			async function startCamera() {
 				try {
-					const devices = await navigator.mediaDevices.enumerateDevices();
-					videoDevices = devices.filter(d => d.kind === 'videoinput');
-
 					stream = await navigator.mediaDevices.getUserMedia({
 						video: {
 							facingMode: { ideal: 'environment' },
@@ -667,6 +684,10 @@
 			async function initVideo(s) {
 				video.srcObject = s;
 				await video.play();
+
+				// Enumerate after permission is granted so deviceId is populated
+				const devices = await navigator.mediaDevices.enumerateDevices();
+				videoDevices = devices.filter(d => d.kind === 'videoinput');
 
 				placeholder.style.display = 'none';
 				video.style.display = 'block';
@@ -691,22 +712,30 @@
 
 			// ── Camera flip ───────────────────────────────────────────────────
 			async function flipCamera() {
-				if (!stream || videoDevices.length < 2) return;
-				stopLoops();
-				stream.getTracks().forEach(t => t.stop());
-				deviceIndex = (deviceIndex + 1) % videoDevices.length;
+				// Allow retry even when stream is null (previous flip failed)
+				if (videoDevices.length < 2) return;
+				if (stream) {
+					stopLoops();
+					stream.getTracks().forEach(t => t.stop());
+					stream = null;
+				}
+				const nextIndex = (deviceIndex + 1) % videoDevices.length;
 				try {
 					stream = await navigator.mediaDevices.getUserMedia({
 						video: {
-							deviceId: { exact: videoDevices[deviceIndex].deviceId },
+							deviceId: { exact: videoDevices[nextIndex].deviceId },
 							width:  { ideal: 1920 },
 							height: { ideal: 1080 }
 						}
 					});
+					deviceIndex = nextIndex;
 					torchOn = false;
 					torchBtn.classList.remove('on');
 					await initVideo(stream);
-				} catch {}
+				} catch {
+					// camControls stays visible; user can tap flip again to retry
+					setStatus('error', 'Switch failed — tap ↺ to retry');
+				}
 			}
 
 			// ── Torch ─────────────────────────────────────────────────────────
@@ -731,6 +760,7 @@
 
 			function stopLoops() {
 				scanning = false;
+				detectGen++;
 				clearTimeout(detectTimer);
 				cancelAnimationFrame(rafId);
 				lastBarcodes = [];
@@ -746,8 +776,10 @@
 					scheduleDetect();
 					return;
 				}
+				const gen = detectGen;
 				try {
 					const found = await detector.detect(video);
+					if (detectGen !== gen) return; // stopLoops() fired while we awaited
 					lastBarcodes = found;
 					if (found.length > 0) {
 						const bc  = found[0];
@@ -766,13 +798,16 @@
 			function animFrame() {
 				if (!scanning) return;
 
-				// Sync canvas resolution to video
-				if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-					canvas.width  = video.videoWidth  || 1280;
-					canvas.height = video.videoHeight || 720;
+				// Canvas internal dimensions = container CSS pixels so all
+				// drawing coordinates are in display space, not video-native space.
+				const cw = video.clientWidth  || 1280;
+				const ch = video.clientHeight || 720;
+				if (canvas.width !== cw || canvas.height !== ch) {
+					canvas.width  = cw;
+					canvas.height = ch;
 				}
 
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.clearRect(0, 0, cw, ch);
 
 				if (lastBarcodes.length > 0) {
 					lastBarcodes.forEach(bc => drawBox(bc));
@@ -781,6 +816,21 @@
 				}
 
 				rafId = requestAnimationFrame(animFrame);
+			}
+
+			// Convert a point from video-native pixel space to canvas/display pixel
+			// space, accounting for object-fit:cover scale and center-crop offset.
+			function videoToDisplay(x, y) {
+				const vW = video.videoWidth;
+				const vH = video.videoHeight;
+				const dW = canvas.width;
+				const dH = canvas.height;
+				if (!vW || !vH) return { x, y };
+				const scale = Math.max(dW / vW, dH / vH);
+				return {
+					x: x * scale - (vW * scale - dW) / 2,
+					y: y * scale - (vH * scale - dH) / 2
+				};
 			}
 
 			function drawScanLine() {
@@ -802,6 +852,8 @@
 				const pts = bc.cornerPoints;
 				if (!pts || pts.length < 4) return;
 
+				// Transform all corners from video-native → display pixel space
+				const dPts = pts.map(p => videoToDisplay(p.x, p.y));
 				const lw = Math.max(2, canvas.width / 350);
 
 				ctx.save();
@@ -810,8 +862,8 @@
 				ctx.shadowColor = '#38bdf8';
 				ctx.shadowBlur = 10;
 				ctx.beginPath();
-				ctx.moveTo(pts[0].x, pts[0].y);
-				for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+				ctx.moveTo(dPts[0].x, dPts[0].y);
+				for (let i = 1; i < dPts.length; i++) ctx.lineTo(dPts[i].x, dPts[i].y);
 				ctx.closePath();
 				ctx.stroke();
 
@@ -820,10 +872,10 @@
 				ctx.font = `bold ${fontSize}px monospace`;
 				ctx.shadowBlur = 6;
 				ctx.fillStyle = 'rgba(2, 6, 23, 0.7)';
-				ctx.fillText(bc.rawValue, pts[0].x + lw, pts[0].y - fontSize * 0.2 + 2);
+				ctx.fillText(bc.rawValue, dPts[0].x + lw, dPts[0].y - fontSize * 0.2 + 2);
 				ctx.fillStyle = '#38bdf8';
 				ctx.shadowColor = 'transparent';
-				ctx.fillText(bc.rawValue, pts[0].x + lw, pts[0].y - fontSize * 0.2);
+				ctx.fillText(bc.rawValue, dPts[0].x + lw, dPts[0].y - fontSize * 0.2);
 				ctx.restore();
 			}
 
@@ -845,7 +897,7 @@
 				if (idx !== -1) codes.splice(idx, 1);
 
 				codes.unshift({
-					id:        Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+					id:        crypto.randomUUID(),
 					value,
 					format:    fmtLabel(format),
 					timestamp: Date.now()
@@ -854,10 +906,10 @@
 				saveCodes();
 				renderList();
 
-				// Flash new top entry
+				// Animate and flash only the newly inserted top entry
 				const first = codesList.querySelector('.code-entry');
 				if (first) {
-					first.classList.add('new-flash');
+					first.classList.add('is-new', 'new-flash');
 					setTimeout(() => first.classList.remove('new-flash'), 700);
 				}
 			}
@@ -880,9 +932,9 @@
 						</div>
 						<div class="entry-actions">
 							<button class="icon-btn copy-btn"
-								data-val="${esc(c.value)}" title="Copy">⎘</button>
+								data-val="${esc(c.value)}" title="Copy" aria-label="Copy code">⎘</button>
 							<button class="icon-btn del-btn del"
-								data-id="${c.id}" title="Remove">✕</button>
+								data-id="${c.id}" title="Remove" aria-label="Remove code">✕</button>
 						</div>
 					</div>
 				`).join('');
@@ -901,20 +953,29 @@
 							btn.textContent = prev;
 						}, 1400);
 					}
-				} catch {}
+				} catch {
+					if (btn) {
+						const prev = btn.textContent;
+						btn.textContent = '✗';
+						setTimeout(() => { btn.textContent = prev; }, 1400);
+					}
+				}
 			}
 
 			function deleteCode(id) {
 				codes = codes.filter(c => c.id !== id);
 				saveCodes();
 				renderList();
-				if (codes.length === 0) resetLastDetected();
+				// Do not touch lastDetected — it reflects the camera's last read,
+				// not the list contents. resetLastDetected() is reserved for clearAll.
 			}
 
 			function clearAll() {
 				if (codes.length === 0) return;
 				if (!confirm('Clear all scanned codes?')) return;
 				codes = [];
+				lastRawValue = null;
+				lastRawTime  = 0;
 				saveCodes();
 				renderList();
 				resetLastDetected();
