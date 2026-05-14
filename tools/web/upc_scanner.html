@@ -556,10 +556,10 @@
 			</div>
 
 			<div id="unsupportedMsg" class="unsupported-card" style="display:none">
-				<h3>Browser not supported</h3>
+				<h3>Camera not available</h3>
 				<p>
-					The native <code>BarcodeDetector</code> API is required.
-					Please use Chrome 83+, Edge 83+, or Safari 17+.
+					Your browser does not support camera access (<code>getUserMedia</code>).
+					Please use a modern browser over HTTPS.
 				</p>
 			</div>
 
@@ -676,6 +676,10 @@
 			// bounding-box breathing pulse (starts at max opacity)
 			let boxPulse = Math.PI / 2;
 
+			// ZXing fallback for browsers without BarcodeDetector (e.g. Firefox)
+			let useZXing = false;
+			let zxingReader = null;
+
 			// ── DOM refs ──────────────────────────────────────────────────────
 			const video     = document.getElementById('cameraVideo');
 			const canvas    = document.getElementById('cameraCanvas');
@@ -697,15 +701,19 @@
 			const clearBtn     = document.getElementById('clearBtn');
 
 			// ── Capability check ──────────────────────────────────────────────
-			if (!('BarcodeDetector' in window)) {
+			if (!navigator.mediaDevices?.getUserMedia) {
+				// No camera API at all — nothing we can do
 				document.getElementById('unsupportedMsg').style.display = 'block';
 				startBtn.disabled = true;
 				startBtn.textContent = 'Not supported';
-			} else {
-				// Filter to formats the browser actually supports to avoid throws on Safari
+			} else if ('BarcodeDetector' in window) {
+				// Native path: Chrome, Edge, Safari — filter to supported formats
 				const supported = await BarcodeDetector.getSupportedFormats();
 				const formats   = DESIRED_FORMATS.filter(f => supported.includes(f));
 				detector = new BarcodeDetector({ formats: formats.length ? formats : supported });
+			} else {
+				// ZXing fallback path: Firefox and any browser without BarcodeDetector
+				useZXing = true;
 			}
 
 			// ── Initial render ────────────────────────────────────────────────
@@ -833,8 +841,9 @@
 			// ── Detection & animation loops ───────────────────────────────────
 			function startLoops() {
 				scanning = true;
-				scheduleDetect();
 				rafId = requestAnimationFrame(animFrame);
+				if (useZXing) startZXingLoop();
+				else scheduleDetect();
 			}
 
 			function stopLoops() {
@@ -843,6 +852,38 @@
 				clearTimeout(detectTimer);
 				cancelAnimationFrame(rafId);
 				lastBarcodes = [];
+				zxingReader?.reset();
+				zxingReader = null;
+			}
+
+			async function startZXingLoop() {
+				const ZXING_FORMAT_NAMES = {
+					0: 'aztec',    1: 'codabar', 2: 'code_39',  3: 'code_93',
+					4: 'code_128', 5: 'data_matrix', 6: 'ean_8', 7: 'ean_13',
+					8: 'itf',     10: 'pdf_417', 11: 'qr_code', 14: 'upc_a', 15: 'upc_e'
+				};
+				try {
+					setStatus('scanning', 'Loading…');
+					const { BrowserMultiFormatReader } = await import(
+						'https://esm.sh/@zxing/browser@0.1.5'
+					);
+					if (!scanning) return; // camera stopped while library was loading
+					zxingReader = new BrowserMultiFormatReader();
+					setStatus('scanning', 'Scanning…');
+					zxingReader.decodeFromVideoElement(video, (result, _err) => {
+						if (!scanning || !result) return;
+						const rawValue = result.getText();
+						const format   = ZXING_FORMAT_NAMES[result.getBarcodeFormat()] ?? 'unknown';
+						const now      = Date.now();
+						if (rawValue !== lastRawValue || now - lastRawTime > DEDUPE_MS) {
+							lastRawValue = rawValue;
+							lastRawTime  = now;
+							onCodeFound(rawValue, format);
+						}
+					});
+				} catch {
+					if (scanning) setStatus('error', 'Scanner unavailable — try Chrome or Safari');
+				}
 			}
 
 			function scheduleDetect() {
