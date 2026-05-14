@@ -5,16 +5,23 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		<title>UPC Scanner</title>
 		<style>
+			/* ── Design tokens ───────────────────────────────────── */
 			:root {
-				--bg: #020617;
-				--panel: #0f172a;
-				--card: #111827;
-				--line: #334155;
-				--accent: #38bdf8;
+				/* Colors */
+				--bg:      #020617;
+				--panel:   #0f172a;
+				--card:    #111827;
+				--line:    #334155;
+				--accent:  #38bdf8;
 				--accent2: #22c55e;
-				--text: #e5e7eb;
-				--muted: #94a3b8;
-				--danger: #ef4444;
+				--text:    #e5e7eb;
+				--muted:   #94a3b8;
+				--danger:  #ef4444;
+
+				/* Radii — three values, semantically assigned */
+				--radius-sm: 6px;   /* badges, icon buttons, tags */
+				--radius-md: 10px;  /* cards, list entries, buttons */
+				--radius-lg: 16px;  /* camera card, major containers */
 			}
 
 			* { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,7 +37,7 @@
 				-moz-osx-font-smoothing: grayscale;
 			}
 
-			/* ── Nav ─────────────────────────────────────────── */
+			/* ── Nav ─────────────────────────────────────────────── */
 			nav {
 				position: sticky;
 				top: 0;
@@ -62,56 +69,57 @@
 			.nav-links {
 				list-style: none;
 				display: flex;
-				gap: 1.75rem;
+				gap: 1.5rem;
 				align-items: center;
 			}
 
 			.nav-links a {
 				color: var(--muted);
 				text-decoration: none;
-				font-size: 0.9rem;
+				font-size: 0.875rem;
 				font-weight: 500;
 				transition: color 0.2s;
 			}
 			.nav-links a:hover { color: var(--text); }
 
-			/* ── Layout ──────────────────────────────────────── */
+			/* ── Layout ──────────────────────────────────────────── */
 			main {
 				max-width: 860px;
 				margin: 0 auto;
-				padding: 2.5rem 1.5rem 5rem;
+				/* spacing scale: 32px top, 24px sides, 64px+safe-area bottom */
+				padding: 2rem 1.5rem calc(4rem + env(safe-area-inset-bottom));
 			}
 
 			.page-header {
-				margin-bottom: 1.75rem;
+				margin-bottom: 2rem; /* 32px */
 			}
 
 			.page-header h1 {
-				font-size: 2rem;
+				font-size: 1.75rem;
 				font-weight: 700;
-				letter-spacing: -0.03em;
-				margin-bottom: 0.3rem;
+				letter-spacing: -0.025em;
+				margin-bottom: 0.25rem; /* 4px */
 			}
 
 			.page-header p {
 				color: var(--muted);
-				font-size: 0.9375rem;
+				font-size: 0.875rem;
 			}
 
-			/* ── Unsupported banner ───────────────────────────── */
+			/* ── Unsupported banner ───────────────────────────────── */
 			.unsupported-card {
 				background: rgba(239, 68, 68, 0.07);
-				border: 1px solid rgba(239, 68, 68, 0.35);
-				border-radius: 12px;
-				padding: 1.5rem 1.75rem;
-				margin-bottom: 1.5rem;
+				border: 1px solid rgba(239, 68, 68, 0.3);
+				border-radius: var(--radius-lg);
+				padding: 1.5rem;
+				margin-bottom: 1.5rem; /* 24px */
 			}
 
 			.unsupported-card h3 {
-				font-size: 1rem;
+				font-size: 0.9375rem;
 				font-weight: 600;
 				color: #fca5a5;
-				margin-bottom: 0.4rem;
+				margin-bottom: 0.25rem;
 			}
 
 			.unsupported-card p {
@@ -120,13 +128,13 @@
 				line-height: 1.6;
 			}
 
-			/* ── Camera card ─────────────────────────────────── */
+			/* ── Camera card ─────────────────────────────────────── */
 			.camera-card {
 				background: #000;
 				border: 1px solid var(--line);
-				border-radius: 14px;
+				border-radius: var(--radius-lg);
 				overflow: hidden;
-				margin-bottom: 1.125rem;
+				margin-bottom: 1.5rem; /* 24px */
 			}
 
 			.video-wrapper {
@@ -160,48 +168,52 @@
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				gap: 1rem;
+				gap: 1rem; /* 16px */
 				color: var(--muted);
 				background: var(--card);
 			}
 
-			.camera-placeholder-icon {
-				font-size: 3rem;
-				opacity: 0.45;
+			.viewfinder-icon {
+				width: 52px;
+				height: 52px;
+				color: var(--text);
+				opacity: 0.25;
 			}
 
 			.camera-placeholder p {
-				font-size: 0.9375rem;
+				font-size: 0.875rem;
+				color: var(--muted);
 			}
 
-			/* status badge */
+			/* status badge — accent reserved for scanning state */
 			.status-badge {
 				position: absolute;
 				top: 12px;
 				left: 12px;
 				display: flex;
 				align-items: center;
-				gap: 7px;
-				background: rgba(2, 6, 23, 0.82);
-				border: 1px solid rgba(255, 255, 255, 0.1);
-				border-radius: 8px;
-				padding: 5px 11px;
+				gap: 6px;
+				background: rgba(2, 6, 23, 0.85);
+				border: 1px solid rgba(255, 255, 255, 0.08);
+				border-radius: var(--radius-sm);
+				padding: 6px 10px;
 				font-size: 0.8125rem;
 				font-weight: 500;
 				backdrop-filter: blur(8px);
 			}
 
 			.status-dot {
-				width: 7px;
-				height: 7px;
+				width: 6px;
+				height: 6px;
 				border-radius: 50%;
 				background: var(--muted);
 				flex-shrink: 0;
 			}
 
+			/* accent used here: it IS the active scanning state */
 			.status-dot.scanning {
 				background: var(--accent);
-				animation: blink 1.4s ease-in-out infinite;
+				animation: blink 1.6s ease-in-out infinite;
 			}
 
 			.status-dot.found {
@@ -214,7 +226,7 @@
 
 			@keyframes blink {
 				0%, 100% { opacity: 1; }
-				50% { opacity: 0.3; }
+				50%       { opacity: 0.2; }
 			}
 
 			/* camera control buttons */
@@ -227,12 +239,13 @@
 			}
 
 			.cam-btn {
-				background: rgba(2, 6, 23, 0.82);
-				border: 1px solid rgba(255, 255, 255, 0.1);
+				background: rgba(2, 6, 23, 0.85);
+				border: 1px solid rgba(255, 255, 255, 0.08);
 				color: var(--text);
-				border-radius: 8px;
-				width: 38px;
-				height: 38px;
+				border-radius: var(--radius-md);
+				/* 44px minimum touch target */
+				width: 44px;
+				height: 44px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -243,76 +256,95 @@
 			}
 
 			.cam-btn:hover {
-				border-color: var(--accent);
-				color: var(--accent);
+				border-color: rgba(255, 255, 255, 0.2);
 			}
 
 			.cam-btn.on {
 				border-color: var(--accent);
 				color: var(--accent);
-				background: rgba(56, 189, 248, 0.12);
+				background: rgba(56, 189, 248, 0.1);
 			}
 
-			/* ── Primary button ──────────────────────────────── */
+			/* ── Primary button ──────────────────────────────────── */
 			.btn-primary {
-				background: var(--accent);
+				background: var(--text);
 				color: var(--bg);
 				border: none;
-				border-radius: 9px;
-				padding: 0.75rem 1.625rem;
+				border-radius: var(--radius-md);
+				padding: 0.75rem 1.5rem;
 				font-size: 0.9375rem;
 				font-weight: 600;
 				cursor: pointer;
-				transition: opacity 0.2s, transform 0.2s;
+				transition: opacity 0.2s, transform 0.15s;
 				letter-spacing: -0.01em;
 			}
 
-			.btn-primary:hover { opacity: 0.87; }
+			.btn-primary:hover  { opacity: 0.88; }
 			.btn-primary:active { transform: scale(0.97); }
 			.btn-primary:disabled {
-				opacity: 0.4;
+				opacity: 0.35;
 				cursor: not-allowed;
 			}
 
-			/* ── Last detected strip ─────────────────────────── */
+			/* ── Last detected — hero section ────────────────────── */
 			.last-detected {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
 				background: var(--card);
 				border: 1px solid var(--line);
-				border-radius: 12px;
-				padding: 1rem 1.25rem;
-				margin-bottom: 1.375rem;
-				min-height: 68px;
-				transition: border-color 0.25s, background 0.25s;
+				border-radius: var(--radius-md);
+				padding: 1.25rem 1.5rem;
+				margin-bottom: 2rem; /* 32px — clear separation from list below */
+				transition: border-color 0.3s, background 0.3s;
 			}
 
+			/* accent used here: it IS the active found state */
 			.last-detected.lit {
-				border-color: var(--accent);
-				background: rgba(56, 189, 248, 0.05);
+				border-color: rgba(56, 189, 248, 0.4);
+				background: rgba(56, 189, 248, 0.04);
+			}
+
+			.last-strip-top {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 0.5rem; /* 8px */
 			}
 
 			.last-label {
-				font-size: 0.7rem;
+				font-size: 0.6875rem;
 				font-weight: 700;
 				color: var(--muted);
 				text-transform: uppercase;
 				letter-spacing: 0.08em;
-				white-space: nowrap;
 			}
 
+			/* format tag: muted, not accent — it's metadata, not state */
+			.last-format {
+				font-size: 0.6875rem;
+				font-weight: 600;
+				color: var(--muted);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+
+			.last-strip-bottom {
+				display: flex;
+				align-items: center;
+				gap: 1rem; /* 16px */
+			}
+
+			/* The code IS the purpose of the tool — make it the hero */
 			.last-value {
 				flex: 1;
 				font-family: "SF Mono", "Fira Code", ui-monospace, "Cascadia Code",
 					"Roboto Mono", monospace;
-				font-size: 1.375rem;
+				font-size: 2.25rem;
 				font-weight: 700;
 				letter-spacing: 0.06em;
 				color: var(--text);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
+				line-height: 1.1;
 			}
 
 			.last-value.empty {
@@ -321,91 +353,93 @@
 				color: var(--muted);
 				letter-spacing: 0;
 				font-family: inherit;
+				line-height: 1.5;
 			}
 
-			.last-format {
-				font-size: 0.725rem;
-				font-weight: 700;
-				background: rgba(56, 189, 248, 0.12);
-				color: var(--accent);
-				border-radius: 6px;
-				padding: 0.25rem 0.5rem;
-				letter-spacing: 0.05em;
-				white-space: nowrap;
-			}
-
-			/* ── List ────────────────────────────────────────── */
+			/* ── List ────────────────────────────────────────────── */
 			.list-header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				margin-bottom: 0.75rem;
+				margin-bottom: 0.75rem; /* 12px */
 			}
 
 			.list-label {
-				font-size: 0.75rem;
+				font-size: 0.6875rem;
 				font-weight: 700;
 				color: var(--muted);
 				text-transform: uppercase;
 				letter-spacing: 0.08em;
 			}
 
+			/* count: text weight, not accent — it's a count, not a state */
 			.list-count {
-				color: var(--accent);
+				font-weight: 700;
+				color: var(--text);
 			}
 
-			.btn-ghost {
+			/* text link, not a button — communicates destructive intent clearly */
+			.btn-clear {
 				background: none;
-				border: 1px solid var(--line);
+				border: none;
 				color: var(--muted);
-				border-radius: 7px;
-				padding: 0.35rem 0.875rem;
 				font-size: 0.8125rem;
 				font-weight: 500;
 				cursor: pointer;
-				transition: color 0.2s, border-color 0.2s;
+				padding: 0.25rem 0;
+				transition: color 0.2s;
 			}
-
-			.btn-ghost:hover {
-				border-color: var(--danger);
-				color: var(--danger);
-			}
+			.btn-clear:hover { color: var(--danger); }
 
 			.codes-list {
 				display: flex;
 				flex-direction: column;
-				gap: 0.5rem;
+				gap: 0.5rem; /* 8px */
 			}
 
 			.empty-state {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.75rem; /* 12px */
 				text-align: center;
 				padding: 3rem 1rem;
 				color: var(--muted);
-				font-size: 0.9375rem;
+			}
+
+			.empty-state svg {
+				width: 40px;
+				height: 40px;
+				opacity: 0.2;
+			}
+
+			.empty-state p {
+				font-size: 0.875rem;
 			}
 
 			.code-entry {
 				display: flex;
 				align-items: center;
-				gap: 0.875rem;
+				gap: 1rem; /* 16px */
 				background: var(--card);
 				border: 1px solid var(--line);
-				border-radius: 10px;
-				padding: 0.875rem 1rem;
-				transition: border-color 0.3s, background 0.3s;
+				border-radius: var(--radius-md);
+				padding: 0.75rem 1rem;
+				transition: border-color 0.4s, background 0.4s;
 			}
 
 			.code-entry.is-new {
-				animation: slideDown 0.22s ease-out;
+				animation: slideDown 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 			}
 
+			/* flash: 12% opacity — actually visible, not a ghost */
 			.code-entry.new-flash {
 				border-color: var(--accent2);
-				background: rgba(34, 197, 94, 0.07);
+				background: rgba(34, 197, 94, 0.12);
 			}
 
 			@keyframes slideDown {
-				from { opacity: 0; transform: translateY(-6px); }
+				from { opacity: 0; transform: translateY(-10px); }
 				to   { opacity: 1; transform: translateY(0); }
 			}
 
@@ -415,7 +449,7 @@
 					"Roboto Mono", monospace;
 				font-size: 0.9375rem;
 				font-weight: 600;
-				letter-spacing: 0.05em;
+				letter-spacing: 0.06em;
 				color: var(--text);
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -427,63 +461,75 @@
 				display: flex;
 				flex-direction: column;
 				align-items: flex-end;
-				gap: 3px;
+				gap: 2px;
 				flex-shrink: 0;
 			}
 
+			/* muted, not accent — format type is metadata */
 			.entry-format {
 				font-size: 0.6875rem;
-				font-weight: 700;
-				color: var(--accent);
+				font-weight: 600;
+				color: var(--muted);
 				letter-spacing: 0.06em;
+				text-transform: uppercase;
 			}
 
 			.entry-time {
-				font-size: 0.75rem;
+				font-size: 0.6875rem;
 				color: var(--muted);
+				opacity: 0.6;
 			}
 
 			.entry-actions {
 				display: flex;
-				gap: 6px;
+				gap: 2px;
 				flex-shrink: 0;
 			}
 
+			/* 44px touch target, borderless by default — cleaner */
 			.icon-btn {
-				background: var(--panel);
-				border: 1px solid var(--line);
+				background: transparent;
+				border: 1px solid transparent;
 				color: var(--muted);
-				border-radius: 6px;
-				width: 30px;
-				height: 30px;
+				border-radius: var(--radius-sm);
+				width: 44px;
+				height: 44px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
-				font-size: 0.8125rem;
-				transition: color 0.15s, border-color 0.15s;
+				font-size: 0.9375rem;
+				transition: color 0.15s, background 0.15s, border-color 0.15s;
 				flex-shrink: 0;
 			}
 
-			.icon-btn:hover { color: var(--text); border-color: var(--muted); }
+			.icon-btn:hover {
+				color: var(--text);
+				background: rgba(255, 255, 255, 0.06);
+			}
 
 			.icon-btn.done {
 				color: var(--accent2);
-				border-color: var(--accent2);
 			}
 
 			.icon-btn.del:hover {
 				color: var(--danger);
-				border-color: var(--danger);
+				background: rgba(239, 68, 68, 0.08);
 			}
 
-			/* ── Responsive ──────────────────────────────────── */
+			/* ── Responsive ──────────────────────────────────────── */
 			@media (max-width: 600px) {
-				main { padding: 1.5rem 1rem 4rem; }
-				.page-header h1 { font-size: 1.625rem; }
-				.last-value { font-size: 1.125rem; }
-				.entry-value { font-size: 0.875rem; }
-				.nav-links { gap: 1.25rem; }
+				main {
+					padding: 1.5rem 1rem calc(3rem + env(safe-area-inset-bottom));
+				}
+
+				.page-header h1  { font-size: 1.5rem; }
+				.last-value      { font-size: 1.75rem; }
+				.nav-links       { gap: 1.25rem; }
+			}
+
+			@media (max-width: 380px) {
+				.last-value { font-size: 1.375rem; }
 			}
 		</style>
 	</head>
@@ -522,8 +568,19 @@
 				<div class="video-wrapper" id="videoWrapper">
 
 					<div class="camera-placeholder" id="placeholder">
-						<div class="camera-placeholder-icon">📷</div>
-						<p>Ready to scan</p>
+						<!-- Viewfinder icon — purposeful, not decorative -->
+						<svg class="viewfinder-icon" viewBox="0 0 64 64" fill="none"
+							xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<path d="M8 22 L8 8 L22 8"   stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<p>Enable camera access to start scanning</p>
 						<button class="btn-primary" id="startBtn">Start Camera</button>
 					</div>
 
@@ -538,21 +595,27 @@
 
 					<div class="camera-controls" id="camControls" style="display:none">
 						<button class="cam-btn" id="torchBtn"
-							title="Toggle flashlight" style="display:none">🔦</button>
+							title="Toggle flashlight" aria-label="Toggle flashlight"
+							style="display:none">🔦</button>
 						<button class="cam-btn" id="flipBtn"
-							title="Switch camera" style="display:none">🔄</button>
+							title="Switch camera" aria-label="Switch camera"
+							style="display:none">🔄</button>
 					</div>
 
 				</div>
 			</div>
 
-			<!-- Last detected -->
+			<!-- Last detected — two-row layout: label/format then hero code/copy -->
 			<div class="last-detected" id="lastDetected">
-				<span class="last-label">Last</span>
-				<span class="last-value empty" id="lastValue">Waiting for scan…</span>
-				<span class="last-format" id="lastFormat" style="display:none"></span>
-				<button class="icon-btn" id="lastCopyBtn"
-					style="display:none" title="Copy" aria-label="Copy code">⎘</button>
+				<div class="last-strip-top">
+					<span class="last-label">Last detected</span>
+					<span class="last-format" id="lastFormat" style="display:none"></span>
+				</div>
+				<div class="last-strip-bottom">
+					<span class="last-value empty" id="lastValue">Waiting for scan…</span>
+					<button class="icon-btn" id="lastCopyBtn"
+						style="display:none" title="Copy" aria-label="Copy code">⎘</button>
+				</div>
 			</div>
 
 			<!-- History -->
@@ -560,10 +623,23 @@
 				<span class="list-label">
 					Scanned <span class="list-count" id="codeCount">0</span>
 				</span>
-				<button class="btn-ghost" id="clearBtn">Clear all</button>
+				<button class="btn-clear" id="clearBtn">Clear all</button>
 			</div>
 			<div class="codes-list" id="codesList">
-				<div class="empty-state">No codes scanned yet</div>
+				<div class="empty-state">
+					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true">
+						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p>Scanned codes will appear here</p>
+				</div>
 			</div>
 		</main>
 
@@ -596,6 +672,9 @@
 			// scan-line animation state
 			let scanY = 0;
 			let scanDir = 1;
+
+			// bounding-box breathing pulse (starts at max opacity)
+			let boxPulse = Math.PI / 2;
 
 			// ── DOM refs ──────────────────────────────────────────────────────
 			const video     = document.getElementById('cameraVideo');
@@ -810,8 +889,13 @@
 				ctx.clearRect(0, 0, cw, ch);
 
 				if (lastBarcodes.length > 0) {
-					lastBarcodes.forEach(bc => drawBox(bc));
+					// Advance pulse and compute opacity for breathing effect
+					boxPulse += 0.06;
+					const opacity = 0.65 + 0.35 * Math.abs(Math.sin(boxPulse));
+					lastBarcodes.forEach(bc => drawBox(bc, opacity));
 				} else {
+					// Reset pulse so next detection always starts at full brightness
+					boxPulse = Math.PI / 2;
 					drawScanLine();
 				}
 
@@ -836,7 +920,8 @@
 			function drawScanLine() {
 				const w = canvas.width;
 				const h = canvas.height;
-				scanY += scanDir * (h / 180);
+				// Slower movement: h/260 instead of h/180 — more deliberate
+				scanY += scanDir * (h / 260);
 				if (scanY > h * 0.88) scanDir = -1;
 				if (scanY < h * 0.12) scanDir =  1;
 
@@ -848,7 +933,7 @@
 				ctx.fillRect(0, scanY - 3, w, 6);
 			}
 
-			function drawBox(bc) {
+			function drawBox(bc, opacity = 1) {
 				const pts = bc.cornerPoints;
 				if (!pts || pts.length < 4) return;
 
@@ -857,6 +942,7 @@
 				const lw = Math.max(2, canvas.width / 350);
 
 				ctx.save();
+				ctx.globalAlpha = opacity;
 				ctx.strokeStyle = '#38bdf8';
 				ctx.lineWidth = lw;
 				ctx.shadowColor = '#38bdf8';
@@ -915,11 +1001,27 @@
 			}
 
 			// ── Render list ───────────────────────────────────────────────────
+			const EMPTY_STATE_HTML = `
+				<div class="empty-state">
+					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true">
+						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p>Scanned codes will appear here</p>
+				</div>`;
+
 			function renderList() {
 				codeCount.textContent = codes.length;
 
 				if (codes.length === 0) {
-					codesList.innerHTML = '<div class="empty-state">No codes scanned yet</div>';
+					codesList.innerHTML = EMPTY_STATE_HTML;
 					return;
 				}
 
