@@ -686,6 +686,7 @@
 			// ZXing fallback for browsers without BarcodeDetector (e.g. Firefox)
 			let useZXing = false;
 			let zxingReader = null;
+			let zxingControls = null; // IScannerControls returned by decodeFromVideoElement
 
 			// ── DOM refs ──────────────────────────────────────────────────────
 			const video     = document.getElementById('cameraVideo');
@@ -852,6 +853,7 @@
 
 			// ── Detection & animation loops ───────────────────────────────────
 			function startLoops() {
+				if (scanning) return; // prevent duplicate rAF/detect chains
 				scanning = true;
 				rafId = requestAnimationFrame(animFrame);
 				if (useZXing) startZXingLoop();
@@ -864,16 +866,20 @@
 				clearTimeout(detectTimer);
 				cancelAnimationFrame(rafId);
 				lastBarcodes = [];
-				zxingReader?.reset();
+				zxingControls?.stop();
+				zxingControls = null;
 				zxingReader = null;
 				lastDetected.classList.remove('lit');
 			}
 
 			async function startZXingLoop() {
 				const ZXING_FORMAT_NAMES = {
-					0: 'aztec',    1: 'codabar', 2: 'code_39',  3: 'code_93',
-					4: 'code_128', 5: 'data_matrix', 6: 'ean_8', 7: 'ean_13',
-					8: 'itf',     10: 'pdf_417', 11: 'qr_code', 14: 'upc_a', 15: 'upc_e'
+					 0: 'aztec',            1: 'codabar',         2: 'code_39',
+					 3: 'code_93',          4: 'code_128',        5: 'data_matrix',
+					 6: 'ean_8',            7: 'ean_13',          8: 'itf',
+					 9: 'maxicode',        10: 'pdf_417',        11: 'qr_code',
+					12: 'rss_14',          13: 'rss_expanded',   14: 'upc_a',
+					15: 'upc_e',           16: 'upc_ean_extension'
 				};
 				try {
 					setStatus('', 'Preparing scanner…');
@@ -881,9 +887,13 @@
 						'https://esm.sh/@zxing/browser@0.1.5'
 					);
 					if (!scanning) return; // camera stopped while library was loading
+
 					zxingReader = new BrowserMultiFormatReader();
 					setStatus('scanning', 'Scanning…');
-					zxingReader.decodeFromVideoElement(video, (result, _err) => {
+
+					// decodeFromVideoElement is async and returns IScannerControls —
+					// must await to capture the stop handle.
+					const controls = await zxingReader.decodeFromVideoElement(video, (result, _err) => {
 						if (!scanning || !result) return;
 						const rawValue = result.getText();
 						const format   = ZXING_FORMAT_NAMES[result.getBarcodeFormat()] ?? 'unknown';
@@ -894,8 +904,14 @@
 							onCodeFound(rawValue, format);
 						}
 					});
+
+					// Second race window: stopLoops() may have fired during the await above.
+					if (!scanning) { controls?.stop(); return; }
+					zxingControls = controls;
 				} catch {
-					if (scanning) setStatus('error', 'Scanner failed to load — check connection and reload');
+					// Network failure or ZXing init error — stop animation and surface error.
+					stopLoops();
+					setStatus('error', 'Scanner failed to load — check connection and reload');
 				}
 			}
 
@@ -1080,7 +1096,7 @@
 				}
 
 				codesList.innerHTML = codes.map(c => `
-					<div class="code-entry" data-id="${c.id}">
+					<div class="code-entry" data-id="${esc(c.id)}">
 						<span class="entry-value">${esc(c.value)}</span>
 						<div class="entry-meta">
 							<span class="entry-format">${esc(c.format)}</span>
@@ -1090,7 +1106,7 @@
 							<button class="icon-btn copy-btn"
 								data-val="${esc(c.value)}" title="Copy" aria-label="Copy code">⎘</button>
 							<button class="icon-btn del-btn del"
-								data-id="${c.id}" title="Remove" aria-label="Remove code">✕</button>
+								data-id="${esc(c.id)}" title="Remove" aria-label="Remove code">✕</button>
 						</div>
 					</div>
 				`).join('');
