@@ -715,10 +715,17 @@
 				startBtn.disabled = true;
 				startBtn.textContent = 'Not supported';
 			} else if ('BarcodeDetector' in window) {
-				// Native path: Chrome, Edge, Safari — filter to supported formats
-				const supported = await BarcodeDetector.getSupportedFormats();
-				const formats   = DESIRED_FORMATS.filter(f => supported.includes(f));
-				detector = new BarcodeDetector({ formats: formats.length ? formats : supported });
+				// Native path: Chrome, Edge, Safari — filter to supported formats.
+				// Wrapped in try-catch: some browsers advertise BarcodeDetector but
+				// getSupportedFormats() or the constructor throws (Samsung Internet,
+				// partial flag builds). Fall back to ZXing rather than killing the IIFE.
+				try {
+					const supported = await BarcodeDetector.getSupportedFormats();
+					const formats   = DESIRED_FORMATS.filter(f => supported.includes(f));
+					detector = new BarcodeDetector({ formats: formats.length ? formats : supported });
+				} catch {
+					useZXing = true;
+				}
 			} else {
 				// ZXing fallback path: Firefox and any browser without BarcodeDetector
 				useZXing = true;
@@ -783,7 +790,15 @@
 
 			async function initVideo(s) {
 				video.srcObject = s;
-				await video.play();
+				// play() can throw AbortError on iOS when the user-gesture chain is
+				// considered consumed after the getUserMedia await. The video has
+				// autoplay+muted+playsinline so it will start on its own; we just
+				// wait for the first frame rather than relying on play()'s promise.
+				video.play().catch(() => {});
+				await new Promise(resolve => {
+					if (video.readyState >= 2) { resolve(); return; }
+					video.addEventListener('canplay', resolve, { once: true });
+				});
 
 				// Enumerate after permission is granted so deviceId is populated
 				const devices = await navigator.mediaDevices.enumerateDevices();
