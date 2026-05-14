@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<title>UPC Scanner</title>
+		<style>
+			/* ── Design tokens ───────────────────────────────────── */
+			:root {
+				/* Colors */
+				--bg:      #020617;
+				--panel:   #0f172a;
+				--card:    #111827;
+				--line:    #334155;
+				--accent:  #38bdf8;
+				--accent2: #22c55e;
+				--text:    #e5e7eb;
+				--muted:   #94a3b8;
+				--danger:  #ef4444;
+
+				/* Radii — three values, semantically assigned */
+				--radius-sm: 6px;   /* badges, icon buttons, tags */
+				--radius-md: 10px;  /* cards, list entries, buttons */
+				--radius-lg: 16px;  /* camera card, major containers */
+			}
+
+			* { margin: 0; padding: 0; box-sizing: border-box; }
+
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+					"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+					"Helvetica Neue", sans-serif;
+				background: var(--bg);
+				color: var(--text);
+				min-height: 100vh;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			/* ── Nav ─────────────────────────────────────────────── */
+			nav {
+				position: sticky;
+				top: 0;
+				z-index: 100;
+				background: rgba(2, 6, 23, 0.95);
+				border-bottom: 1px solid var(--line);
+				backdrop-filter: blur(10px);
+			}
+
+			.nav-container {
+				max-width: 860px;
+				margin: 0 auto;
+				padding: 1rem 1.5rem;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.nav-brand {
+				font-size: 1.125rem;
+				font-weight: 600;
+				color: var(--text);
+				text-decoration: none;
+				letter-spacing: -0.02em;
+				transition: color 0.2s;
+			}
+			.nav-brand:hover { color: var(--accent); }
+
+			.nav-links {
+				list-style: none;
+				display: flex;
+				gap: 1.5rem;
+				align-items: center;
+			}
+
+			.nav-links a {
+				color: var(--muted);
+				text-decoration: none;
+				font-size: 0.875rem;
+				font-weight: 500;
+				transition: color 0.2s;
+			}
+			.nav-links a:hover { color: var(--text); }
+
+			/* ── Layout ──────────────────────────────────────────── */
+			main {
+				max-width: 860px;
+				margin: 0 auto;
+				/* spacing scale: 32px top, 24px sides, 64px+safe-area bottom */
+				padding: 2rem 1.5rem calc(4rem + env(safe-area-inset-bottom));
+			}
+
+			.page-header {
+				margin-bottom: 2rem; /* 32px */
+			}
+
+			.page-header h1 {
+				font-size: 1.75rem;
+				font-weight: 700;
+				letter-spacing: -0.025em;
+				margin-bottom: 0.25rem; /* 4px */
+			}
+
+			.page-header p {
+				color: var(--muted);
+				font-size: 0.875rem;
+			}
+
+			/* ── Unsupported banner ───────────────────────────────── */
+			.unsupported-card {
+				background: rgba(239, 68, 68, 0.07);
+				border: 1px solid rgba(239, 68, 68, 0.3);
+				border-radius: var(--radius-lg);
+				padding: 1.5rem;
+				margin-bottom: 1.5rem; /* 24px */
+			}
+
+			.unsupported-card h3 {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: #fca5a5;
+				margin-bottom: 0.25rem;
+			}
+
+			.unsupported-card p {
+				font-size: 0.875rem;
+				color: var(--muted);
+				line-height: 1.6;
+			}
+
+			/* ── Camera card ─────────────────────────────────────── */
+			.camera-card {
+				background: #000;
+				border: 1px solid var(--line);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				margin-bottom: 1.5rem; /* 24px */
+			}
+
+			.video-wrapper {
+				position: relative;
+				width: 100%;
+				aspect-ratio: 16 / 9;
+				background: #000;
+				overflow: hidden;
+			}
+
+			#cameraVideo {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			#cameraCanvas {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+			}
+
+			/* placeholder */
+			.camera-placeholder {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1rem; /* 16px */
+				color: var(--muted);
+				background: var(--card);
+			}
+
+			.viewfinder-icon {
+				width: 52px;
+				height: 52px;
+				color: var(--text);
+				opacity: 0.25;
+			}
+
+			.camera-placeholder p {
+				font-size: 0.875rem;
+				color: var(--muted);
+			}
+
+			/* status badge — accent reserved for scanning state */
+			.status-badge {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				background: rgba(2, 6, 23, 0.85);
+				border: 1px solid rgba(255, 255, 255, 0.08);
+				border-radius: var(--radius-sm);
+				padding: 6px 10px;
+				font-size: 0.8125rem;
+				font-weight: 500;
+				backdrop-filter: blur(8px);
+			}
+
+			.status-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--muted);
+				flex-shrink: 0;
+			}
+
+			/* accent used here: it IS the active scanning state */
+			.status-dot.scanning {
+				background: var(--accent);
+				animation: blink 1.6s ease-in-out infinite;
+			}
+
+			.status-dot.found {
+				background: var(--accent2);
+			}
+
+			.status-dot.error {
+				background: var(--danger);
+			}
+
+			@keyframes blink {
+				0%, 100% { opacity: 1; }
+				50%       { opacity: 0.2; }
+			}
+
+			/* camera control buttons */
+			.camera-controls {
+				position: absolute;
+				bottom: 12px;
+				right: 12px;
+				display: flex;
+				gap: 8px;
+			}
+
+			.cam-btn {
+				background: rgba(2, 6, 23, 0.85);
+				border: 1px solid rgba(255, 255, 255, 0.08);
+				color: var(--text);
+				border-radius: var(--radius-md);
+				/* 44px minimum touch target */
+				width: 44px;
+				height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				font-size: 1.1rem;
+				backdrop-filter: blur(8px);
+				transition: color 0.2s, border-color 0.2s, background 0.2s;
+			}
+
+			.cam-btn:hover {
+				border-color: rgba(255, 255, 255, 0.2);
+			}
+
+			.cam-btn.on {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: rgba(56, 189, 248, 0.1);
+			}
+
+			/* ── Primary button ──────────────────────────────────── */
+			.btn-primary {
+				background: var(--text);
+				color: var(--bg);
+				border: none;
+				border-radius: var(--radius-md);
+				padding: 0.75rem 1.5rem;
+				font-size: 0.9375rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: opacity 0.2s, transform 0.15s;
+				letter-spacing: -0.01em;
+			}
+
+			.btn-primary:hover  { opacity: 0.88; }
+			.btn-primary:active { transform: scale(0.97); }
+			.btn-primary:disabled {
+				opacity: 0.35;
+				cursor: not-allowed;
+			}
+
+			/* ── Last detected — hero section ────────────────────── */
+			.last-detected {
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-radius: var(--radius-md);
+				padding: 1.25rem 1.5rem;
+				margin-bottom: 2rem; /* 32px — clear separation from list below */
+				transition: border-color 0.3s, background 0.3s;
+			}
+
+			/* accent used here: it IS the active found state */
+			.last-detected.lit {
+				border-color: rgba(56, 189, 248, 0.4);
+				background: rgba(56, 189, 248, 0.04);
+			}
+
+			.last-strip-top {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 0.5rem; /* 8px */
+			}
+
+			.last-label {
+				font-size: 0.6875rem;
+				font-weight: 700;
+				color: var(--muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+			}
+
+			/* format tag: muted, not accent — it's metadata, not state */
+			.last-format {
+				font-size: 0.6875rem;
+				font-weight: 600;
+				color: var(--muted);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+
+			.last-strip-bottom {
+				display: flex;
+				align-items: center;
+				gap: 1rem; /* 16px */
+			}
+
+			/* The code IS the purpose of the tool — make it the hero */
+			.last-value {
+				flex: 1;
+				font-family: "SF Mono", "Fira Code", ui-monospace, "Cascadia Code",
+					"Roboto Mono", monospace;
+				font-size: 2.25rem;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				color: var(--text);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				line-height: 1.1;
+			}
+
+			.last-value.empty {
+				font-size: 0.9375rem;
+				font-weight: 400;
+				color: var(--muted);
+				letter-spacing: 0;
+				font-family: inherit;
+				line-height: 1.5;
+			}
+
+			/* ── List ────────────────────────────────────────────── */
+			.list-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 0.75rem; /* 12px */
+			}
+
+			.list-label {
+				font-size: 0.6875rem;
+				font-weight: 700;
+				color: var(--muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+			}
+
+			/* count: text weight, not accent — it's a count, not a state */
+			.list-count {
+				font-weight: 700;
+				color: var(--text);
+			}
+
+			/* text link, not a button — communicates destructive intent clearly */
+			.btn-clear {
+				background: none;
+				border: none;
+				color: var(--muted);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				cursor: pointer;
+				padding: 0.25rem 0;
+				transition: color 0.2s;
+			}
+			.btn-clear:hover { color: var(--danger); }
+
+			.codes-list {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem; /* 8px */
+			}
+
+			.empty-state {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.75rem; /* 12px */
+				text-align: center;
+				padding: 3rem 1rem;
+				color: var(--muted);
+			}
+
+			.empty-state svg {
+				width: 40px;
+				height: 40px;
+				opacity: 0.2;
+			}
+
+			.empty-state p {
+				font-size: 0.875rem;
+			}
+
+			.code-entry {
+				display: flex;
+				align-items: center;
+				gap: 1rem; /* 16px */
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-radius: var(--radius-md);
+				padding: 0.75rem 1rem;
+				transition: border-color 0.4s, background 0.4s;
+			}
+
+			.code-entry.is-new {
+				animation: slideDown 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+			}
+
+			/* flash: 12% opacity — actually visible, not a ghost */
+			.code-entry.new-flash {
+				border-color: var(--accent2);
+				background: rgba(34, 197, 94, 0.12);
+			}
+
+			@keyframes slideDown {
+				from { opacity: 0; transform: translateY(-10px); }
+				to   { opacity: 1; transform: translateY(0); }
+			}
+
+			.entry-value {
+				flex: 1;
+				font-family: "SF Mono", "Fira Code", ui-monospace, "Cascadia Code",
+					"Roboto Mono", monospace;
+				font-size: 0.9375rem;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				color: var(--text);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+
+			.entry-meta {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: 2px;
+				flex-shrink: 0;
+			}
+
+			/* muted, not accent — format type is metadata */
+			.entry-format {
+				font-size: 0.6875rem;
+				font-weight: 600;
+				color: var(--muted);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+
+			.entry-time {
+				font-size: 0.6875rem;
+				color: var(--muted);
+				opacity: 0.6;
+			}
+
+			.entry-actions {
+				display: flex;
+				gap: 2px;
+				flex-shrink: 0;
+			}
+
+			/* 44px touch target, borderless by default — cleaner */
+			.icon-btn {
+				background: transparent;
+				border: 1px solid transparent;
+				color: var(--muted);
+				border-radius: var(--radius-sm);
+				width: 44px;
+				height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				font-size: 0.9375rem;
+				transition: color 0.15s, background 0.15s, border-color 0.15s;
+				flex-shrink: 0;
+			}
+
+			.icon-btn:hover {
+				color: var(--text);
+				background: rgba(255, 255, 255, 0.06);
+			}
+
+			.icon-btn.done {
+				color: var(--accent2);
+			}
+
+			.icon-btn.del:hover {
+				color: var(--danger);
+				background: rgba(239, 68, 68, 0.08);
+			}
+
+			/* ── Responsive ──────────────────────────────────────── */
+			@media (max-width: 600px) {
+				main {
+					padding: 1.5rem 1rem calc(3rem + env(safe-area-inset-bottom));
+				}
+
+				.page-header h1  { font-size: 1.5rem; }
+				.last-value      { font-size: 1.75rem; }
+				.nav-links       { gap: 1.25rem; }
+			}
+
+			@media (max-width: 380px) {
+				.last-value { font-size: 1.375rem; }
+			}
+		</style>
+	</head>
+	<body>
+
+		<nav>
+			<div class="nav-container">
+				<a href="/" class="nav-brand">aditya n</a>
+				<ul class="nav-links">
+					<li><a href="/">Tools</a></li>
+					<li><a href="/about.html">About</a></li>
+					<li>
+						<a href="https://github.com/adityanatraj" target="_blank"
+							rel="noopener noreferrer">GitHub</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<main>
+			<div class="page-header">
+				<h1>UPC Scanner</h1>
+				<p>Point your camera at a barcode to decode and collect it</p>
+			</div>
+
+			<div id="unsupportedMsg" class="unsupported-card" style="display:none">
+				<h3>Browser not supported</h3>
+				<p>
+					The native <code>BarcodeDetector</code> API is required.
+					Please use Chrome 83+, Edge 83+, or Safari 17+.
+				</p>
+			</div>
+
+			<!-- Camera -->
+			<div class="camera-card">
+				<div class="video-wrapper" id="videoWrapper">
+
+					<div class="camera-placeholder" id="placeholder">
+						<!-- Viewfinder icon — purposeful, not decorative -->
+						<svg class="viewfinder-icon" viewBox="0 0 64 64" fill="none"
+							xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<path d="M8 22 L8 8 L22 8"   stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+								stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<p>Enable camera access to start scanning</p>
+						<button class="btn-primary" id="startBtn">Start Camera</button>
+					</div>
+
+					<video id="cameraVideo" autoplay muted playsinline
+						style="display:none"></video>
+					<canvas id="cameraCanvas"></canvas>
+
+					<div class="status-badge" id="statusBadge" style="display:none">
+						<div class="status-dot" id="statusDot"></div>
+						<span id="statusText">Scanning…</span>
+					</div>
+
+					<div class="camera-controls" id="camControls" style="display:none">
+						<button class="cam-btn" id="torchBtn"
+							title="Toggle flashlight" aria-label="Toggle flashlight"
+							style="display:none">🔦</button>
+						<button class="cam-btn" id="flipBtn"
+							title="Switch camera" aria-label="Switch camera"
+							style="display:none">🔄</button>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Last detected — two-row layout: label/format then hero code/copy -->
+			<div class="last-detected" id="lastDetected">
+				<div class="last-strip-top">
+					<span class="last-label">Last detected</span>
+					<span class="last-format" id="lastFormat" style="display:none"></span>
+				</div>
+				<div class="last-strip-bottom">
+					<span class="last-value empty" id="lastValue">Waiting for scan…</span>
+					<button class="icon-btn" id="lastCopyBtn"
+						style="display:none" title="Copy" aria-label="Copy code">⎘</button>
+				</div>
+			</div>
+
+			<!-- History -->
+			<div class="list-header">
+				<span class="list-label">
+					Scanned <span class="list-count" id="codeCount">0</span>
+				</span>
+				<button class="btn-clear" id="clearBtn">Clear all</button>
+			</div>
+			<div class="codes-list" id="codesList">
+				<div class="empty-state">
+					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true">
+						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p>Scanned codes will appear here</p>
+				</div>
+			</div>
+		</main>
+
+		<script>
+		(async () => {
+			// ── Constants & state ─────────────────────────────────────────────
+			const STORAGE_KEY = 'upc_scanner_v1';
+			const DEDUPE_MS = 3000;
+			const DESIRED_FORMATS = [
+				'upc_a', 'upc_e', 'ean_13', 'ean_8',
+				'code_128', 'code_39', 'itf', 'qr_code'
+			];
+
+			let codes = loadCodes();
+			let stream = null;
+			let detector = null;
+			let scanning = false;
+			let rafId = null;
+			let detectTimer = null;
+			let lastBarcodes = [];
+			let lastRawValue = null;
+			let lastRawTime = 0;
+			let torchOn = false;
+			let torchSupported = false;
+			let videoDevices = [];
+			let deviceIndex = 0;
+			let detectGen = 0;
+			let pausedForHide = false;
+
+			// scan-line animation state
+			let scanY = 0;
+			let scanDir = 1;
+
+			// bounding-box breathing pulse (starts at max opacity)
+			let boxPulse = Math.PI / 2;
+
+			// ── DOM refs ──────────────────────────────────────────────────────
+			const video     = document.getElementById('cameraVideo');
+			const canvas    = document.getElementById('cameraCanvas');
+			const ctx       = canvas.getContext('2d');
+			const placeholder  = document.getElementById('placeholder');
+			const startBtn     = document.getElementById('startBtn');
+			const statusBadge  = document.getElementById('statusBadge');
+			const statusDot    = document.getElementById('statusDot');
+			const statusText   = document.getElementById('statusText');
+			const camControls  = document.getElementById('camControls');
+			const torchBtn     = document.getElementById('torchBtn');
+			const flipBtn      = document.getElementById('flipBtn');
+			const lastDetected = document.getElementById('lastDetected');
+			const lastValueEl  = document.getElementById('lastValue');
+			const lastFormatEl = document.getElementById('lastFormat');
+			const lastCopyBtn  = document.getElementById('lastCopyBtn');
+			const codesList    = document.getElementById('codesList');
+			const codeCount    = document.getElementById('codeCount');
+			const clearBtn     = document.getElementById('clearBtn');
+
+			// ── Capability check ──────────────────────────────────────────────
+			if (!('BarcodeDetector' in window)) {
+				document.getElementById('unsupportedMsg').style.display = 'block';
+				startBtn.disabled = true;
+				startBtn.textContent = 'Not supported';
+			} else {
+				// Filter to formats the browser actually supports to avoid throws on Safari
+				const supported = await BarcodeDetector.getSupportedFormats();
+				const formats   = DESIRED_FORMATS.filter(f => supported.includes(f));
+				detector = new BarcodeDetector({ formats: formats.length ? formats : supported });
+			}
+
+			// ── Initial render ────────────────────────────────────────────────
+			renderList();
+
+			// ── Event listeners ───────────────────────────────────────────────
+			startBtn.addEventListener('click', startCamera);
+			clearBtn.addEventListener('click', clearAll);
+			torchBtn.addEventListener('click', toggleTorch);
+			flipBtn.addEventListener('click', flipCamera);
+			lastCopyBtn.addEventListener('click', () => copyValue(lastValueEl.textContent, lastCopyBtn));
+
+			codesList.addEventListener('click', e => {
+				const copyBtn = e.target.closest('.copy-btn');
+				const delBtn  = e.target.closest('.del-btn');
+				if (copyBtn) copyValue(copyBtn.dataset.val, copyBtn);
+				if (delBtn)  deleteCode(delBtn.dataset.id);
+			});
+
+			// Stop camera light when the tab is hidden; resume when visible again
+			document.addEventListener('visibilitychange', () => {
+				if (document.hidden) {
+					if (scanning) { stopLoops(); pausedForHide = true; }
+				} else if (pausedForHide) {
+					pausedForHide = false;
+					if (stream) startLoops();
+				}
+			});
+
+			// Release camera track so the indicator light goes off on navigation
+			window.addEventListener('beforeunload', () => {
+				stream?.getTracks().forEach(t => t.stop());
+			});
+
+			// ── Camera start ──────────────────────────────────────────────────
+			async function startCamera() {
+				try {
+					stream = await navigator.mediaDevices.getUserMedia({
+						video: {
+							facingMode: { ideal: 'environment' },
+							width:  { ideal: 1920 },
+							height: { ideal: 1080 }
+						}
+					});
+
+					await initVideo(stream);
+
+				} catch (err) {
+					setStatus('error',
+						err.name === 'NotAllowedError' ? 'Camera denied' : 'Camera error');
+					statusBadge.style.display = 'flex';
+				}
+			}
+
+			async function initVideo(s) {
+				video.srcObject = s;
+				await video.play();
+
+				// Enumerate after permission is granted so deviceId is populated
+				const devices = await navigator.mediaDevices.enumerateDevices();
+				videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+				placeholder.style.display = 'none';
+				video.style.display = 'block';
+				statusBadge.style.display = 'flex';
+				camControls.style.display = 'flex';
+
+				if (videoDevices.length > 1) flipBtn.style.display = 'flex';
+
+				const track = s.getVideoTracks()[0];
+				const caps  = track.getCapabilities?.() ?? {};
+				if (caps.torch) {
+					torchSupported = true;
+					torchBtn.style.display = 'flex';
+				} else {
+					torchSupported = false;
+					torchBtn.style.display = 'none';
+				}
+
+				setStatus('scanning', 'Scanning…');
+				startLoops();
+			}
+
+			// ── Camera flip ───────────────────────────────────────────────────
+			async function flipCamera() {
+				// Allow retry even when stream is null (previous flip failed)
+				if (videoDevices.length < 2) return;
+				if (stream) {
+					stopLoops();
+					stream.getTracks().forEach(t => t.stop());
+					stream = null;
+				}
+				const nextIndex = (deviceIndex + 1) % videoDevices.length;
+				try {
+					stream = await navigator.mediaDevices.getUserMedia({
+						video: {
+							deviceId: { exact: videoDevices[nextIndex].deviceId },
+							width:  { ideal: 1920 },
+							height: { ideal: 1080 }
+						}
+					});
+					deviceIndex = nextIndex;
+					torchOn = false;
+					torchBtn.classList.remove('on');
+					await initVideo(stream);
+				} catch {
+					// camControls stays visible; user can tap flip again to retry
+					setStatus('error', 'Switch failed — tap ↺ to retry');
+				}
+			}
+
+			// ── Torch ─────────────────────────────────────────────────────────
+			async function toggleTorch() {
+				if (!torchSupported || !stream) return;
+				torchOn = !torchOn;
+				const track = stream.getVideoTracks()[0];
+				try {
+					await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+					torchBtn.classList.toggle('on', torchOn);
+				} catch {
+					torchOn = !torchOn;
+				}
+			}
+
+			// ── Detection & animation loops ───────────────────────────────────
+			function startLoops() {
+				scanning = true;
+				scheduleDetect();
+				rafId = requestAnimationFrame(animFrame);
+			}
+
+			function stopLoops() {
+				scanning = false;
+				detectGen++;
+				clearTimeout(detectTimer);
+				cancelAnimationFrame(rafId);
+				lastBarcodes = [];
+			}
+
+			function scheduleDetect() {
+				if (!scanning) return;
+				detectTimer = setTimeout(runDetect, 150);
+			}
+
+			async function runDetect() {
+				if (!scanning || video.readyState < 2) {
+					scheduleDetect();
+					return;
+				}
+				const gen = detectGen;
+				try {
+					const found = await detector.detect(video);
+					if (detectGen !== gen) return; // stopLoops() fired while we awaited
+					lastBarcodes = found;
+					if (found.length > 0) {
+						const bc  = found[0];
+						const now = Date.now();
+						if (bc.rawValue !== lastRawValue || now - lastRawTime > DEDUPE_MS) {
+							lastRawValue = bc.rawValue;
+							lastRawTime  = now;
+							onCodeFound(bc.rawValue, bc.format);
+						}
+					}
+				} catch {}
+				scheduleDetect();
+			}
+
+			// ── Canvas animation ──────────────────────────────────────────────
+			function animFrame() {
+				if (!scanning) return;
+
+				// Canvas internal dimensions = container CSS pixels so all
+				// drawing coordinates are in display space, not video-native space.
+				const cw = video.clientWidth  || 1280;
+				const ch = video.clientHeight || 720;
+				if (canvas.width !== cw || canvas.height !== ch) {
+					canvas.width  = cw;
+					canvas.height = ch;
+				}
+
+				ctx.clearRect(0, 0, cw, ch);
+
+				if (lastBarcodes.length > 0) {
+					// Advance pulse and compute opacity for breathing effect
+					boxPulse += 0.06;
+					const opacity = 0.65 + 0.35 * Math.abs(Math.sin(boxPulse));
+					lastBarcodes.forEach(bc => drawBox(bc, opacity));
+				} else {
+					// Reset pulse so next detection always starts at full brightness
+					boxPulse = Math.PI / 2;
+					drawScanLine();
+				}
+
+				rafId = requestAnimationFrame(animFrame);
+			}
+
+			// Convert a point from video-native pixel space to canvas/display pixel
+			// space, accounting for object-fit:cover scale and center-crop offset.
+			function videoToDisplay(x, y) {
+				const vW = video.videoWidth;
+				const vH = video.videoHeight;
+				const dW = canvas.width;
+				const dH = canvas.height;
+				if (!vW || !vH) return { x, y };
+				const scale = Math.max(dW / vW, dH / vH);
+				return {
+					x: x * scale - (vW * scale - dW) / 2,
+					y: y * scale - (vH * scale - dH) / 2
+				};
+			}
+
+			function drawScanLine() {
+				const w = canvas.width;
+				const h = canvas.height;
+				// Slower movement: h/260 instead of h/180 — more deliberate
+				scanY += scanDir * (h / 260);
+				if (scanY > h * 0.88) scanDir = -1;
+				if (scanY < h * 0.12) scanDir =  1;
+
+				const g = ctx.createLinearGradient(0, scanY - 3, 0, scanY + 3);
+				g.addColorStop(0,   'transparent');
+				g.addColorStop(0.5, 'rgba(56, 189, 248, 0.4)');
+				g.addColorStop(1,   'transparent');
+				ctx.fillStyle = g;
+				ctx.fillRect(0, scanY - 3, w, 6);
+			}
+
+			function drawBox(bc, opacity = 1) {
+				const pts = bc.cornerPoints;
+				if (!pts || pts.length < 4) return;
+
+				// Transform all corners from video-native → display pixel space
+				const dPts = pts.map(p => videoToDisplay(p.x, p.y));
+				const lw = Math.max(2, canvas.width / 350);
+
+				ctx.save();
+				ctx.globalAlpha = opacity;
+				ctx.strokeStyle = '#38bdf8';
+				ctx.lineWidth = lw;
+				ctx.shadowColor = '#38bdf8';
+				ctx.shadowBlur = 10;
+				ctx.beginPath();
+				ctx.moveTo(dPts[0].x, dPts[0].y);
+				for (let i = 1; i < dPts.length; i++) ctx.lineTo(dPts[i].x, dPts[i].y);
+				ctx.closePath();
+				ctx.stroke();
+
+				// value label above box
+				const fontSize = Math.max(14, canvas.width / 55);
+				ctx.font = `bold ${fontSize}px monospace`;
+				ctx.shadowBlur = 6;
+				ctx.fillStyle = 'rgba(2, 6, 23, 0.7)';
+				ctx.fillText(bc.rawValue, dPts[0].x + lw, dPts[0].y - fontSize * 0.2 + 2);
+				ctx.fillStyle = '#38bdf8';
+				ctx.shadowColor = 'transparent';
+				ctx.fillText(bc.rawValue, dPts[0].x + lw, dPts[0].y - fontSize * 0.2);
+				ctx.restore();
+			}
+
+			// ── Code detected ─────────────────────────────────────────────────
+			function onCodeFound(value, format) {
+				setStatus('found', 'Found!');
+				setTimeout(() => setStatus('scanning', 'Scanning…'), 1200);
+
+				// Update last-detected strip
+				lastValueEl.textContent  = value;
+				lastFormatEl.textContent = fmtLabel(format);
+				lastValueEl.classList.remove('empty');
+				lastFormatEl.style.display = '';
+				lastCopyBtn.style.display  = '';
+				lastDetected.classList.add('lit');
+
+				// Upsert into list (deduplicate; move to top)
+				const idx = codes.findIndex(c => c.value === value);
+				if (idx !== -1) codes.splice(idx, 1);
+
+				codes.unshift({
+					id:        crypto.randomUUID(),
+					value,
+					format:    fmtLabel(format),
+					timestamp: Date.now()
+				});
+
+				saveCodes();
+				renderList();
+
+				// Animate and flash only the newly inserted top entry
+				const first = codesList.querySelector('.code-entry');
+				if (first) {
+					first.classList.add('is-new', 'new-flash');
+					setTimeout(() => first.classList.remove('new-flash'), 700);
+				}
+			}
+
+			// ── Render list ───────────────────────────────────────────────────
+			const EMPTY_STATE_HTML = `
+				<div class="empty-state">
+					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true">
+						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
+							stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p>Scanned codes will appear here</p>
+				</div>`;
+
+			function renderList() {
+				codeCount.textContent = codes.length;
+
+				if (codes.length === 0) {
+					codesList.innerHTML = EMPTY_STATE_HTML;
+					return;
+				}
+
+				codesList.innerHTML = codes.map(c => `
+					<div class="code-entry" data-id="${c.id}">
+						<span class="entry-value">${esc(c.value)}</span>
+						<div class="entry-meta">
+							<span class="entry-format">${esc(c.format)}</span>
+							<span class="entry-time">${fmtTime(c.timestamp)}</span>
+						</div>
+						<div class="entry-actions">
+							<button class="icon-btn copy-btn"
+								data-val="${esc(c.value)}" title="Copy" aria-label="Copy code">⎘</button>
+							<button class="icon-btn del-btn del"
+								data-id="${c.id}" title="Remove" aria-label="Remove code">✕</button>
+						</div>
+					</div>
+				`).join('');
+			}
+
+			// ── Actions ───────────────────────────────────────────────────────
+			async function copyValue(val, btn) {
+				try {
+					await navigator.clipboard.writeText(val);
+					if (btn) {
+						const prev = btn.textContent;
+						btn.classList.add('done');
+						btn.textContent = '✓';
+						setTimeout(() => {
+							btn.classList.remove('done');
+							btn.textContent = prev;
+						}, 1400);
+					}
+				} catch {
+					if (btn) {
+						const prev = btn.textContent;
+						btn.textContent = '✗';
+						setTimeout(() => { btn.textContent = prev; }, 1400);
+					}
+				}
+			}
+
+			function deleteCode(id) {
+				codes = codes.filter(c => c.id !== id);
+				saveCodes();
+				renderList();
+				// Do not touch lastDetected — it reflects the camera's last read,
+				// not the list contents. resetLastDetected() is reserved for clearAll.
+			}
+
+			function clearAll() {
+				if (codes.length === 0) return;
+				if (!confirm('Clear all scanned codes?')) return;
+				codes = [];
+				lastRawValue = null;
+				lastRawTime  = 0;
+				saveCodes();
+				renderList();
+				resetLastDetected();
+			}
+
+			function resetLastDetected() {
+				lastDetected.classList.remove('lit');
+				lastValueEl.textContent = 'Waiting for scan…';
+				lastValueEl.classList.add('empty');
+				lastFormatEl.style.display = 'none';
+				lastCopyBtn.style.display  = 'none';
+			}
+
+			// ── Status ────────────────────────────────────────────────────────
+			function setStatus(state, label) {
+				statusDot.className = 'status-dot ' + state;
+				statusText.textContent = label;
+			}
+
+			// ── Persistence ───────────────────────────────────────────────────
+			function loadCodes() {
+				try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+				catch { return []; }
+			}
+
+			function saveCodes() {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
+			}
+
+			// ── Helpers ───────────────────────────────────────────────────────
+			function fmtTime(ts) {
+				return new Date(ts).toLocaleTimeString([], {
+					hour: '2-digit', minute: '2-digit'
+				});
+			}
+
+			function fmtLabel(fmt) {
+				const map = {
+					upc_a: 'UPC-A', upc_e: 'UPC-E',
+					ean_13: 'EAN-13', ean_8: 'EAN-8',
+					code_128: 'Code 128', code_39: 'Code 39',
+					itf: 'ITF', qr_code: 'QR Code'
+				};
+				return map[fmt] || String(fmt || 'Barcode').toUpperCase().replace(/_/g, ' ');
+			}
+
+			function esc(s) {
+				return String(s)
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+		})();
+		</script>
+
+	</body>
+</html>
