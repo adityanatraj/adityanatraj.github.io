@@ -708,6 +708,23 @@
 			const codeCount    = document.getElementById('codeCount');
 			const clearBtn     = document.getElementById('clearBtn');
 
+			// ── Static HTML templates ─────────────────────────────────────────
+			const EMPTY_STATE_HTML = `
+				<div class="empty-state">
+					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true">
+						<rect x="8"  y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="13" y="16" width="4"  height="32" fill="currentColor" rx="1"/>
+						<rect x="20" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="25" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
+						<rect x="34" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="39" y="16" width="3"  height="32" fill="currentColor" rx="1"/>
+						<rect x="45" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="50" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
+					</svg>
+					<p>Scanned codes will appear here</p>
+				</div>`;
+
 			// ── Capability check ──────────────────────────────────────────────
 			if (!navigator.mediaDevices?.getUserMedia) {
 				// No camera API at all — nothing we can do
@@ -1085,22 +1102,6 @@
 			}
 
 			// ── Render list ───────────────────────────────────────────────────
-			const EMPTY_STATE_HTML = `
-				<div class="empty-state">
-					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
-						aria-hidden="true">
-						<rect x="8"  y="16" width="2"  height="32" fill="currentColor" rx="1"/>
-						<rect x="13" y="16" width="4"  height="32" fill="currentColor" rx="1"/>
-						<rect x="20" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
-						<rect x="25" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
-						<rect x="34" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
-						<rect x="39" y="16" width="3"  height="32" fill="currentColor" rx="1"/>
-						<rect x="45" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
-						<rect x="50" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
-					</svg>
-					<p>Scanned codes will appear here</p>
-				</div>`;
-
 			function renderList() {
 				codeCount.textContent = codes.length;
 				clearBtn.style.display = codes.length ? '' : 'none';
