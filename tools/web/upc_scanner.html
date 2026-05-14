@@ -782,6 +782,7 @@
 
 			// ── Camera start ──────────────────────────────────────────────────
 			async function startCamera() {
+				startBtn.disabled = true;
 				try {
 					stream = await navigator.mediaDevices.getUserMedia({
 						video: {
@@ -794,6 +795,7 @@
 					await initVideo(stream);
 
 				} catch (err) {
+					startBtn.disabled = false;
 					if (err.name === 'NotAllowedError') {
 						placeholder.querySelector('p').textContent =
 							'Camera access was denied. Allow camera in your browser settings, then reload.';
