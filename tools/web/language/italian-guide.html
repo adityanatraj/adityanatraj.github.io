@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Italian for Travelers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ec;
+    --terracotta: #c0613a;
+    --terracotta-light: #e07a55;
+    --gold: #b8963e;
+    --forest: #2d5016;
+    --ink: #1a1208;
+    --mist: #f0e8d8;
+    --border: #d4c4a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(192,97,58,0.3) 0%, transparent 70%);
+  }
+  header .flag { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  header h1 em {
+    color: var(--terracotta-light);
+    font-style: italic;
+  }
+  header p {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    opacity: 0.7;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    position: relative;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--mist);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    background: none;
+    border: none;
+    padding: 1rem 1.2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.5;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  nav button.active {
+    opacity: 1;
+    border-bottom-color: var(--terracotta);
+    color: var(--terracotta);
+  }
+  nav button:hover { opacity: 0.8; }
+
+  /* MAIN */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .section { display: none; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* SECTION HEADING */
+  .section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: var(--terracotta);
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 0.2rem;
+  }
+  .section-header p {
+    margin-top: 0.6rem;
+    color: #5a4a2a;
+    font-size: 0.95rem;
+  }
+
+  /* LESSON BLOCK */
+  .lesson {
+    margin-bottom: 2.5rem;
+  }
+  .lesson h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+  }
+  .lesson p, .lesson li {
+    font-size: 0.95rem;
+    color: #3a2e1a;
+    margin-bottom: 0.5rem;
+  }
+  .lesson ul { padding-left: 1.2rem; }
+
+  /* CONCEPT BOX */
+  .concept {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--terracotta);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+  }
+  .concept .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--terracotta);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  /* TABLE */
+  .it-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .it-table th {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+  .it-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .it-table tr:nth-child(even) td { background: var(--mist); }
+  .it-table .it { font-style: italic; color: var(--terracotta); font-weight: 500; }
+  .it-table .pron { color: #888; font-size: 0.82rem; }
+
+  /* EXAMPLE */
+  .example {
+    background: var(--mist);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+  }
+  .example .it-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--terracotta);
+    display: block;
+  }
+  .example .en-text {
+    font-size: 0.875rem;
+    color: #5a4a2a;
+    display: block;
+    margin-top: 0.15rem;
+  }
+  .example .note {
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 0.3rem;
+    display: block;
+  }
+
+  /* PHRASE CARD */
+  .phrase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .phrase-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .phrase-card:hover {
+    border-color: var(--terracotta);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  .phrase-card .it-phrase {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--terracotta);
+    display: block;
+  }
+  .phrase-card .en-phrase {
+    font-size: 0.85rem;
+    color: #5a4a2a;
+    margin-top: 0.2rem;
+    display: block;
+  }
+  .phrase-card .pron-phrase {
+    font-size: 0.78rem;
+    color: #aaa;
+    margin-top: 0.3rem;
+    display: block;
+  }
+  .phrase-card .ctx {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: var(--mist);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 0.15rem 0.6rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* TIP */
+  .tip {
+    background: #fef9ec;
+    border: 1px solid #e8d498;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.75rem;
+  }
+  .tip .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .tip p { font-size: 0.88rem; color: #5a4520; margin: 0; }
+
+  /* QUIZ */
+  .quiz {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin: 1.5rem 0;
+  }
+  .quiz h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #e8d8b8;
+  }
+  .quiz-q { margin-bottom: 1.25rem; }
+  .quiz-q p { font-size: 0.92rem; opacity: 0.85; margin-bottom: 0.6rem; }
+  .quiz-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .quiz-options button {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--cream);
+    border-radius: 5px;
+    padding: 0.4rem 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiz-options button:hover { background: rgba(255,255,255,0.15); }
+  .quiz-options button.correct { background: #2d5016; border-color: #4a8a28; }
+  .quiz-options button.wrong { background: #5a1a10; border-color: #8a3020; }
+  .quiz-feedback {
+    font-size: 0.82rem;
+    margin-top: 0.5rem;
+    min-height: 1.2em;
+    opacity: 0.8;
+    font-style: italic;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    background: var(--terracotta);
+    color: white;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    font-weight: 500;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.8rem;
+    color: #aaa;
+    border-top: 1px solid var(--border);
+  }
+  footer em { font-style: italic; color: var(--terracotta); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="flag">🇮🇹</div>
+  <h1>Italian for <em>Travelers</em></h1>
+  <p>A practical language guide for students visiting Italy</p>
+</header>
+
+<nav id="nav">
+  <button class="active" onclick="show('intro',this)">Introduction</button>
+  <button onclick="show('pronunciation',this)">Pronunciation</button>
+  <button onclick="show('nouns',this)">Nouns & Gender</button>
+  <button onclick="show('verbs',this)">Verbs & Tense</button>
+  <button onclick="show('phrases',this)">Key Phrases</button>
+  <button onclick="show('numbers',this)">Numbers & Time</button>
+  <button onclick="show('scenarios',this)">Real Scenarios</button>
+  <button onclick="show('quiz',this)">Practice Quiz</button>
+  <button onclick="show('french',this)">🇫🇷 From French</button>
+</nav>
+
+<main>
+
+<!-- INTRODUCTION -->
+<div id="intro" class="section active">
+  <div class="section-header">
+    <div class="num">Capitolo Uno</div>
+    <h2>Why Italian Is More Approachable Than You Think</h2>
+    <p>A quick-start philosophy for building practical fluency in weeks, not years.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>The Good News</h3>
+    <p>Italian is one of the most phonetically consistent languages in the world — almost every letter is always pronounced the same way. Unlike English, where "ough" can sound like "off," "oo," or "ow," Italian words sound exactly as they're spelled once you learn the rules. That alone puts you far ahead of most language learners.</p>
+    <p>Italian also shares thousands of words with English through Latin — words like <em>cultura, università, animale, museo</em> — so you already have a working vocabulary without realizing it.</p>
+  </div>
+
+  <div class="concept">
+    <div class="label">Core Principle</div>
+    <p>Italians deeply appreciate any attempt to speak their language. Even broken Italian delivered with a smile will earn you warmth, patience, and often better service. <strong>Attempting is always better than retreating to English.</strong></p>
+  </div>
+
+  <div class="lesson">
+    <h3>What This Guide Covers</h3>
+    <ul>
+      <li><strong>Pronunciation</strong> — the sounds of Italian, stress patterns, and the letters that trip up English speakers</li>
+      <li><strong>Grammar Essentials</strong> — gender, articles, adjective agreement, and the key verb tenses</li>
+      <li><strong>Survival Phrases</strong> — greetings, requests, food ordering, directions, shopping</li>
+      <li><strong>Real Scenarios</strong> — how a conversation actually flows in a restaurant, at a train station, in a shop</li>
+      <li><strong>Numbers & Time</strong> — telling time, prices, dates, and transportation</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <div class="icon">💡</div>
+    <p><strong>Learning Strategy:</strong> Focus on the present tense and a handful of irregular verbs. Add <em>per favore</em> and <em>grazie</em> to everything. Carry a small notebook. Italians will teach you words if you ask — and they love doing it.</p>
+  </div>
+</div>
+
+<!-- PRONUNCIATION -->
+<div id="pronunciation" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Due</div>
+    <h2>Pronunciation — Sound Like You Mean It</h2>
+    <p>Italian is phonetically regular. Learn these rules once and they apply everywhere.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>The Vowels — Pure and Clear</h3>
+    <p>Italian has 5 pure vowels with no diphthongs. Each is short and crisp — never slurred or reduced to a schwa sound like in English.</p>
+    <table class="it-table">
+      <tr><th>Vowel</th><th>Sound (like...)</th><th>Example</th></tr>
+      <tr><td><strong>A</strong></td><td>father, not "cat"</td><td><span class="it">casa</span> — house</td></tr>
+      <tr><td><strong>E</strong></td><td>bed or café</td><td><span class="it">bene</span> — good/well</td></tr>
+      <tr><td><strong>I</strong></td><td>machine, "ee"</td><td><span class="it">vino</span> — wine</td></tr>
+      <tr><td><strong>O</strong></td><td>note (no "ow")</td><td><span class="it">poco</span> — a little</td></tr>
+      <tr><td><strong>U</strong></td><td>boot, "oo"</td><td><span class="it">uno</span> — one</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>The Tricky Consonants</h3>
+    <table class="it-table">
+      <tr><th>Letter(s)</th><th>Rule</th><th>Example</th></tr>
+      <tr><td><strong>C + E/I</strong></td><td>like English "ch"</td><td><span class="it">ciao</span> = "chow"</td></tr>
+      <tr><td><strong>C + A/O/U</strong></td><td>like English "k"</td><td><span class="it">caffè</span> = "kaf-feh"</td></tr>
+      <tr><td><strong>G + E/I</strong></td><td>like English "j"</td><td><span class="it">gelato</span> = "jeh-LAH-toh"</td></tr>
+      <tr><td><strong>G + A/O/U</strong></td><td>hard "g" (go)</td><td><span class="it">grazie</span> = "GRAT-syeh"</td></tr>
+      <tr><td><strong>GN</strong></td><td>like "ny" in canyon</td><td><span class="it">gnocchi</span> = "nyoh-kee"</td></tr>
+      <tr><td><strong>GL + I</strong></td><td>like "ly" in million</td><td><span class="it">figlio</span> = "FEEL-yoh"</td></tr>
+      <tr><td><strong>SC + E/I</strong></td><td>like "sh"</td><td><span class="it">scena</span> = "SHEH-nah"</td></tr>
+      <tr><td><strong>Z</strong></td><td>"ts" or "dz"</td><td><span class="it">pizza</span> = "PEET-tsah"</td></tr>
+      <tr><td><strong>H</strong></td><td>always silent</td><td><span class="it">ho</span> = "oh" (I have)</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Stress & Double Consonants</h3>
+    <p>Most Italian words are stressed on the second-to-last syllable. When an accent mark appears (à, è, ì, ò, ù), that syllable takes the stress.</p>
+    <div class="two-col">
+      <div class="example">
+        <span class="it-text">caffè</span>
+        <span class="en-text">coffee — stress on last (accent)</span>
+      </div>
+      <div class="example">
+        <span class="it-text">tavolo</span>
+        <span class="en-text">table — TAH-voh-loh (2nd to last)</span>
+      </div>
+    </div>
+    <p>Double consonants are pronounced with a brief pause or lengthening — this matters! <em>Anno</em> (year) sounds different from <em>ano</em>, and Italians will notice.</p>
+    <div class="example">
+      <span class="it-text">nonna → non-NA</span>
+      <span class="en-text">grandmother — the double N is held slightly longer</span>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="icon">🎵</div>
+    <p>Italian has a natural rhythm and musicality. Speak it slightly more slowly than you think you need to, open your mouth fully for the vowels, and don't swallow the endings of words.</p>
+  </div>
+</div>
+
+<!-- NOUNS & GENDER -->
+<div id="nouns" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Tre</div>
+    <h2>Nouns, Gender & Articles</h2>
+    <p>Italian nouns have gender. Everything — tables, coffee, weather — is either masculine or feminine. This affects articles and adjectives.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>Masculine vs. Feminine</h3>
+    <p>Most nouns ending in <strong>-o</strong> are masculine; most ending in <strong>-a</strong> are feminine. Nouns ending in <strong>-e</strong> can be either — you learn these with time.</p>
+    <div class="two-col">
+      <div class="concept">
+        <div class="label">Masculine (ends -o)</div>
+        <p><em>il vino</em> — the wine<br><em>il treno</em> — the train<br><em>il ragazzo</em> — the boy</p>
+      </div>
+      <div class="concept">
+        <div class="label">Feminine (ends -a)</div>
+        <p><em>la pizza</em> — the pizza<br><em>la stazione</em> — the station<br><em>la ragazza</em> — the girl</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Definite Articles ("the")</h3>
+    <table class="it-table">
+      <tr><th></th><th>Singular</th><th>Plural</th></tr>
+      <tr><td><strong>Masculine</strong></td><td>il (il treno) / l' (l'uomo) / lo (lo zaino)</td><td>i (i treni) / gli (gli uomini)</td></tr>
+      <tr><td><strong>Feminine</strong></td><td>la (la pizza) / l' (l'amica)</td><td>le (le pizze)</td></tr>
+    </table>
+    <div class="tip" style="margin-top:0.75rem">
+      <div class="icon">📌</div>
+      <p>Use <strong>l'</strong> before any noun starting with a vowel. Use <strong>lo</strong> before masculine nouns starting with s+consonant, z, gn, ps, x.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Indefinite Articles ("a / an")</h3>
+    <table class="it-table">
+      <tr><th>Gender</th><th>Form</th><th>Example</th></tr>
+      <tr><td>Masculine</td><td><span class="it">un</span></td><td><span class="it">un caffè</span> — a coffee</td></tr>
+      <tr><td>Masculine (s+cons, z)</td><td><span class="it">uno</span></td><td><span class="it">uno zaino</span> — a backpack</td></tr>
+      <tr><td>Feminine</td><td><span class="it">una</span></td><td><span class="it">una pizza</span> — a pizza</td></tr>
+      <tr><td>Feminine (before vowel)</td><td><span class="it">un'</span></td><td><span class="it">un'amica</span> — a (female) friend</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Adjective Agreement</h3>
+    <p>Adjectives must match the noun in both gender and number. They usually follow the noun.</p>
+    <div class="example">
+      <span class="it-text">un vino buono → dei vini buoni</span>
+      <span class="en-text">a good wine → some good wines (masculine)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">una pizza buona → delle pizze buone</span>
+      <span class="en-text">a good pizza → some good pizzas (feminine)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">il museo grande → i musei grandi</span>
+      <span class="en-text">the big museum → the big museums (-e adjectives just add -i for plural)</span>
+    </div>
+  </div>
+</div>
+
+<!-- VERBS -->
+<div id="verbs" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Quattro</div>
+    <h2>Verbs — The Engine of the Language</h2>
+    <p>Italian verbs conjugate by person. Master the present tense and a few key irregulars and you can handle most conversations.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>The Three Verb Families</h3>
+    <p>All Italian verbs end in <strong>-are</strong>, <strong>-ere</strong>, or <strong>-ire</strong>. Each follows a predictable conjugation pattern in the present tense.</p>
+
+    <table class="it-table">
+      <tr><th>Person</th><th>parlare (to speak)</th><th>vedere (to see)</th><th>partire (to leave)</th></tr>
+      <tr><td>io (I)</td><td class="it">parlo</td><td class="it">vedo</td><td class="it">parto</td></tr>
+      <tr><td>tu (you, informal)</td><td class="it">parli</td><td class="it">vedi</td><td class="it">parti</td></tr>
+      <tr><td>lui/lei (he/she)</td><td class="it">parla</td><td class="it">vede</td><td class="it">parte</td></tr>
+      <tr><td>noi (we)</td><td class="it">parliamo</td><td class="it">vediamo</td><td class="it">partiamo</td></tr>
+      <tr><td>voi (you all)</td><td class="it">parlate</td><td class="it">vedete</td><td class="it">partite</td></tr>
+      <tr><td>loro (they)</td><td class="it">parlano</td><td class="it">vedono</td><td class="it">partono</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Essential Irregular Verbs</h3>
+    <p>These are the verbs you'll use most. Memorize them — they're worth every minute.</p>
+
+    <table class="it-table">
+      <tr><th>Person</th><th>essere (to be)</th><th>avere (to have)</th><th>andare (to go)</th><th>volere (to want)</th></tr>
+      <tr><td>io</td><td class="it">sono</td><td class="it">ho</td><td class="it">vado</td><td class="it">voglio</td></tr>
+      <tr><td>tu</td><td class="it">sei</td><td class="it">hai</td><td class="it">vai</td><td class="it">vuoi</td></tr>
+      <tr><td>lui/lei</td><td class="it">è</td><td class="it">ha</td><td class="it">va</td><td class="it">vuole</td></tr>
+      <tr><td>noi</td><td class="it">siamo</td><td class="it">abbiamo</td><td class="it">andiamo</td><td class="it">vogliamo</td></tr>
+      <tr><td>voi</td><td class="it">siete</td><td class="it">avete</td><td class="it">andate</td><td class="it">volete</td></tr>
+      <tr><td>loro</td><td class="it">sono</td><td class="it">hanno</td><td class="it">vanno</td><td class="it">vogliono</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Potere, Dovere, Sapere <span class="badge">Modal Verbs</span></h3>
+    <p>These combine with an infinitive verb to express ability, obligation, or knowledge — extremely useful.</p>
+    <div class="example">
+      <span class="it-text">Posso avere il conto?</span>
+      <span class="en-text">Can I have the bill? (posso = I can, from potere)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Devo prendere il treno delle 10.</span>
+      <span class="en-text">I have to take the 10 o'clock train. (devo = I must, from dovere)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Sa parlare inglese?</span>
+      <span class="en-text">Do you know how to speak English? (formal; sa = he/she/you(formal) knows)</span>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Talking About the Past — Passato Prossimo</h3>
+    <p>For travelers, you mainly need two tenses: present and the recent past. The <em>passato prossimo</em> is formed with <em>avere</em> or <em>essere</em> + past participle.</p>
+    <div class="concept">
+      <div class="label">Formula</div>
+      <p><strong>avere / essere</strong> (conjugated) + <strong>past participle</strong></p>
+    </div>
+    <div class="example">
+      <span class="it-text">Ho mangiato una pizza buonissima.</span>
+      <span class="en-text">I ate an amazing pizza. (ho = I have, mangiato = eaten)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Siamo andati al museo ieri.</span>
+      <span class="en-text">We went to the museum yesterday. (motion verbs use essere; andati agrees with noi)</span>
+    </div>
+    <div class="tip">
+      <div class="icon">📌</div>
+      <p>Verbs of motion (andare, venire, partire, arrivare, tornare) and reflexive verbs use <em>essere</em>. Most other verbs use <em>avere</em>. When using <em>essere</em>, the past participle must agree with the subject in gender and number.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Formal vs. Informal Address</h3>
+    <p>Use <strong>tu</strong> with friends, young people, and children. Use <strong>Lei</strong> (capitalized, 3rd person singular) with strangers, elders, shopkeepers, and anyone you'd address as "sir" or "ma'am."</p>
+    <div class="example">
+      <span class="it-text">Come stai? (tu) vs. Come sta? (Lei)</span>
+      <span class="en-text">How are you? — informal vs. formal</span>
+    </div>
+  </div>
+</div>
+
+<!-- PHRASES -->
+<div id="phrases" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Cinque</div>
+    <h2>Essential Phrases</h2>
+    <p>The phrases that will carry you through almost every situation. Tap a card to hear the pronunciation guide.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>Greetings & Basics</h3>
+    <div class="phrase-grid">
+      <div class="phrase-card">
+        <span class="it-phrase">Buongiorno</span>
+        <span class="en-phrase">Good morning / Good day</span>
+        <span class="pron-phrase">bwon-JOR-noh</span>
+        <span class="ctx">Greeting</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Buonasera</span>
+        <span class="en-phrase">Good evening</span>
+        <span class="pron-phrase">bwoh-nah-SEH-rah</span>
+        <span class="ctx">Greeting</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Ciao</span>
+        <span class="en-phrase">Hi / Bye (informal only)</span>
+        <span class="pron-phrase">chow</span>
+        <span class="ctx">Informal</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Arrivederci</span>
+        <span class="en-phrase">Goodbye (formal)</span>
+        <span class="pron-phrase">ah-ree-veh-DEHR-chee</span>
+        <span class="ctx">Formal</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Per favore / Per piacere</span>
+        <span class="en-phrase">Please</span>
+        <span class="pron-phrase">pehr fah-VOH-reh</span>
+        <span class="ctx">Essential</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Grazie (mille)</span>
+        <span class="en-phrase">Thank you (very much)</span>
+        <span class="pron-phrase">GRAT-syeh MEEL-leh</span>
+        <span class="ctx">Essential</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Prego</span>
+        <span class="en-phrase">You're welcome / Go ahead</span>
+        <span class="pron-phrase">PREH-goh</span>
+        <span class="ctx">Response</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Mi scusi / Scusa</span>
+        <span class="en-phrase">Excuse me (formal / informal)</span>
+        <span class="pron-phrase">mee SKOO-zee / SKOO-zah</span>
+        <span class="ctx">Essential</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Come si chiama? / Mi chiamo...</span>
+        <span class="en-phrase">What's your name? / My name is...</span>
+        <span class="pron-phrase">KOH-meh see KYAH-mah</span>
+        <span class="ctx">Introductions</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Non capisco</span>
+        <span class="en-phrase">I don't understand</span>
+        <span class="pron-phrase">non kah-PEES-koh</span>
+        <span class="ctx">Essential</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Parla inglese?</span>
+        <span class="en-phrase">Do you speak English? (formal)</span>
+        <span class="pron-phrase">PAR-lah een-GLEH-zeh</span>
+        <span class="ctx">Help</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Può ripetere, per favore?</span>
+        <span class="en-phrase">Can you repeat that, please?</span>
+        <span class="pron-phrase">pwoh ree-peh-TEH-reh</span>
+        <span class="ctx">Help</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>At a Restaurant</h3>
+    <div class="phrase-grid">
+      <div class="phrase-card">
+        <span class="it-phrase">Un tavolo per due, per favore</span>
+        <span class="en-phrase">A table for two, please</span>
+        <span class="pron-phrase">oon TAH-voh-loh pehr DOO-eh</span>
+        <span class="ctx">Restaurant</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Vorrei...</span>
+        <span class="en-phrase">I would like...</span>
+        <span class="pron-phrase">vor-RAY</span>
+        <span class="ctx">Ordering</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Il menù, per favore</span>
+        <span class="en-phrase">The menu, please</span>
+        <span class="pron-phrase">eel meh-NOO</span>
+        <span class="ctx">Restaurant</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Cos'è questo?</span>
+        <span class="en-phrase">What is this?</span>
+        <span class="pron-phrase">koh-ZEH KWES-toh</span>
+        <span class="ctx">Restaurant</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Il conto, per favore</span>
+        <span class="en-phrase">The bill, please</span>
+        <span class="pron-phrase">eel KON-toh</span>
+        <span class="ctx">Restaurant</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">È delizioso!</span>
+        <span class="en-phrase">It's delicious!</span>
+        <span class="pron-phrase">eh deh-leet-SYOH-zoh</span>
+        <span class="ctx">Compliment</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>Getting Around</h3>
+    <div class="phrase-grid">
+      <div class="phrase-card">
+        <span class="it-phrase">Dov'è...?</span>
+        <span class="en-phrase">Where is...?</span>
+        <span class="pron-phrase">doh-VEH</span>
+        <span class="ctx">Directions</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Come arrivo a...?</span>
+        <span class="en-phrase">How do I get to...?</span>
+        <span class="pron-phrase">KOH-meh ar-REE-voh ah</span>
+        <span class="ctx">Directions</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">A sinistra / A destra / Dritto</span>
+        <span class="en-phrase">Left / Right / Straight ahead</span>
+        <span class="pron-phrase">see-NEES-trah / DES-trah / DREET-toh</span>
+        <span class="ctx">Directions</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Un biglietto per..., per favore</span>
+        <span class="en-phrase">A ticket to..., please</span>
+        <span class="pron-phrase">oon beel-YET-toh pehr</span>
+        <span class="ctx">Transport</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">A che ora parte il treno?</span>
+        <span class="en-phrase">What time does the train leave?</span>
+        <span class="pron-phrase">ah keh OH-rah PAR-teh eel TREH-noh</span>
+        <span class="ctx">Transport</span>
+      </div>
+      <div class="phrase-card">
+        <span class="it-phrase">Dov'è il bagno?</span>
+        <span class="en-phrase">Where is the bathroom?</span>
+        <span class="pron-phrase">doh-VEH eel BAN-yoh</span>
+        <span class="ctx">Essential</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NUMBERS & TIME -->
+<div id="numbers" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Sei</div>
+    <h2>Numbers, Time & Money</h2>
+    <p>Prices, schedules, addresses — you'll need these constantly.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>Numbers 0–20</h3>
+    <table class="it-table">
+      <tr><th>#</th><th>Italian</th><th>#</th><th>Italian</th></tr>
+      <tr><td>0</td><td class="it">zero</td><td>10</td><td class="it">dieci</td></tr>
+      <tr><td>1</td><td class="it">uno</td><td>11</td><td class="it">undici</td></tr>
+      <tr><td>2</td><td class="it">due</td><td>12</td><td class="it">dodici</td></tr>
+      <tr><td>3</td><td class="it">tre</td><td>13</td><td class="it">tredici</td></tr>
+      <tr><td>4</td><td class="it">quattro</td><td>14</td><td class="it">quattordici</td></tr>
+      <tr><td>5</td><td class="it">cinque</td><td>15</td><td class="it">quindici</td></tr>
+      <tr><td>6</td><td class="it">sei</td><td>16</td><td class="it">sedici</td></tr>
+      <tr><td>7</td><td class="it">sette</td><td>17</td><td class="it">diciassette</td></tr>
+      <tr><td>8</td><td class="it">otto</td><td>18</td><td class="it">diciotto</td></tr>
+      <tr><td>9</td><td class="it">nove</td><td>19</td><td class="it">diciannove</td></tr>
+      <tr><td colspan="2"></td><td>20</td><td class="it">venti</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Tens, Hundreds & Compounds</h3>
+    <table class="it-table">
+      <tr><th>Number</th><th>Italian</th><th>Notes</th></tr>
+      <tr><td>30</td><td class="it">trenta</td><td></td></tr>
+      <tr><td>40</td><td class="it">quaranta</td><td></td></tr>
+      <tr><td>50</td><td class="it">cinquanta</td><td></td></tr>
+      <tr><td>100</td><td class="it">cento</td><td></td></tr>
+      <tr><td>1,000</td><td class="it">mille</td><td>plural: mila</td></tr>
+      <tr><td>21</td><td class="it">ventuno</td><td>drop vowel before uno/otto</td></tr>
+      <tr><td>28</td><td class="it">ventotto</td><td>drop vowel before otto</td></tr>
+      <tr><td>35</td><td class="it">trentacinque</td><td>just combine</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>Telling Time</h3>
+    <p>Italy uses a 24-hour clock on schedules. In conversation, people use 12-hour time.</p>
+    <div class="example">
+      <span class="it-text">Che ora è? / Che ore sono?</span>
+      <span class="en-text">What time is it?</span>
+    </div>
+    <div class="example">
+      <span class="it-text">È l'una. / Sono le tre.</span>
+      <span class="en-text">It's one o'clock. / It's three o'clock. (è for 1, sono for all others)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Sono le otto e mezza.</span>
+      <span class="en-text">It's 8:30. (e mezza = and a half)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Sono le tre e un quarto.</span>
+      <span class="en-text">It's 3:15. (un quarto = a quarter)</span>
+    </div>
+    <div class="example">
+      <span class="it-text">Sono le cinque meno venti.</span>
+      <span class="en-text">It's 4:40. (five minus twenty — Italians often subtract!)</span>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Days of the Week & Months</h3>
+    <div class="two-col">
+      <table class="it-table">
+        <tr><th>Day</th><th>Italian</th></tr>
+        <tr><td>Monday</td><td class="it">lunedì</td></tr>
+        <tr><td>Tuesday</td><td class="it">martedì</td></tr>
+        <tr><td>Wednesday</td><td class="it">mercoledì</td></tr>
+        <tr><td>Thursday</td><td class="it">giovedì</td></tr>
+        <tr><td>Friday</td><td class="it">venerdì</td></tr>
+        <tr><td>Saturday</td><td class="it">sabato</td></tr>
+        <tr><td>Sunday</td><td class="it">domenica</td></tr>
+      </table>
+      <table class="it-table">
+        <tr><th>Month</th><th>Italian</th></tr>
+        <tr><td>January</td><td class="it">gennaio</td></tr>
+        <tr><td>February</td><td class="it">febbraio</td></tr>
+        <tr><td>March</td><td class="it">marzo</td></tr>
+        <tr><td>April</td><td class="it">aprile</td></tr>
+        <tr><td>May</td><td class="it">maggio</td></tr>
+        <tr><td>June</td><td class="it">giugno</td></tr>
+        <tr><td>July</td><td class="it">luglio</td></tr>
+        <tr><td>August</td><td class="it">agosto</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- REAL SCENARIOS -->
+<div id="scenarios" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Sette</div>
+    <h2>Real Scenarios — Full Conversations</h2>
+    <p>Here's how these phrases come together in actual life situations.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>🍽️ At a Restaurant</h3>
+    <div class="concept">
+      <div class="label">Model Dialogue</div>
+      <p><strong>Waiter:</strong> <em>Buonasera! Quante persone siete?</em><br><span style="font-size:0.82rem;color:#888">Good evening! How many people are you?</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Buonasera. Siamo in due, per favore.</em><br><span style="font-size:0.82rem;color:#888">Good evening. There are two of us, please.</span></p>
+      <p style="margin-top:0.5rem"><strong>Waiter:</strong> <em>Prego, da questa parte. Volete vedere il menù?</em><br><span style="font-size:0.82rem;color:#888">Please, this way. Do you want to see the menu?</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Sì, grazie. E dell'acqua, per favore.</em><br><span style="font-size:0.82rem;color:#888">Yes, thank you. And some water, please.</span></p>
+      <p style="margin-top:0.5rem"><strong>Waiter:</strong> <em>Naturale o frizzante?</em><br><span style="font-size:0.82rem;color:#888">Still or sparkling?</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Naturale, grazie. Vorrei le tagliatelle al ragù.</em><br><span style="font-size:0.82rem;color:#888">Still, thanks. I'd like the tagliatelle with meat sauce.</span></p>
+      <p style="margin-top:0.5rem"><strong>Later — You:</strong> <em>Scusi, il conto per favore.</em><br><span style="font-size:0.82rem;color:#888">Excuse me, the bill please.</span></p>
+    </div>
+    <div class="tip">
+      <div class="icon">🇮🇹</div>
+      <p>In Italy, waiters won't bring the bill until you ask — it's considered rude to rush you. Also: bread (<em>il pane</em>) is usually charged as a <em>coperto</em> (cover charge), listed on the menu.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>🚂 At the Train Station</h3>
+    <div class="concept">
+      <div class="label">Model Dialogue</div>
+      <p><strong>You:</strong> <em>Buongiorno. Un biglietto per Roma, per favore.</em><br><span style="font-size:0.82rem;color:#888">Good morning. One ticket to Rome, please.</span></p>
+      <p style="margin-top:0.5rem"><strong>Ticket Agent:</strong> <em>Solo andata o andata e ritorno?</em><br><span style="font-size:0.82rem;color:#888">One way or round trip?</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Andata e ritorno. A che ora parte il prossimo treno?</em><br><span style="font-size:0.82rem;color:#888">Round trip. What time does the next train leave?</span></p>
+      <p style="margin-top:0.5rem"><strong>Agent:</strong> <em>Alle undici e venti, binario quattro.</em><br><span style="font-size:0.82rem;color:#888">At 11:20, platform four.</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Perfetto, grazie mille.</em><br><span style="font-size:0.82rem;color:#888">Perfect, thank you very much.</span></p>
+    </div>
+    <div class="tip">
+      <div class="icon">⚠️</div>
+      <p>Always validate (<em>timbrare</em>) your train ticket before boarding at the yellow machines on the platform — or you risk a fine, even with a valid ticket.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>🛍️ In a Shop</h3>
+    <div class="concept">
+      <div class="label">Model Dialogue</div>
+      <p><strong>Shopkeeper:</strong> <em>Buongiorno! Posso aiutarla?</em><br><span style="font-size:0.82rem;color:#888">Good morning! Can I help you?</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Sto solo guardando, grazie.</em><br><span style="font-size:0.82rem;color:#888">I'm just browsing, thank you.</span></p>
+      <p style="margin-top:0.5rem"><strong>You (later):</strong> <em>Quanto costa questo?</em><br><span style="font-size:0.82rem;color:#888">How much does this cost?</span></p>
+      <p style="margin-top:0.5rem"><strong>Shopkeeper:</strong> <em>Ventotto euro.</em><br><span style="font-size:0.82rem;color:#888">Twenty-eight euros.</span></p>
+      <p style="margin-top:0.5rem"><strong>You:</strong> <em>Lo prendo. Accetta carte di credito?</em><br><span style="font-size:0.82rem;color:#888">I'll take it. Do you accept credit cards?</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Otto</div>
+    <h2>Practice Quiz</h2>
+    <p>Test what you've learned. Select the correct answer for each question.</p>
+  </div>
+
+  <div class="quiz">
+    <h4>Quick Knowledge Check</h4>
+
+    <div class="quiz-q" id="q1">
+      <p>1. How do you say "a table for two, please" in Italian?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'correct','q1')">Un tavolo per due, per favore</button>
+        <button onclick="answer(this,'wrong','q1')">Due tavoli per uno, grazie</button>
+        <button onclick="answer(this,'wrong','q1')">Un posto per tre, prego</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="quiz-q" id="q2">
+      <p>2. Which article goes before <em>amica</em> (female friend)?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'wrong','q2')">la</button>
+        <button onclick="answer(this,'correct','q2')">l'</button>
+        <button onclick="answer(this,'wrong','q2')">il</button>
+        <button onclick="answer(this,'wrong','q2')">un</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="quiz-q" id="q3">
+      <p>3. What does <em>Vorrei</em> mean?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'wrong','q3')">I want (bluntly)</button>
+        <button onclick="answer(this,'correct','q3')">I would like</button>
+        <button onclick="answer(this,'wrong','q3')">Do you have</button>
+        <button onclick="answer(this,'wrong','q3')">Give me</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="quiz-q" id="q4">
+      <p>4. "Siamo andati al museo" uses <em>essere</em> because…?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'wrong','q4')">It happened in the past</button>
+        <button onclick="answer(this,'correct','q4')">Andare is a verb of motion</button>
+        <button onclick="answer(this,'wrong','q4')">The subject is plural</button>
+        <button onclick="answer(this,'wrong','q4')">Museums require it</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="quiz-q" id="q5">
+      <p>5. How do you ask "where is the bathroom?" formally?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'wrong','q5')">Dove il bagno?</button>
+        <button onclick="answer(this,'wrong','q5')">Dov'è una toilette?</button>
+        <button onclick="answer(this,'correct','q5')">Dov'è il bagno?</button>
+        <button onclick="answer(this,'wrong','q5')">Come si va bagno?</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="quiz-q" id="q6">
+      <p>6. How do you say "it's 3:30" in Italian?</p>
+      <div class="quiz-options">
+        <button onclick="answer(this,'wrong','q6')">È le tre e mezza</button>
+        <button onclick="answer(this,'correct','q6')">Sono le tre e mezza</button>
+        <button onclick="answer(this,'wrong','q6')">Sono tre e trenta</button>
+        <button onclick="answer(this,'wrong','q6')">Sono le mezzogiorno</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+  </div>
+
+  <div class="lesson" style="margin-top:2rem">
+    <h3>Next Steps for Your Students</h3>
+    <ul>
+      <li><strong>Duolingo / Babbel</strong> — daily 10-minute practice for vocabulary and verb conjugation</li>
+      <li><strong>Pimsleur Italian</strong> — excellent audio-based approach; ideal for pronunciation and speaking confidence</li>
+      <li><strong>Watch Italian films</strong> with Italian subtitles (<em>Cinema Paradiso, La Grande Bellezza</em>)</li>
+      <li><strong>Label objects at home</strong> in Italian — passive vocabulary exposure is powerful</li>
+      <li><strong>Carry a phrasebook</strong> and use it openly — Italians find it endearing</li>
+      <li><strong>Talk to people.</strong> Order in Italian first, then switch to English if needed. The attempt is the bridge.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FROM FRENCH -->
+<div id="french" class="section">
+  <div class="section-header">
+    <div class="num">Capitolo Speciale 🇫🇷→🇮🇹</div>
+    <h2>If You Already Know French</h2>
+    <p>Your French is a powerful engine. Here's exactly what transfers, what to unlearn, and where the traps are.</p>
+  </div>
+
+  <div class="lesson">
+    <h3>Your Unfair Advantage — The Numbers</h3>
+    <p>French and Italian share roughly <strong>85–89% of their core vocabulary</strong> through their shared Latin roots. That is the highest lexical overlap of any two major European languages. You already own thousands of Italian words — you just need to see the patterns that connect them.</p>
+    <div class="concept">
+      <div class="label">The Core Transfer Rule</div>
+      <p>Many French words map to Italian by predictable sound shifts. Once you see the pattern, you can guess Italian words you've never studied.</p>
+    </div>
+    <table class="it-table">
+      <tr><th>French</th><th>Pattern</th><th>Italian</th><th>Meaning</th></tr>
+      <tr><td class="it">nation</td><td>-tion → -zione</td><td class="it">nazione</td><td>nation</td></tr>
+      <tr><td class="it">important</td><td>-ant → -ante</td><td class="it">importante</td><td>important</td></tr>
+      <tr><td class="it">musique</td><td>-ique → -ica</td><td class="it">musica</td><td>music</td></tr>
+      <tr><td class="it">possible</td><td>nearly identical</td><td class="it">possibile</td><td>possible</td></tr>
+      <tr><td class="it">université</td><td>-é → -à (accent shifts)</td><td class="it">università</td><td>university</td></tr>
+      <tr><td class="it">différent</td><td>-ent → -ente</td><td class="it">differente</td><td>different</td></tr>
+      <tr><td class="it">restaurant</td><td>-ant → -ante</td><td class="it">ristorante</td><td>restaurant</td></tr>
+      <tr><td class="it">problème</td><td>-ème → -ema</td><td class="it">problema</td><td>problem</td></tr>
+    </table>
+    <div class="tip">
+      <div class="icon">🔍</div>
+      <p>When you encounter an Italian word you don't know, try "French-ifying" it mentally — and vice versa. The instinct is usually reliable for cognates, though watch for false friends below.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Grammar That Transfers Directly</h3>
+    <p>You already understand the architecture. These concepts require no explanation — just the Italian forms.</p>
+    <table class="it-table">
+      <tr><th>Concept</th><th>French</th><th>Italian</th><th>Status</th></tr>
+      <tr><td>Noun gender</td><td>le/la</td><td>il/la</td><td style="color:#2d8a2d">✓ Direct transfer</td></tr>
+      <tr><td>Adjective agreement</td><td>petit/petite/petits</td><td>piccolo/piccola/piccoli</td><td style="color:#2d8a2d">✓ Same logic</td></tr>
+      <tr><td>Formal address</td><td>vous (3rd pl. form)</td><td>Lei (3rd sg. form)</td><td style="color:#b8963e">~ Similar, different person</td></tr>
+      <tr><td>Passé composé / Passato prossimo</td><td>avoir/être + pp</td><td>avere/essere + pp</td><td style="color:#2d8a2d">✓ Nearly identical</td></tr>
+      <tr><td>Verb conjugation by person</td><td>je/tu/il changes endings</td><td>io/tu/lui changes endings</td><td style="color:#2d8a2d">✓ Same concept</td></tr>
+      <tr><td>Partitive articles</td><td>du, de la, des</td><td>del, della, dei</td><td style="color:#2d8a2d">✓ Same logic</td></tr>
+      <tr><td>Subjunctive mood</td><td>que + subjonctif</td><td>che + congiuntivo</td><td style="color:#b8963e">~ More frequent in Italian</td></tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>The Past Tense — Side by Side</h3>
+    <p>The <em>passato prossimo</em> works almost identically to the French <em>passé composé</em>. The same rule about motion verbs taking <em>être/essere</em> applies in both languages.</p>
+    <div class="two-col">
+      <div class="concept">
+        <div class="label">French (passé composé)</div>
+        <p><em>J'ai mangé une pizza.</em><br>I ate a pizza.<br><br><em>Nous sommes allés au musée.</em><br>We went to the museum.</p>
+      </div>
+      <div class="concept">
+        <div class="label">Italian (passato prossimo)</div>
+        <p><em>Ho mangiato una pizza.</em><br>I ate a pizza.<br><br><em>Siamo andati al museo.</em><br>We went to the museum.</p>
+      </div>
+    </div>
+    <div class="tip">
+      <div class="icon">💡</div>
+      <p>The agreement rule is the same: with <em>essere/être</em>, the past participle agrees with the subject in gender and number. <em>Siamo andati</em> (masc. pl.) vs. <em>siamo andate</em> (fem. pl.) — just like French.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>⚠️ False Friends — Where French Misleads You</h3>
+    <p>These are the most dangerous words for French speakers: they look or sound familiar but mean something completely different. Memorize this list.</p>
+    <table class="it-table">
+      <tr><th>Italian word</th><th>What French suggests</th><th>What it actually means</th><th>The real Italian word</th></tr>
+      <tr><td class="it">sensibile</td><td>sensible (reasonable)</td><td>sensitive, emotional</td><td class="it">ragionevole</td></tr>
+      <tr><td class="it">libreria</td><td>librairie (bookshop) ✓ — but also…</td><td>bookshop OR bookcase</td><td class="it">biblioteca = library</td></tr>
+      <tr><td class="it">attualmente</td><td>actuellement (currently) ✓</td><td>currently (correct!)</td><td class="it">—</td></tr>
+      <tr><td class="it">annoiato</td><td>ennuyé? — but sounds like "annoyed"</td><td>bored, not annoyed</td><td class="it">infastidito = annoyed</td></tr>
+      <tr><td class="it">burro</td><td>burro (donkey in Spanish — wrong language!)</td><td>butter</td><td class="it">asino = donkey</td></tr>
+      <tr><td class="it">caldo</td><td>froid? — sounds like "cold"</td><td>hot / warm</td><td class="it">freddo = cold</td></tr>
+      <tr><td class="it">largo</td><td>large (big)</td><td>wide, broad — not big</td><td class="it">grande = big</td></tr>
+      <tr><td class="it">camera</td><td>caméra (film camera)</td><td>bedroom (hotel room)</td><td class="it">macchina fotografica = camera</td></tr>
+      <tr><td class="it">pavimento</td><td>pavement (sidewalk)</td><td>floor (inside a building)</td><td class="it">marciapiede = sidewalk</td></tr>
+      <tr><td class="it">parente</td><td>parent (mother/father)</td><td>relative, family member</td><td class="it">genitore = parent</td></tr>
+      <tr><td class="it">romanzo</td><td>romance (romantic thing)</td><td>novel (a book)</td><td class="it">storia d'amore = romance</td></tr>
+      <tr><td class="it">pretendere</td><td>prétendre (to claim)</td><td>to demand, to expect</td><td class="it">affermare = to claim</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>🎙️ Pronunciation — What to Unlearn</h3>
+    <p>This is the hardest part for French speakers. Your French phonetic habits are deeply ingrained — and several of them actively interfere with Italian. Be conscious of each one.</p>
+
+    <div class="concept">
+      <div class="label">Problem 1 — Nasal Vowels</div>
+      <p>French nasalizes vowels constantly: <em>bon, vin, blanc, temps</em>. Italian <strong>never nasalizes</strong> vowels. The letter N is always a full consonant. <em>Bene</em> is "BEH-neh" — both syllables clear and oral, never nasal.</p>
+    </div>
+    <div class="example">
+      <span class="it-text">bon (French) → bene (Italian)</span>
+      <span class="en-text">French: nasal "o" sound. Italian: clear "EH" — mouth open, no nasalization.</span>
+    </div>
+
+    <div class="concept">
+      <div class="label">Problem 2 — Final Syllables</div>
+      <p>French swallows word endings. Italian <strong>pronounces every syllable fully</strong> — especially final vowels. <em>Importante</em> has 4 full syllables: im-por-TAN-teh. Never drop the final "e".</p>
+    </div>
+    <div class="example">
+      <span class="it-text">importante → eem-por-TAN-teh</span>
+      <span class="en-text">All four syllables spoken clearly. French speakers tend to clip the final "e" — resist this.</span>
+    </div>
+
+    <div class="concept">
+      <div class="label">Problem 3 — Liaison & Linking</div>
+      <p>French links words together across boundaries (les amis → "ley-za-mee"). Italian words are <strong>more separate</strong>. Each word keeps its own identity, though some phonetic blending occurs naturally with practice.</p>
+    </div>
+
+    <div class="concept">
+      <div class="label">Problem 4 — Stress Patterns</div>
+      <p>French stress is nearly flat with a slight emphasis at the end of phrases. Italian stress falls on a <strong>specific syllable within each word</strong>, usually the second-to-last. Getting this right transforms your accent immediately.</p>
+    </div>
+    <div class="example">
+      <span class="it-text">università → oo-nee-vehr-see-TAH</span>
+      <span class="en-text">Stress on the final à (accent marks always show stress). French would flatten this.</span>
+    </div>
+
+    <div class="concept">
+      <div class="label">Problem 5 — The R</div>
+      <p>French has a guttural back-of-throat R (<em>r</em> uvulaire). Italian R is a <strong>rolled or tapped R</strong>, produced at the front of the mouth with the tongue tip. It takes practice to switch — but it's essential for sounding Italian.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">🎯</div>
+      <p><strong>Practical drill:</strong> Take any French word you know and say it with (1) fully pronounced final syllables, (2) no nasal vowels, (3) a front-rolled R. You'll often land very close to the Italian equivalent.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>Key Structural Differences to Learn</h3>
+    <p>Beyond false friends and pronunciation, a few grammatical patterns work differently from French.</p>
+
+    <div class="concept">
+      <div class="label">Formal "You" — Lei, not vous</div>
+      <p>French <em>vous</em> is second person plural. Italian formal <em>Lei</em> is <strong>third person singular</strong> — you speak about the person as if referring to them. This means "do you speak Italian?" formally becomes <em>Parla italiano?</em> (he/she speaks…), not a second-person form.</p>
+    </div>
+    <div class="example">
+      <span class="it-text">Parla italiano, signora? (Lei form)</span>
+      <span class="en-text">Do you speak Italian, madam? — literally "does she speak Italian"</span>
+      <span class="note">French: Parlez-vous italien? — second person plural. Italian: completely different person.</span>
+    </div>
+
+    <div class="concept">
+      <div class="label">Subject Pronouns Are Optional</div>
+      <p>French requires subject pronouns (<em>je parle, tu parles</em>). Italian drops them — the verb ending carries the information. <em>Parlo italiano</em> = I speak Italian, no <em>io</em> needed (though you can include it for emphasis).</p>
+    </div>
+
+    <div class="concept">
+      <div class="label">The Imperfetto — Used More Broadly</div>
+      <p>The Italian imperfetto (imperfect tense) covers habitual past actions and descriptions, similar to French imparfait. French speakers often handle this well — just note Italian uses it more freely in spoken language, including where French might use a conditional.</p>
+    </div>
+    <div class="example">
+      <span class="it-text">Da piccolo, mangiavo sempre la pasta.</span>
+      <span class="en-text">As a child, I always ate pasta. — imperfetto for habitual past, identical to imparfait logic.</span>
+    </div>
+
+    <div class="concept">
+      <div class="label">Adjective Position — More Flexible</div>
+      <p>Like French, Italian adjectives usually follow the noun. But Italian has more flexibility, and some common adjectives (bello, brutto, grande, piccolo, buono) frequently precede the noun, changing their form when they do.</p>
+    </div>
+    <div class="example">
+      <span class="it-text">un bel ragazzo / un ragazzo bello</span>
+      <span class="en-text">a handsome boy — "bel" is the shortened pre-noun form; "bello" follows the noun</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="lesson">
+    <h3>🚀 Your Accelerated Learning Path</h3>
+    <p>Given your French foundation, here's a realistic and honest timeline:</p>
+    <div class="concept">
+      <div class="label">Week 1–2</div>
+      <p>Focus entirely on <strong>pronunciation correction</strong>. Practice opening vowels, eliminating nasal sounds, and pronouncing final syllables. Record yourself. This is the hardest adjustment and must come first — bad habits solidify fast.</p>
+    </div>
+    <div class="concept">
+      <div class="label">Week 2–3</div>
+      <p>Memorize the <strong>false friends list</strong> above. Then do a rapid sweep of verb conjugations — you understand the concept, you just need the Italian endings. Drill <em>essere, avere, andare, volere</em> until they're automatic.</p>
+    </div>
+    <div class="concept">
+      <div class="label">Week 3–4</div>
+      <p>Move into <strong>full conversations</strong>. Use the scenarios in this guide. Your vocabulary will fill in quickly through context. Focus on the Lei vs. tu distinction and on dropping subject pronouns naturally.</p>
+    </div>
+    <div class="concept">
+      <div class="label">Week 4–6</div>
+      <p>Expand vocabulary through Italian media — films, podcasts, music. Your French foundation means new words click into place with minimal effort. By week 6, functional conversational Italian is within reach.</p>
+    </div>
+    <div class="tip">
+      <div class="icon">🎬</div>
+      <p><strong>Recommended resources for French speakers:</strong> Pimsleur Italian (audio-first, corrects pronunciation actively); the YouTube channel "Italy Made Easy" by Manu Venditti; Italian films with Italian subtitles — start with <em>La vita è bella</em> or <em>Nuovo Cinema Paradiso</em>.</p>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<footer>
+  <p><em>In bocca al lupo!</em> — Good luck! (literally: "Into the wolf's mouth!")<br>
+  <span style="font-size:0.75rem">The traditional reply is <em>"Crepi!"</em> — "May it die!" 🐺</span></p>
+</footer>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+const feedback = {
+  q1: "✓ Correct! Un tavolo = a table, per due = for two.",
+  q2: "✓ Right! Before any vowel sound, use l' — for feminine nouns too.",
+  q3: "✓ Yes! Vorrei is the conditional of volere — polite and essential.",
+  q4: "✓ Exactly. Verbs of motion (andare, venire, partire) take essere in past tense.",
+  q5: "✓ Correct. Dov'è = where is; il bagno = the bathroom.",
+  q6: "✓ Right! Use sono le for all hours except 1 (è l'una) and noon/midnight."
+};
+const wrong = {
+  q1: "Not quite — tavolo is singular, and per due means for two.",
+  q2: "Close! 'la' would be used before a consonant. Before a vowel, use l'.",
+  q3: "Vorrei is actually the conditional — it means 'I would like', which is more polite.",
+  q4: "The key reason is that andare is a motion verb — those use essere in the past.",
+  q5: "Almost — you need the article il before bagno, and dov'è contracts properly.",
+  q6: "Remember: use sono le for any hour other than 1 o'clock."
+};
+
+function answer(btn, result, qid) {
+  const opts = btn.parentElement.querySelectorAll('button');
+  opts.forEach(b => b.disabled = true);
+  btn.classList.add(result);
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = result === 'correct' ? feedback[qid] : wrong[qid];
+  fb.style.color = result === 'correct' ? '#7bc67e' : '#e07a55';
+}
+</script>
+</body>
+</html>
