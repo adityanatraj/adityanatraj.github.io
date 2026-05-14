@@ -194,7 +194,7 @@
 				align-items: center;
 				gap: 6px;
 				background: rgba(2, 6, 23, 0.85);
-				border: 1px solid rgba(255, 255, 255, 0.08);
+				border: 1px solid rgba(255, 255, 255, 0.15);
 				border-radius: var(--radius-sm);
 				padding: 6px 10px;
 				font-size: 0.8125rem;
@@ -213,7 +213,7 @@
 			/* accent used here: it IS the active scanning state */
 			.status-dot.scanning {
 				background: var(--accent);
-				animation: blink 1.6s ease-in-out infinite;
+				animation: blink 1.1s ease-in-out infinite;
 			}
 
 			.status-dot.found {
@@ -293,13 +293,14 @@
 				border-radius: var(--radius-md);
 				padding: 1.25rem 1.5rem;
 				margin-bottom: 2rem; /* 32px — clear separation from list below */
-				transition: border-color 0.3s, background 0.3s;
+				transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
 			}
 
 			/* accent used here: it IS the active found state */
 			.last-detected.lit {
-				border-color: rgba(56, 189, 248, 0.4);
-				background: rgba(56, 189, 248, 0.04);
+				border-color: rgba(56, 189, 248, 0.35);
+				background: rgba(56, 189, 248, 0.05);
+				box-shadow: inset 3px 0 0 var(--accent);
 			}
 
 			.last-strip-top {
@@ -310,7 +311,7 @@
 			}
 
 			.last-label {
-				font-size: 0.6875rem;
+				font-size: 0.75rem;
 				font-weight: 700;
 				color: var(--muted);
 				text-transform: uppercase;
@@ -319,7 +320,7 @@
 
 			/* format tag: muted, not accent — it's metadata, not state */
 			.last-format {
-				font-size: 0.6875rem;
+				font-size: 0.75rem;
 				font-weight: 600;
 				color: var(--muted);
 				letter-spacing: 0.06em;
@@ -339,7 +340,7 @@
 					"Roboto Mono", monospace;
 				font-size: 2.25rem;
 				font-weight: 700;
-				letter-spacing: 0.06em;
+				letter-spacing: 0.025em;
 				color: var(--text);
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -365,7 +366,7 @@
 			}
 
 			.list-label {
-				font-size: 0.6875rem;
+				font-size: 0.75rem;
 				font-weight: 700;
 				color: var(--muted);
 				text-transform: uppercase;
@@ -429,7 +430,7 @@
 			}
 
 			.code-entry.is-new {
-				animation: slideDown 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+				animation: slideDown 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 			}
 
 			/* flash: 12% opacity — actually visible, not a ghost */
@@ -467,7 +468,7 @@
 
 			/* muted, not accent — format type is metadata */
 			.entry-format {
-				font-size: 0.6875rem;
+				font-size: 0.75rem;
 				font-weight: 600;
 				color: var(--muted);
 				letter-spacing: 0.06em;
@@ -475,14 +476,14 @@
 			}
 
 			.entry-time {
-				font-size: 0.6875rem;
+				font-size: 0.75rem;
 				color: var(--muted);
 				opacity: 0.6;
 			}
 
 			.entry-actions {
 				display: flex;
-				gap: 2px;
+				gap: 8px;
 				flex-shrink: 0;
 			}
 
@@ -517,12 +518,18 @@
 				background: rgba(239, 68, 68, 0.08);
 			}
 
+			/* copy button in hero strip gets a visible resting border */
+			.last-strip-bottom .icon-btn {
+				border-color: var(--line);
+			}
+
 			/* ── Responsive ──────────────────────────────────────── */
 			@media (max-width: 600px) {
 				main {
 					padding: 1.5rem 1rem calc(3rem + env(safe-area-inset-bottom));
 				}
 
+				.page-header     { margin-bottom: 1.25rem; }
 				.page-header h1  { font-size: 1.5rem; }
 				.last-value      { font-size: 1.75rem; }
 				.nav-links       { gap: 1.25rem; }
@@ -629,14 +636,14 @@
 				<div class="empty-state">
 					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
 						aria-hidden="true">
-						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
+						<rect x="8"  y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="13" y="16" width="4"  height="32" fill="currentColor" rx="1"/>
+						<rect x="20" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="25" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
+						<rect x="34" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="39" y="16" width="3"  height="32" fill="currentColor" rx="1"/>
+						<rect x="45" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="50" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
 					</svg>
 					<p>Scanned codes will appear here</p>
 				</div>
@@ -762,9 +769,14 @@
 					await initVideo(stream);
 
 				} catch (err) {
-					setStatus('error',
-						err.name === 'NotAllowedError' ? 'Camera denied' : 'Camera error');
-					statusBadge.style.display = 'flex';
+					if (err.name === 'NotAllowedError') {
+						placeholder.querySelector('p').textContent =
+							'Camera access was denied. Allow camera in your browser settings, then reload.';
+						startBtn.textContent = 'Retry';
+					} else {
+						setStatus('error', 'Camera error');
+						statusBadge.style.display = 'flex';
+					}
 				}
 			}
 
@@ -854,6 +866,7 @@
 				lastBarcodes = [];
 				zxingReader?.reset();
 				zxingReader = null;
+				lastDetected.classList.remove('lit');
 			}
 
 			async function startZXingLoop() {
@@ -863,7 +876,7 @@
 					8: 'itf',     10: 'pdf_417', 11: 'qr_code', 14: 'upc_a', 15: 'upc_e'
 				};
 				try {
-					setStatus('scanning', 'Loading…');
+					setStatus('', 'Preparing scanner…');
 					const { BrowserMultiFormatReader } = await import(
 						'https://esm.sh/@zxing/browser@0.1.5'
 					);
@@ -882,7 +895,7 @@
 						}
 					});
 				} catch {
-					if (scanning) setStatus('error', 'Scanner unavailable — try Chrome or Safari');
+					if (scanning) setStatus('error', 'Scanner failed to load — check connection and reload');
 				}
 			}
 
@@ -961,14 +974,13 @@
 			function drawScanLine() {
 				const w = canvas.width;
 				const h = canvas.height;
-				// Slower movement: h/260 instead of h/180 — more deliberate
 				scanY += scanDir * (h / 260);
-				if (scanY > h * 0.88) scanDir = -1;
-				if (scanY < h * 0.12) scanDir =  1;
+				if (scanY > h * 0.85) scanDir = -1;
+				if (scanY < h * 0.15) scanDir =  1;
 
 				const g = ctx.createLinearGradient(0, scanY - 3, 0, scanY + 3);
 				g.addColorStop(0,   'transparent');
-				g.addColorStop(0.5, 'rgba(56, 189, 248, 0.4)');
+				g.addColorStop(0.5, 'rgba(56, 189, 248, 0.65)');
 				g.addColorStop(1,   'transparent');
 				ctx.fillStyle = g;
 				ctx.fillRect(0, scanY - 3, w, 6);
@@ -1046,20 +1058,21 @@
 				<div class="empty-state">
 					<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
 						aria-hidden="true">
-						<path d="M8 22 L8 8 L22 8"    stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M42 8 L56 8 L56 22"  stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M56 42 L56 56 L42 56" stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
-						<path d="M22 56 L8 56 L8 42"  stroke="currentColor" stroke-width="3.5"
-							stroke-linecap="round" stroke-linejoin="round"/>
+						<rect x="8"  y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="13" y="16" width="4"  height="32" fill="currentColor" rx="1"/>
+						<rect x="20" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="25" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
+						<rect x="34" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="39" y="16" width="3"  height="32" fill="currentColor" rx="1"/>
+						<rect x="45" y="16" width="2"  height="32" fill="currentColor" rx="1"/>
+						<rect x="50" y="16" width="6"  height="32" fill="currentColor" rx="1"/>
 					</svg>
 					<p>Scanned codes will appear here</p>
 				</div>`;
 
 			function renderList() {
 				codeCount.textContent = codes.length;
+				clearBtn.style.display = codes.length ? '' : 'none';
 
 				if (codes.length === 0) {
 					codesList.innerHTML = EMPTY_STATE_HTML;
