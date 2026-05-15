@@ -590,6 +590,8 @@
 					})),
 					rollsLeft: 3,
 					gameEnded: false,
+					startedAt: new Date().toISOString(),
+					endedAt: null,
 				};
 				render();
 			}
@@ -785,6 +787,7 @@
 				);
 				if (allScored) {
 					gameState.gameEnded = true;
+					gameState.endedAt = new Date().toISOString();
 					showWinnerModal();
 				}
 			}
@@ -924,9 +927,9 @@
 			   SAVE / LOAD
 			============================================================================ */
 			function saveGame() {
-				// Create a comprehensive save object with both game state and statistics
 				const saveData = {
-					version: "1.1", // Version to track save file format
+					version: "1.2",
+					savedAt: new Date().toISOString(),
 					gameState: gameState,
 					statistics: getStats() || {
 						gamesPlayed: 0,
@@ -934,32 +937,27 @@
 						playerScores: {},
 						highestScore: { name: "", score: 0 },
 					},
-					savedAt: new Date().toISOString(),
 				};
 
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
 					type: "application/json",
 				});
+				const fname = "yahtzee-game.json";
 
-				const linkDownload = function () {
-					const a = document.createElement("a");
-					a.href = URL.createObjectURL(blob);
-					a.download = "yahtzee-game.json";
-					a.click();
-					setTimeout(() => URL.revokeObjectURL(a.href), 0);
-				};
 				try {
-					const file = new File([blob], "yahtzee-game.json", {
-						type: "application/json",
-					});
-					navigator.share({
-						title: "yahtzee-game.json",
-						text: "yahtzee game save state",
-						files: [file],
-					});
-				} catch (error) {
-					linkDownload();
-				}
+					const file = new File([blob], fname, { type: "application/json" });
+					if (navigator.share && navigator.canShare &&
+						navigator.canShare({ files: [file] })) {
+						navigator.share({ title: fname, files: [file] });
+						return;
+					}
+				} catch (_) {}
+
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = fname;
+				a.click();
+				setTimeout(() => URL.revokeObjectURL(a.href), 0);
 			}
 
 			function loadGame() {

@@ -214,8 +214,6 @@ button.danger {
   </div>
 </div>
 
-<input type="file" id="fileInput" accept="application/json" class="hidden" />
-
 <script>
 const MAX_WRONG = 6;
 
@@ -313,7 +311,9 @@ function startGame() {
     secret,
     guessed: [],
     wrong: 0,
-    over: false
+    over: false,
+    startedAt: new Date().toISOString(),
+    endedAt: null
   };
 
   document.getElementById('secretInput').value = '';
@@ -342,10 +342,16 @@ function guess(letter) {
   state.guessed.push(letter);
   if (!state.secret.includes(letter)) {
     state.wrong++;
-    if (state.wrong >= MAX_WRONG) state.over = true;
+    if (state.wrong >= MAX_WRONG) {
+      state.over = true;
+      state.endedAt = new Date().toISOString();
+    }
   } else {
     const won = [...state.secret].every(c => c === ' ' || state.guessed.includes(c));
-    if (won) state.over = true;
+    if (won) {
+      state.over = true;
+      state.endedAt = new Date().toISOString();
+    }
   }
   render();
 }
@@ -381,7 +387,9 @@ function render() {
 
 function saveGame() {
   if (!state) return;
-  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  const savedAt = new Date().toISOString();
+  const data = { version: '1.1', savedAt, gameState: state };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'hangman-game.json';
@@ -390,17 +398,24 @@ function saveGame() {
 }
 
 function loadGame() {
-  const input = document.getElementById('fileInput');
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
   input.onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      state = JSON.parse(reader.result);
-      document.getElementById('setup').classList.add('hidden');
-      document.getElementById('game').classList.remove('hidden');
-      buildKeyboard();
-      render();
+      try {
+        const data = JSON.parse(reader.result);
+        state = data.version ? data.gameState : data;
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        buildKeyboard();
+        render();
+      } catch (err) {
+        alert('Could not load save file: ' + err.message);
+      }
     };
     reader.readAsText(file);
   };
