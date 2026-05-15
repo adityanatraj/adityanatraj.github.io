@@ -160,8 +160,8 @@
 
 			footer {
 				text-align: center;
-				border-top: 1px solid var(--border-color);
-				color: var(--text-tertiary);
+				border-top: 1px solid var(--line);
+				color: var(--muted);
 				font-size: 0.875rem;
 			}
 
@@ -306,10 +306,6 @@
 				justify-content: space-between;
 			}
 
-			.bottom-padding {
-				height: env(safe-area-inset-bottom);
-			}
-
 			.turn-indicator {
 				font-weight: 700;
 				margin-bottom: 8px;
@@ -440,6 +436,7 @@
 
 			.modal-actions {
 				display: flex;
+				flex-wrap: wrap;
 				gap: 10px;
 				justify-content: center;
 				margin-top: 20px;
@@ -499,7 +496,7 @@
 			<div class="modal-content">
 				<div id="statsContent"></div>
 				<div class="modal-actions">
-					<button class="secondary" onclick="clearStats()">Clear Stats</button>
+					<button class="secondary" onclick="clearPastGames()">Clear Stats</button>
 					<button onclick="closeStatsModal()">Close</button>
 				</div>
 			</div>
@@ -507,18 +504,18 @@
 
 		<div id="statsLoadModal" class="modal">
 			<div class="modal-content">
-				<h2>Load Statistics</h2>
+				<h2>Load Past Games</h2>
 				<p style="color: var(--muted); margin: 16px 0">
-					This save file contains statistics. What would you like to do?
+					This save file contains past game records. What would you like to do?
 				</p>
 				<div id="statsLoadPreview" class="stats-preview"></div>
 				<div class="modal-actions">
-					<button class="secondary" onclick="handleStatsLoad('replace')">
-						Replace All Stats
+					<button class="secondary" onclick="handlePastGamesLoad('replace')">
+						Replace All
 					</button>
-					<button onclick="handleStatsLoad('merge')">Merge Stats</button>
-					<button class="secondary" onclick="handleStatsLoad('skip')">
-						Keep Current Stats
+					<button onclick="handlePastGamesLoad('merge')">Merge</button>
+					<button class="secondary" onclick="handlePastGamesLoad('skip')">
+						Keep Current
 					</button>
 				</div>
 			</div>
@@ -566,15 +563,9 @@
 
 				// Preserve and reorder players if there's an existing game
 				if (gameState && gameState.players) {
-					const scores = gameState.players
-						.map((p, i) => ({
-							name: p.name,
-							score: calcTotals(p).grand,
-							index: i,
-						}))
-						.sort((a, b) => b.score - a.score);
-
-					playerNames = scores.map((s) => s.name);
+					playerNames = [...gameState.players]
+						.sort((a, b) => calcTotals(b).grand - calcTotals(a).grand)
+						.map((p) => p.name);
 				}
 
 				gameState = {
@@ -794,17 +785,12 @@
 
 			function showWinnerModal() {
 				const scores = gameState.players
-					.map((p, i) => ({
-						name: p.name,
-						score: calcTotals(p).grand,
-						index: i,
-					}))
+					.map((p) => ({ name: p.name, score: calcTotals(p).grand }))
 					.sort((a, b) => b.score - a.score);
 
 				const winner = scores[0];
 
-				// Update statistics
-				updateStats(winner.name, scores);
+				recordGame();
 
 				document.getElementById("winnerTitle").textContent =
 					`🏆 ${winner.name} Wins! 🏆`;
@@ -928,15 +914,10 @@
 			============================================================================ */
 			function saveGame() {
 				const saveData = {
-					version: "1.2",
+					version: "1.3",
 					savedAt: new Date().toISOString(),
 					gameState: gameState,
-					statistics: getStats() || {
-						gamesPlayed: 0,
-						playerWins: {},
-						playerScores: {},
-						highestScore: { name: "", score: 0 },
-					},
+					pastGames: getPastGames() || [],
 				};
 
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
@@ -970,17 +951,14 @@
 						try {
 							const data = JSON.parse(r.result);
 
-							// Handle backward compatibility - old saves just had gameState directly
 							if (data.version) {
-								// New format with gameState and statistics
 								gameState = data.gameState;
-
-								// If there are statistics in the save file, ask user what to do
-								if (data.statistics && data.statistics.gamesPlayed > 0) {
-									showStatsLoadModal(data.statistics);
+								// v1.3+: pastGames array; v1.2: statistics key — discard silently
+								if (data.pastGames && data.pastGames.length > 0) {
+									showPastGamesLoadModal(data.pastGames);
 								}
 							} else {
-								// Old format - data IS the gameState
+								// Pre-versioned format — data IS the gameState
 								gameState = data;
 							}
 
@@ -996,112 +974,139 @@
 			}
 
 			/* ============================================================================
-			   STATISTICS
+			   PAST GAMES
 			============================================================================ */
-			function getStats() {
+			function getPastGames() {
 				try {
 					if (typeof localStorage === "undefined") return null;
-					const stored = localStorage.getItem("yahtzeeStats");
-					return stored
-						? JSON.parse(stored)
-						: {
-								gamesPlayed: 0,
-								playerWins: {},
-								playerScores: {},
-								highestScore: { name: "", score: 0 },
-							};
+					if (localStorage.getItem("yahtzeeStats") !== null) {
+						localStorage.removeItem("yahtzeeStats");
+					}
+					const stored = localStorage.getItem("yahtzeeGames");
+					return stored ? JSON.parse(stored) : [];
 				} catch (e) {
 					console.warn("localStorage unavailable:", e);
 					return null;
 				}
 			}
 
-			function saveStats(stats) {
+			function savePastGames(games) {
 				try {
 					if (typeof localStorage === "undefined") return;
-					localStorage.setItem("yahtzeeStats", JSON.stringify(stats));
+					localStorage.setItem("yahtzeeGames", JSON.stringify(games));
 				} catch (e) {
-					console.warn("Failed to save stats:", e);
+					console.warn("Failed to save past games:", e);
 				}
 			}
 
-			function updateStats(winnerName, scores) {
-				const stats = getStats();
-				if (!stats) return;
+			function recordGame() {
+				const games = getPastGames();
+				if (games === null) return;
+				games.push({
+					startedAt: gameState.startedAt,
+					endedAt: gameState.endedAt,
+					players: gameState.players.map((p) => ({
+						name: p.name,
+						scores: { ...p.scores },
+						total: calcTotals(p).grand,
+					})),
+				});
+				savePastGames(games);
+			}
 
-				stats.gamesPlayed++;
+			function computeStats(games) {
+				const playerWins = {};
+				const playerTotals = {};
+				let highestScore = { name: "", score: 0 };
 
-				// Update wins
-				stats.playerWins[winnerName] = (stats.playerWins[winnerName] || 0) + 1;
-
-				// Update all scores for averaging
-				scores.forEach((s) => {
-					if (!stats.playerScores[s.name]) {
-						stats.playerScores[s.name] = [];
-					}
-					stats.playerScores[s.name].push(s.score);
+				games.forEach((game) => {
+					const maxTotal = Math.max(...game.players.map((p) => p.total));
+					game.players.forEach((p) => {
+						if (p.total === maxTotal) {
+							playerWins[p.name] = (playerWins[p.name] || 0) + 1;
+						}
+						if (!playerTotals[p.name]) playerTotals[p.name] = [];
+						playerTotals[p.name].push(p.total);
+						if (p.total > highestScore.score) {
+							highestScore = { name: p.name, score: p.total };
+						}
+					});
 				});
 
-				// Update highest score
-				const topScore = Math.max(...scores.map((s) => s.score));
-				const topPlayer = scores.find((s) => s.score === topScore);
-				if (topScore > stats.highestScore.score) {
-					stats.highestScore = { name: topPlayer.name, score: topScore };
-				}
-
-				saveStats(stats);
+				return { gamesPlayed: games.length, playerWins, playerTotals, highestScore };
 			}
 
-			function clearStats() {
-				if (confirm("Clear all statistics? This cannot be undone.")) {
+			function sanitizePastGames(arr) {
+				if (!Array.isArray(arr)) return [];
+				return arr.filter((g) => {
+					if (!g || typeof g !== "object") return false;
+					if (typeof g.startedAt !== "string") return false;
+					if (!Array.isArray(g.players) || g.players.length === 0) return false;
+					return g.players.every(
+						(p) =>
+							typeof p.name === "string" &&
+							typeof p.scores === "object" &&
+							p.scores !== null &&
+							typeof p.total === "number" &&
+							p.total >= 0,
+					);
+				});
+			}
+
+			function clearPastGames() {
+				if (confirm("Clear all past games? This cannot be undone.")) {
 					try {
-						localStorage.removeItem("yahtzeeStats");
+						localStorage.removeItem("yahtzeeGames");
 						showStatsModal();
 					} catch (e) {
-						console.warn("Failed to clear stats:", e);
+						console.warn("Failed to clear past games:", e);
 					}
 				}
 			}
 
 			function showStatsModal() {
-				const stats = getStats();
+				const games = getPastGames();
 				const modal = document.getElementById("statsModal");
 				const content = document.getElementById("statsContent");
 
-				if (!stats) {
+				if (games === null) {
 					content.innerHTML = `<p style="color:var(--muted)">Statistics unavailable — storage is disabled in this browser.</p>`;
 					modal.classList.add("show");
 					return;
 				}
 
 				let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
-				html += `<p><strong>Total Games:</strong> ${stats.gamesPlayed}</p>`;
 
-				if (stats.highestScore.score > 0) {
-					html += `<p><strong>Highest Score:</strong> ${stats.highestScore.name} - ${stats.highestScore.score}</p>`;
+				if (games.length === 0) {
+					html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
+					content.innerHTML = html;
+					modal.classList.add("show");
+					return;
 				}
 
-				if (Object.keys(stats.playerWins).length > 0) {
+				const { gamesPlayed, playerWins, playerTotals, highestScore } = computeStats(games);
+
+				html += `<p><strong>Total Games:</strong> ${gamesPlayed}</p>`;
+
+				if (highestScore.score > 0) {
+					html += `<p><strong>Highest Score:</strong> ${highestScore.name} — ${highestScore.score}</p>`;
+				}
+
+				if (Object.keys(playerWins).length > 0) {
 					html += `<h4>Wins by Player</h4>`;
-					Object.entries(stats.playerWins)
+					Object.entries(playerWins)
 						.sort((a, b) => b[1] - a[1])
 						.forEach(([name, wins]) => {
 							html += `<p>${name}: ${wins} win${wins !== 1 ? "s" : ""}</p>`;
 						});
 				}
 
-				if (Object.keys(stats.playerScores).length > 0) {
+				if (Object.keys(playerTotals).length > 0) {
 					html += `<h4>Average Scores</h4>`;
-					Object.entries(stats.playerScores).forEach(([name, scores]) => {
-						const avg = Math.round(
-							scores.reduce((a, b) => a + b, 0) / scores.length,
-						);
-						html += `<p>${name}: ${avg} (${scores.length} game${scores.length !== 1 ? "s" : ""})</p>`;
+					Object.entries(playerTotals).forEach(([name, totals]) => {
+						const avg = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+						html += `<p>${name}: ${avg} (${totals.length} game${totals.length !== 1 ? "s" : ""})</p>`;
 					});
-				}
-
-				if (stats.gamesPlayed === 0) {
-					html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
 				}
 
 				content.innerHTML = html;
@@ -1113,184 +1118,63 @@
 			}
 
 			/* ============================================================================
-			   STATISTICS LOADING & MERGING
+			   PAST GAMES LOADING & MERGING
 			============================================================================ */
-			let pendingLoadedStats = null;
+			let pendingLoadedGames = null;
 
-			/**
-			 * Validates statistics object to ensure it has the correct structure
-			 */
-			function sanitizeStats(stats) {
-				if (!stats || typeof stats !== "object") {
-					return false;
-				}
+			function showPastGamesLoadModal(loadedGames) {
+				const sanitized = sanitizePastGames(loadedGames);
+				if (sanitized.length === 0) return;
 
-				// Ensure required fields exist
-				if (typeof stats.gamesPlayed !== "number" || stats.gamesPlayed < 0) {
-					stats.gamesPlayed = 0;
-				}
+				pendingLoadedGames = sanitized;
+				const currentGames = getPastGames() || [];
+				const loaded = computeStats(sanitized);
+				const current = computeStats(currentGames);
 
-				if (!stats.playerWins || typeof stats.playerWins !== "object") {
-					stats.playerWins = {};
-				}
-
-				if (!stats.playerScores || typeof stats.playerScores !== "object") {
-					stats.playerScores = {};
-				}
-
-				if (!stats.highestScore || typeof stats.highestScore !== "object") {
-					stats.highestScore = { name: "", score: 0 };
-				}
-
-				// Validate playerWins - ensure all values are numbers
-				Object.keys(stats.playerWins).forEach((key) => {
-					if (
-						typeof stats.playerWins[key] !== "number" ||
-						stats.playerWins[key] < 0
-					) {
-						stats.playerWins[key] = 0;
-					}
-				});
-
-				// Validate playerScores - ensure all values are arrays of numbers
-				Object.keys(stats.playerScores).forEach((key) => {
-					if (!Array.isArray(stats.playerScores[key])) {
-						stats.playerScores[key] = [];
-					} else {
-						// Filter out non-numbers
-						stats.playerScores[key] = stats.playerScores[key].filter(
-							(s) => typeof s === "number" && !isNaN(s) && s >= 0,
-						);
-					}
-				});
-
-				// Validate highestScore
-				if (
-					typeof stats.highestScore.score !== "number" ||
-					stats.highestScore.score < 0
-				) {
-					stats.highestScore.score = 0;
-				}
-				if (typeof stats.highestScore.name !== "string") {
-					stats.highestScore.name = "";
-				}
-
-				return true;
-			}
-
-			/**
-			 * Shows modal to let user choose how to handle loaded statistics
-			 */
-			function showStatsLoadModal(loadedStats) {
-				// Validate the loaded stats
-				if (!sanitizeStats(loadedStats)) {
-					console.error("Invalid statistics format in save file");
-					return;
-				}
-
-				pendingLoadedStats = loadedStats;
-				const currentStats = getStats();
-
-				// Build preview of what's being loaded
 				let preview = '<div style="font-size: 14px;">';
-				preview += "<p><strong>Save file contains:</strong></p>";
-				preview += `<p>Games Played: ${loadedStats.gamesPlayed}</p>`;
-
-				if (loadedStats.highestScore.score > 0) {
-					preview += `<p>Highest Score: ${loadedStats.highestScore.name} - ${loadedStats.highestScore.score}</p>`;
+				preview += `<p><strong>Save file:</strong> ${loaded.gamesPlayed} game${loaded.gamesPlayed !== 1 ? "s" : ""}`;
+				if (loaded.highestScore.score > 0) {
+					preview += `, best: ${loaded.highestScore.name} ${loaded.highestScore.score}`;
 				}
+				preview += "</p>";
 
-				const playerCount = Object.keys(loadedStats.playerWins).length;
-				if (playerCount > 0) {
-					preview += `<p>Players with stats: ${playerCount}</p>`;
-				}
-
-				preview += "<br><p><strong>Current stats:</strong></p>";
-				if (currentStats && currentStats.gamesPlayed > 0) {
-					preview += `<p>Games Played: ${currentStats.gamesPlayed}</p>`;
-					if (currentStats.highestScore.score > 0) {
-						preview += `<p>Highest Score: ${currentStats.highestScore.name} - ${currentStats.highestScore.score}</p>`;
+				preview += `<p><strong>Current:</strong> `;
+				if (currentGames.length > 0) {
+					preview += `${current.gamesPlayed} game${current.gamesPlayed !== 1 ? "s" : ""}`;
+					if (current.highestScore.score > 0) {
+						preview += `, best: ${current.highestScore.name} ${current.highestScore.score}`;
 					}
 				} else {
-					preview += `<p style="color: var(--muted);">No current stats</p>`;
+					preview += `<span style="color: var(--muted);">no records</span>`;
 				}
-				preview += "</div>";
+				preview += "</p></div>";
 
 				document.getElementById("statsLoadPreview").innerHTML = preview;
 				document.getElementById("statsLoadModal").classList.add("show");
 			}
 
-			/**
-			 * Handles user choice for loading statistics
-			 */
-			function handleStatsLoad(action) {
-				const modal = document.getElementById("statsLoadModal");
-				modal.classList.remove("show");
+			function handlePastGamesLoad(action) {
+				document.getElementById("statsLoadModal").classList.remove("show");
+				if (!pendingLoadedGames) return;
 
-				if (!pendingLoadedStats) {
-					return;
+				if (action === "replace") {
+					savePastGames(pendingLoadedGames);
+				} else if (action === "merge") {
+					savePastGames(mergePastGames(getPastGames() || [], pendingLoadedGames));
 				}
+				// "skip": do nothing
 
-				switch (action) {
-					case "replace":
-						// Replace all stats with loaded stats
-						saveStats(pendingLoadedStats);
-						break;
-
-					case "merge":
-						// Merge loaded stats with current stats
-						const currentStats = getStats() || {
-							gamesPlayed: 0,
-							playerWins: {},
-							playerScores: {},
-							highestScore: { name: "", score: 0 },
-						};
-
-						const merged = mergeStats(currentStats, pendingLoadedStats);
-						saveStats(merged);
-						break;
-
-					case "skip":
-						// Keep current stats, do nothing
-						break;
-				}
-
-				pendingLoadedStats = null;
+				pendingLoadedGames = null;
 			}
 
-			/**
-			 * Merges two statistics objects
-			 */
-			function mergeStats(current, loaded) {
-				const merged = {
-					gamesPlayed: current.gamesPlayed + loaded.gamesPlayed,
-					playerWins: { ...current.playerWins },
-					playerScores: { ...current.playerScores },
-					highestScore: { ...current.highestScore },
-				};
-
-				// Merge player wins
-				Object.keys(loaded.playerWins).forEach((player) => {
-					merged.playerWins[player] =
-						(merged.playerWins[player] || 0) + loaded.playerWins[player];
-				});
-
-				// Merge player scores
-				Object.keys(loaded.playerScores).forEach((player) => {
-					if (!merged.playerScores[player]) {
-						merged.playerScores[player] = [];
-					}
-					merged.playerScores[player] = merged.playerScores[player].concat(
-						loaded.playerScores[player],
-					);
-				});
-
-				// Update highest score if loaded one is higher
-				if (loaded.highestScore.score > merged.highestScore.score) {
-					merged.highestScore = { ...loaded.highestScore };
-				}
-
-				return merged;
+			function mergePastGames(current, loaded) {
+				const seen = new Set(
+					current.map((g) => g.startedAt + "|" + g.players.map((p) => p.name).sort().join(","))
+				);
+				const unique = loaded.filter(
+					(g) => !seen.has(g.startedAt + "|" + g.players.map((p) => p.name).sort().join(","))
+				);
+				return [...current, ...unique].sort((a, b) => a.startedAt.localeCompare(b.startedAt));
 			}
 
 			function toggleMenu() {
@@ -1310,8 +1194,8 @@
 				}
 			});
 		</script>
+		<footer>
+			<p>© Aditya N</p>
+		</footer>
 	</body>
-	<footer>
-		<p>© Aditya N</p>
-	</footer>
 </html>
