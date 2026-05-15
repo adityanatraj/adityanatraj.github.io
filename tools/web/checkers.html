@@ -582,13 +582,14 @@ function endTurn() {
 }
 
 function checkWin() {
-  const next = 1 - gs.currentPlayer;
-  const hasPieces = gs.board.some(c => c && c.player === next);
-  if (!hasPieces) { gs.winner = gs.currentPlayer; return true; }
+  // gs.currentPlayer is now the player who must move next — check them
+  const p = gs.currentPlayer;
+  const hasPieces = gs.board.some(c => c && c.player === p);
+  if (!hasPieces) { gs.winner = 1 - p; return true; }
   const hasMoves = gs.board.some((c, i) =>
-    c && c.player === next && getMoves(i, gs.board, next).length > 0
+    c && c.player === p && getMoves(i, gs.board, p).length > 0
   );
-  if (!hasMoves) { gs.winner = gs.currentPlayer; return true; }
+  if (!hasMoves) { gs.winner = 1 - p; return true; }
   return false;
 }
 
@@ -767,7 +768,7 @@ function loadGame() {
           gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
           showPhase('playing');
           render();
-        } else if (gs.phase === 'gameover') {
+        } else if (gs.phase === 'gameover' && (gs.winner === 0 || gs.winner === 1)) {
           showPhase('playing');
           render();
           showWinnerModal();
