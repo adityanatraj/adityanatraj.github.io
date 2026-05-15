@@ -214,8 +214,6 @@ button.danger {
   </div>
 </div>
 
-<input type="file" id="fileInput" accept="application/json" class="hidden" />
-
 <script>
 const MAX_WRONG = 6;
 
@@ -389,14 +387,8 @@ function render() {
 
 function saveGame() {
   if (!state) return;
-  state.savedAt = new Date().toISOString();
-  const data = {
-    version: '1.1',
-    startedAt: state.startedAt,
-    savedAt: state.savedAt,
-    endedAt: state.endedAt,
-    gameState: state
-  };
+  const savedAt = new Date().toISOString();
+  const data = { version: '1.1', savedAt, gameState: state };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -406,18 +398,24 @@ function saveGame() {
 }
 
 function loadGame() {
-  const input = document.getElementById('fileInput');
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
   input.onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const data = JSON.parse(reader.result);
-      state = data.version ? data.gameState : data;
-      document.getElementById('setup').classList.add('hidden');
-      document.getElementById('game').classList.remove('hidden');
-      buildKeyboard();
-      render();
+      try {
+        const data = JSON.parse(reader.result);
+        state = data.version ? data.gameState : data;
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        buildKeyboard();
+        render();
+      } catch (err) {
+        alert('Could not load save file: ' + err.message);
+      }
     };
     reader.readAsText(file);
   };

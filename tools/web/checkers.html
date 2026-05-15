@@ -389,7 +389,6 @@ let gs;
 
 function buildInitialState(n0, n1) {
   return {
-    version: '1.0',
     players: [
       { name: n0, captured: 0 },
       { name: n1, captured: 0 }
@@ -404,7 +403,6 @@ function buildInitialState(n0, n1) {
     midJump: null,
     justSelected: null,
     startedAt: new Date().toISOString(),
-    savedAt: null,
     endedAt: null
   };
 }
@@ -719,8 +717,8 @@ function showPhase(phase) {
 
 function saveGame() {
   if (!gs || gs.phase === 'setup') return;
-  gs.savedAt = new Date().toISOString();
-  const data = { version: '1.1', startedAt: gs.startedAt, savedAt: gs.savedAt, endedAt: gs.endedAt, gameState: gs };
+  const savedAt = new Date().toISOString();
+  const data = { version: '1.1', savedAt, gameState: gs };
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const fname = 'checkers-save.json';
