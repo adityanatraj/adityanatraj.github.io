@@ -160,8 +160,8 @@
 
 			footer {
 				text-align: center;
-				border-top: 1px solid var(--border-color);
-				color: var(--text-tertiary);
+				border-top: 1px solid var(--line);
+				color: var(--muted);
 				font-size: 0.875rem;
 			}
 
@@ -306,10 +306,6 @@
 				justify-content: space-between;
 			}
 
-			.bottom-padding {
-				height: env(safe-area-inset-bottom);
-			}
-
 			.turn-indicator {
 				font-weight: 700;
 				margin-bottom: 8px;
@@ -440,6 +436,7 @@
 
 			.modal-actions {
 				display: flex;
+				flex-wrap: wrap;
 				gap: 10px;
 				justify-content: center;
 				margin-top: 20px;
@@ -1197,8 +1194,8 @@
 				}
 			});
 		</script>
+		<footer>
+			<p>© Aditya N</p>
+		</footer>
 	</body>
-	<footer>
-		<p>© Aditya N</p>
-	</footer>
 </html>
