@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Checkers — Two Players</title>
+
+<style>
+:root {
+  --bg: #020617;
+  --panel: #0f172a;
+  --card: #111827;
+  --line: #334155;
+  --line-hover: #3d4f63;
+  --accent: #38bdf8;
+  --text: #e5e7eb;
+  --text-accent: #efefef;
+  --muted: #94a3b8;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --board-light: #c8a96e;
+  --board-dark: #7a4a2a;
+  --piece-r: #991b1b;
+  --piece-r-rim: #7f1d1d;
+  --piece-w: #f0ebe0;
+  --piece-w-rim: #c8b89a;
+  --board-size: min(480px, calc(100vw - 200px));
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100vh; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+header {
+  padding: 12px 16px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.header-top { display: flex; align-items: center; }
+header h1 { font-size: 18px; margin: 0; flex: 1; text-align: center; }
+.back-link {
+  color: var(--muted); text-decoration: none; font-size: 0.8rem;
+  font-weight: 500; transition: color 0.2s; white-space: nowrap;
+}
+.back-link:hover { color: var(--accent); }
+.menu-toggle {
+  background: transparent; color: var(--muted); font-size: 18px;
+  font-weight: 400; min-width: unset; min-height: unset;
+  padding: 4px 6px; line-height: 1; border: none; cursor: pointer; border-radius: 4px;
+}
+.menu-toggle:hover { color: var(--accent); }
+.controls { margin-top: 6px; display: none; gap: 8px; }
+.controls.open { display: flex; }
+.controls button { flex: 1; }
+
+/* ── Buttons ── */
+button {
+  background: var(--accent); border: none; color: var(--bg);
+  border-radius: 6px; font-weight: 600; cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s;
+  touch-action: manipulation; min-width: 48px; min-height: 36px;
+  padding: 0 14px; font-size: 14px;
+}
+button:hover:not(:disabled) { opacity: 0.85; }
+button:active:not(:disabled) { transform: scale(0.95); box-shadow: 0 2px 8px rgba(56,189,248,0.4); }
+button.secondary { background: var(--line); color: var(--text); }
+button.secondary:hover:not(:disabled) { background: var(--line-hover); opacity: 1; }
+button.secondary:active:not(:disabled) { box-shadow: 0 2px 8px rgba(51,65,85,0.4); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Setup ── */
+.setup-wrap {
+  flex: 1;
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 32px 16px;
+}
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 28px 24px; width: 100%; max-width: 380px;
+}
+.card h2 { margin: 0 0 20px; font-size: 1.1rem; color: var(--text-accent); }
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.field input {
+  width: 100%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; color: var(--text); font-size: 15px;
+  padding: 9px 12px; outline: none; transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--accent); }
+.setup-actions { display: flex; gap: 8px; margin-top: 22px; }
+.setup-actions button { flex: 1; height: 42px; }
+
+/* ── Game layout ── */
+#game {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px; padding: 12px; align-items: start;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#game.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Board column ── */
+.board-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: var(--board-size);
+  aspect-ratio: 1;
+  border: 2px solid var(--line);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Board status strip ── */
+.board-status {
+  width: var(--board-size);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 14px;
+  font-size: 0.85rem; color: var(--muted); line-height: 1.5; text-align: center;
+}
+.board-status strong { color: var(--accent); display: block; font-size: 0.9rem; }
+.board-status .jump-notice {
+  color: var(--danger); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
+}
+
+/* ── Board quick-actions (mobile only) ── */
+.board-actions { display: flex; gap: 8px; width: var(--board-size); }
+@media (min-width: 640px) { .board-actions { display: none; } }
+
+/* ── Cells ── */
+.cell { position: relative; display: flex; align-items: center; justify-content: center; }
+.cell.light { background: var(--board-light); }
+.cell.dark  { background: var(--board-dark); }
+.cell.selectable-cell { cursor: pointer; }
+.cell.valid-target { cursor: pointer; }
+.cell.valid-target::after {
+  content: '';
+  display: block;
+  width: 46%; height: 46%;
+  border: 2.5px solid rgba(56,189,248,0.78);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cell.valid-target:hover { background: rgba(56,189,248,0.12); }
+.cell.dark.valid-target:hover { background: #6d6153; }
+
+/* ── Pieces ── */
+@keyframes pieceSelect {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  45%  { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.piece {
+  width: 85%; height: 85%;
+  border-radius: 50%;
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  cursor: default;
+}
+.piece.selectable { cursor: pointer; }
+.piece.selectable:hover { transform: translate(-50%, -50%) scale(1.08); }
+
+.piece.player0 {
+  background: radial-gradient(circle at 35% 35%, #c53030, var(--piece-r));
+  border: 3px solid var(--piece-r-rim);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+.piece.player1 {
+  background: radial-gradient(circle at 35% 35%, #fff9f0, var(--piece-w));
+  border: 3px solid var(--piece-w-rim);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.piece.selected-piece.player0 {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+              0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+.piece.selected-piece.player1 {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+              0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.piece.bounce { animation: pieceSelect 180ms ease-out forwards; }
+
+.piece.king::after {
+  content: '♛';
+  position: absolute;
+  font-size: 0.7em;
+  line-height: 1;
+}
+.piece.player0.king::after { color: #ffd700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+.piece.player1.king::after { color: #6b2d0e; }
+
+/* ── Side panel ── */
+.side-panel { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+
+.player-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 14px 16px;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+.player-card.active { border-color: var(--accent); background: rgba(56,189,248,0.07); }
+.player-card.inactive { opacity: 0.55; }
+.player-card .p-name {
+  font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.player-card .p-piece {
+  display: inline-block; width: 14px; height: 14px;
+  border-radius: 50%; vertical-align: middle; margin-right: 5px;
+}
+.player-card .p-piece.p0 { background: var(--piece-r); border: 1px solid var(--piece-r-rim); }
+.player-card .p-piece.p1 { background: var(--piece-w); border: 1px solid var(--piece-w-rim); }
+.p-stats { display: flex; gap: 10px; font-size: 0.78rem; color: var(--muted); }
+.p-stats span { color: var(--text); font-weight: 600; }
+.p-turn {
+  font-size: 0.72rem; color: var(--accent); font-weight: 600;
+  margin-top: 5px; visibility: hidden; letter-spacing: 0.02em;
+}
+.player-card.active .p-turn { visibility: visible; }
+
+.panel-actions { display: flex; flex-direction: column; gap: 8px; }
+.panel-actions button { width: 100%; }
+@media (max-width: 639px) { .panel-actions { display: none; } }
+
+/* ── Modal ── */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(2,6,23,0.8); z-index: 100;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 28px 24px;
+  width: 100%; max-width: 360px; text-align: center;
+}
+.modal h2 { margin: 0 0 6px; font-size: 1.4rem; }
+.modal .modal-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
+.modal-stats {
+  background: var(--panel); border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 20px;
+  text-align: left; font-size: 0.88rem;
+}
+.modal-stats .stat-row {
+  display: flex; justify-content: space-between;
+  padding: 4px 0; border-bottom: 1px solid var(--line);
+}
+.modal-stats .stat-row:last-child { border-bottom: none; }
+.modal-stats .stat-val { font-weight: 700; color: var(--text-accent); }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1; height: 42px; }
+
+/* ── Utilities ── */
+.hidden { display: none !important; }
+
+/* ── Responsive ── */
+@media (max-width: 639px) {
+  :root { --board-size: min(420px, calc(100vw - 16px)); }
+  #game { grid-template-columns: 1fr; padding: 8px; }
+  .side-panel { min-width: unset; }
+  .board-wrap { order: -1; }
+}
+@media (max-width: 380px) {
+  :root { --board-size: calc(100vw - 16px); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <a class="back-link" href="/">← Tools</a>
+    <h1>Checkers</h1>
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+  <div class="controls" id="controls">
+    <button class="secondary" onclick="saveGame()" id="btn-save">Save</button>
+    <button class="secondary" onclick="loadGame()">Load</button>
+    <button class="secondary" onclick="confirmNewGame()">New Game</button>
+  </div>
+</header>
+
+<!-- Setup Phase -->
+<div id="setup">
+  <div class="setup-wrap">
+    <div class="card">
+      <h2>New Game</h2>
+      <div class="field">
+        <label>Dark pieces — moves first</label>
+        <input id="name0" type="text" maxlength="20" placeholder="Player 1" />
+      </div>
+      <div class="field">
+        <label>Light pieces</label>
+        <input id="name1" type="text" maxlength="20" placeholder="Player 2" />
+      </div>
+      <div class="setup-actions">
+        <button onclick="startGame()">Start Game</button>
+        <button class="secondary" onclick="loadGame()">Load Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Playing Phase -->
+<div id="game" class="hidden">
+  <div class="board-wrap">
+    <div id="board" class="board"></div>
+    <div id="board-status" class="board-status"></div>
+    <div class="board-actions">
+      <button class="secondary" onclick="saveGame()">💾 Save</button>
+      <button class="secondary" onclick="confirmNewGame()">↺ New</button>
+    </div>
+  </div>
+  <div class="side-panel">
+    <div class="player-card" id="card0">
+      <div class="p-name"><span class="p-piece p0"></span><span id="pname0">Player 1</span></div>
+      <div class="p-stats">
+        <span>Pieces: <span id="prem0">12</span></span>
+        <span>Captured: <span id="pcap0">0</span></span>
+      </div>
+      <div class="p-turn">▶ Your turn</div>
+    </div>
+    <div class="player-card" id="card1">
+      <div class="p-name"><span class="p-piece p1"></span><span id="pname1">Player 2</span></div>
+      <div class="p-stats">
+        <span>Pieces: <span id="prem1">12</span></span>
+        <span>Captured: <span id="pcap1">0</span></span>
+      </div>
+      <div class="p-turn">▶ Your turn</div>
+    </div>
+    <div class="panel-actions">
+      <button class="secondary" onclick="saveGame()">Save Game</button>
+      <button class="secondary" onclick="confirmNewGame()">New Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Winner Modal -->
+<div class="modal-backdrop" id="winnerModal">
+  <div class="modal">
+    <h2 id="winnerTitle"></h2>
+    <div class="modal-sub" id="winnerSub"></div>
+    <div class="modal-stats" id="winnerStats"></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('winnerModal')">Close</button>
+      <button onclick="newGame()">New Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm new game modal -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <h2>New Game?</h2>
+    <div class="modal-sub">Current game progress will be lost.</div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('confirmModal')">Cancel</button>
+      <button onclick="closeModal('confirmModal'); newGame()">Start Over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────
+
+const DIRS_FWD = [
+  [[-1,-1],[-1,1]],   // player 0 moves up (decreasing row)
+  [[ 1,-1],[ 1,1]]    // player 1 moves down (increasing row)
+];
+const DIRS_KING = [[-1,-1],[-1,1],[1,-1],[1,1]];
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+let gs;
+
+// ── Init ───────────────────────────────────────────────────────────────────
+
+function buildInitialState(n0, n1) {
+  return {
+    version: '1.0',
+    players: [
+      { name: n0, captured: 0 },
+      { name: n1, captured: 0 }
+    ],
+    board: initBoard(),
+    currentPlayer: 0,
+    phase: 'playing',
+    winner: null,
+    selectedCell: null,
+    validMoves: [],
+    mustJump: false,
+    midJump: null,
+    justSelected: null,
+    savedAt: null
+  };
+}
+
+function initBoard() {
+  const b = new Array(64).fill(null);
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      if ((r + c) % 2 === 1) {
+        if (r < 3) b[r*8+c] = { player: 1, king: false };
+        else if (r > 4) b[r*8+c] = { player: 0, king: false };
+      }
+    }
+  }
+  return b;
+}
+
+function startGame() {
+  const n0 = (document.getElementById('name0').value.trim() || 'Player 1').slice(0,20);
+  const n1 = (document.getElementById('name1').value.trim() || 'Player 2').slice(0,20);
+  gs = buildInitialState(n0, n1);
+  gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
+  showPhase('playing');
+  render();
+}
+
+function newGame() {
+  showPhase('setup');
+}
+
+// ── Board Logic ────────────────────────────────────────────────────────────
+
+function inBounds(r, c) {
+  return r >= 0 && r < 8 && c >= 0 && c < 8;
+}
+
+function getMoves(idx, board, player, jumpsOnly = false) {
+  const piece = board[idx];
+  if (!piece || piece.player !== player) return [];
+  const row = Math.floor(idx / 8), col = idx % 8;
+  const dirs = piece.king ? DIRS_KING : DIRS_FWD[player];
+  const jumps = [], walks = [];
+
+  for (const [dr, dc] of dirs) {
+    const mr = row + dr, mc = col + dc;
+    const lr = row + 2*dr, lc = col + 2*dc;
+    if (inBounds(mr, mc)) {
+      const mid = board[mr*8+mc];
+      if (mid && mid.player !== player && inBounds(lr, lc) && !board[lr*8+lc]) {
+        jumps.push({ from: idx, to: lr*8+lc, captures: [mr*8+mc] });
+      }
+    }
+    if (!jumpsOnly && inBounds(mr, mc) && !board[mr*8+mc]) {
+      walks.push({ from: idx, to: mr*8+mc, captures: [] });
+    }
+  }
+  return jumpsOnly ? jumps : (jumps.length ? jumps : walks);
+}
+
+function computeMustJump(board, player) {
+  return board.some((c, i) =>
+    c && c.player === player && getMoves(i, board, player, true).length > 0
+  );
+}
+
+function executeMove(move) {
+  const piece = { ...gs.board[move.from] };
+  const wasKing = piece.king;
+  gs.board[move.from] = null;
+  for (const ci of move.captures) {
+    gs.board[ci] = null;
+    gs.players[gs.currentPlayer].captured++;
+  }
+  if (move.captures.length) vibrate(30);
+  const landRow = Math.floor(move.to / 8);
+  if (!piece.king) {
+    if ((gs.currentPlayer === 0 && landRow === 0) ||
+        (gs.currentPlayer === 1 && landRow === 7)) {
+      piece.king = true;
+    }
+  }
+  gs.board[move.to] = piece;
+  const justKinged = !wasKing && piece.king;
+  if (justKinged) vibrate([15, 10, 15]);
+  return justKinged;
+}
+
+// ── Interaction ────────────────────────────────────────────────────────────
+
+function handleCellClick(idx) {
+  if (gs.phase !== 'playing') return;
+  const cell = gs.board[idx];
+
+  // Clicking a valid move target
+  if (gs.validMoves.some(m => m.to === idx)) {
+    const move = gs.validMoves.find(m => m.to === idx);
+    const justKinged = executeMove(move);
+    gs.selectedCell = null;
+    gs.validMoves = [];
+    gs.justSelected = null;
+
+    if (move.captures.length && !justKinged) {
+      const furtherJumps = getMoves(move.to, gs.board, gs.currentPlayer, true);
+      if (furtherJumps.length) {
+        gs.midJump = move.to;
+        gs.selectedCell = move.to;
+        gs.validMoves = furtherJumps;
+        gs.justSelected = move.to;
+        render();
+        return;
+      }
+    }
+
+    gs.midJump = null;
+    endTurn();
+    return;
+  }
+
+  // Locked in multi-jump — ignore everything except valid targets (handled above)
+  if (gs.midJump !== null) {
+    render();
+    return;
+  }
+
+  // Selecting a piece
+  if (cell && cell.player === gs.currentPlayer) {
+    if (gs.mustJump) {
+      const jumps = getMoves(idx, gs.board, gs.currentPlayer, true);
+      if (!jumps.length) { render(); return; }
+      gs.selectedCell = idx;
+      gs.validMoves = jumps;
+    } else {
+      const moves = getMoves(idx, gs.board, gs.currentPlayer);
+      if (!moves.length) { render(); return; }
+      gs.selectedCell = idx;
+      gs.validMoves = moves;
+    }
+    gs.justSelected = idx;
+    vibrate(10);
+    render();
+    return;
+  }
+
+  // Clicking empty or opponent — deselect
+  gs.selectedCell = null;
+  gs.validMoves = [];
+  gs.justSelected = null;
+  render();
+}
+
+// ── Turn Management ────────────────────────────────────────────────────────
+
+function endTurn() {
+  gs.currentPlayer = 1 - gs.currentPlayer;
+  gs.selectedCell = null;
+  gs.validMoves = [];
+  gs.midJump = null;
+  gs.justSelected = null;
+
+  if (checkWin()) {
+    gs.phase = 'gameover';
+    render();
+    showWinnerModal();
+    return;
+  }
+
+  gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
+  render();
+}
+
+function checkWin() {
+  // gs.currentPlayer is now the player who must move next — check them
+  const p = gs.currentPlayer;
+  const hasPieces = gs.board.some(c => c && c.player === p);
+  if (!hasPieces) { gs.winner = 1 - p; return true; }
+  const hasMoves = gs.board.some((c, i) =>
+    c && c.player === p && getMoves(i, gs.board, p).length > 0
+  );
+  if (!hasMoves) { gs.winner = 1 - p; return true; }
+  return false;
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+
+function render() {
+  renderBoard();
+  renderStatus();
+  renderPlayerCards();
+}
+
+function renderBoard() {
+  const el = document.getElementById('board');
+  el.innerHTML = '';
+  const validTargets = new Set(gs.validMoves.map(m => m.to));
+  const justSelected = gs.justSelected;
+  gs.justSelected = null;
+
+  for (let i = 0; i < 64; i++) {
+    const row = Math.floor(i / 8), col = i % 8;
+    const isDark = (row + col) % 2 === 1;
+    const div = document.createElement('div');
+    div.className = 'cell ' + (isDark ? 'dark' : 'light');
+
+    if (validTargets.has(i)) {
+      div.classList.add('valid-target');
+      div.addEventListener('click', () => handleCellClick(i));
+    }
+
+    const cell = gs.board[i];
+    if (cell) {
+      const piece = document.createElement('div');
+      piece.className = 'piece player' + cell.player + (cell.king ? ' king' : '');
+
+      const isSelected = gs.selectedCell === i || gs.midJump === i;
+      if (isSelected) {
+        piece.classList.add('selected-piece');
+        if (i === justSelected) piece.classList.add('bounce');
+      }
+
+      const isCurrentPlayer = cell.player === gs.currentPlayer;
+      const canSelect = gs.phase === 'playing' && isCurrentPlayer && gs.midJump === null;
+      const hasJump = gs.mustJump ? getMoves(i, gs.board, cell.player, true).length > 0 : true;
+
+      if (canSelect && hasJump) {
+        piece.classList.add('selectable');
+        div.classList.add('selectable-cell');
+        div.addEventListener('click', () => handleCellClick(i));
+      }
+
+      div.appendChild(piece);
+    }
+
+    el.appendChild(div);
+  }
+}
+
+function renderStatus() {
+  const el = document.getElementById('board-status');
+  if (gs.phase === 'gameover') {
+    el.innerHTML = `<strong>Game Over</strong><span style="color:var(--success)">${esc(gs.players[gs.winner].name)} wins!</span>`;
+    return;
+  }
+  const name = gs.players[gs.currentPlayer].name;
+  let html = `<strong>${esc(name)}'s turn</strong>`;
+  if (gs.midJump !== null) {
+    html += `<div class="jump-notice">Continue jumping!</div>`;
+  } else if (gs.mustJump) {
+    html += `<div class="jump-notice">Jump required!</div>`;
+  } else if (gs.selectedCell !== null) {
+    html += `<span style="color:var(--muted)">Select a destination</span>`;
+  } else {
+    html += `<span style="color:var(--muted)">Select a piece</span>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderPlayerCards() {
+  for (let p = 0; p < 2; p++) {
+    const remaining = gs.board.filter(c => c && c.player === p).length;
+    document.getElementById('pname' + p).textContent = gs.players[p].name;
+    document.getElementById('pcap' + p).textContent = gs.players[p].captured;
+    document.getElementById('prem' + p).textContent = remaining;
+    const isActive = gs.phase === 'playing' && gs.currentPlayer === p;
+    document.getElementById('card' + p).classList.toggle('active', isActive);
+    document.getElementById('card' + p).classList.toggle('inactive', !isActive && gs.phase === 'playing');
+  }
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+
+function showWinnerModal() {
+  const winner = gs.players[gs.winner];
+  const loser  = gs.players[1 - gs.winner];
+  document.getElementById('winnerTitle').textContent = winner.name + ' wins!';
+  document.getElementById('winnerSub').textContent = 'Congratulations!';
+  const stats = document.getElementById('winnerStats');
+  stats.innerHTML = `
+    <div class="stat-row"><span>${esc(winner.name)} captured</span><span class="stat-val">${winner.captured}</span></div>
+    <div class="stat-row"><span>${esc(loser.name)} captured</span><span class="stat-val">${loser.captured}</span></div>
+  `;
+  document.getElementById('winnerModal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function confirmNewGame() {
+  if (gs && gs.phase === 'playing') {
+    document.getElementById('confirmModal').classList.add('show');
+  } else {
+    newGame();
+  }
+}
+
+// ── Phase Switching ────────────────────────────────────────────────────────
+
+function showPhase(phase) {
+  document.getElementById('setup').classList.toggle('hidden', phase !== 'setup');
+  const gameEl = document.getElementById('game');
+  gameEl.classList.toggle('hidden', phase === 'setup');
+  if (phase === 'playing') {
+    gameEl.classList.remove('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => gameEl.classList.add('visible')));
+  }
+  document.getElementById('btn-save').disabled = phase === 'setup';
+  toggleMenu(false);
+}
+
+// ── Save / Load ────────────────────────────────────────────────────────────
+
+function saveGame() {
+  if (!gs || gs.phase === 'setup') return;
+  gs.savedAt = new Date().toISOString();
+  const data = { version: '1.0', savedAt: gs.savedAt, gameState: gs };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const fname = 'checkers-save.json';
+  try {
+    if (navigator.share && navigator.canShare &&
+        navigator.canShare({ files: [new File([blob], fname, { type: 'application/json' })] })) {
+      navigator.share({ title: fname, files: [new File([blob], fname, { type: 'application/json' })] });
+      return;
+    }
+  } catch(_) {}
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 0);
+}
+
+function loadGame() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json,.json';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const data = JSON.parse(r.result);
+        const loaded = data.version ? data.gameState : data;
+        if (!loaded || !Array.isArray(loaded.board) || loaded.board.length !== 64) {
+          throw new Error('Invalid save file structure');
+        }
+        gs = loaded;
+        gs.selectedCell = null;
+        gs.validMoves = [];
+        gs.midJump = null;
+        gs.justSelected = null;
+        gs.mustJump = false;
+        if (gs.phase === 'playing') {
+          gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
+          showPhase('playing');
+          render();
+        } else if (gs.phase === 'gameover' && (gs.winner === 0 || gs.winner === 1)) {
+          showPhase('playing');
+          render();
+          showWinnerModal();
+        } else {
+          showPhase('setup');
+        }
+      } catch(err) {
+        alert('Could not load save file: ' + err.message);
+      }
+    };
+    r.readAsText(file);
+  };
+  inp.click();
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+
+function vibrate(pattern) {
+  try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(_) {}
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleMenu(force) {
+  const c = document.getElementById('controls');
+  if (force === false) { c.classList.remove('open'); return; }
+  c.classList.toggle('open');
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────────────
+
+document.getElementById('btn-save').disabled = true;
+
+['name0','name1'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') startGame();
+  });
+});
+</script>
+</body>
+</html>
