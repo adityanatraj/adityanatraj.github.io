@@ -590,6 +590,8 @@
 					})),
 					rollsLeft: 3,
 					gameEnded: false,
+					startedAt: new Date().toISOString(),
+					endedAt: null,
 				};
 				render();
 			}
@@ -785,6 +787,7 @@
 				);
 				if (allScored) {
 					gameState.gameEnded = true;
+					gameState.endedAt = new Date().toISOString();
 					showWinnerModal();
 				}
 			}
@@ -926,7 +929,10 @@
 			function saveGame() {
 				// Create a comprehensive save object with both game state and statistics
 				const saveData = {
-					version: "1.1", // Version to track save file format
+					version: "1.2",
+					startedAt: gameState.startedAt ?? null,
+					savedAt: new Date().toISOString(),
+					endedAt: gameState.endedAt ?? null,
 					gameState: gameState,
 					statistics: getStats() || {
 						gamesPlayed: 0,
@@ -934,7 +940,6 @@
 						playerScores: {},
 						highestScore: { name: "", score: 0 },
 					},
-					savedAt: new Date().toISOString(),
 				};
 
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {

@@ -313,7 +313,9 @@ function startGame() {
     secret,
     guessed: [],
     wrong: 0,
-    over: false
+    over: false,
+    startedAt: new Date().toISOString(),
+    endedAt: null
   };
 
   document.getElementById('secretInput').value = '';
@@ -342,10 +344,16 @@ function guess(letter) {
   state.guessed.push(letter);
   if (!state.secret.includes(letter)) {
     state.wrong++;
-    if (state.wrong >= MAX_WRONG) state.over = true;
+    if (state.wrong >= MAX_WRONG) {
+      state.over = true;
+      state.endedAt = new Date().toISOString();
+    }
   } else {
     const won = [...state.secret].every(c => c === ' ' || state.guessed.includes(c));
-    if (won) state.over = true;
+    if (won) {
+      state.over = true;
+      state.endedAt = new Date().toISOString();
+    }
   }
   render();
 }
@@ -381,7 +389,15 @@ function render() {
 
 function saveGame() {
   if (!state) return;
-  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  state.savedAt = new Date().toISOString();
+  const data = {
+    version: '1.1',
+    startedAt: state.startedAt,
+    savedAt: state.savedAt,
+    endedAt: state.endedAt,
+    gameState: state
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'hangman-game.json';
@@ -396,7 +412,8 @@ function loadGame() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      state = JSON.parse(reader.result);
+      const data = JSON.parse(reader.result);
+      state = data.version ? data.gameState : data;
       document.getElementById('setup').classList.add('hidden');
       document.getElementById('game').classList.remove('hidden');
       buildKeyboard();
