@@ -141,9 +141,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   color: var(--danger); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
 }
 
-/* ── Board quick-actions (mobile only) ── */
-.board-actions { display: flex; gap: 8px; width: var(--board-size); }
-@media (min-width: 640px) { .board-actions { display: none; } }
 
 /* ── Cells ── */
 .cell { position: relative; display: flex; align-items: center; justify-content: center; }
@@ -240,7 +237,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .panel-actions { display: flex; flex-direction: column; gap: 8px; }
 .panel-actions button { width: 100%; }
-@media (max-width: 639px) { .panel-actions { display: none; } }
 
 /* ── Modal ── */
 .modal-backdrop {
@@ -326,10 +322,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   <div class="board-wrap">
     <div id="board" class="board"></div>
     <div id="board-status" class="board-status"></div>
-    <div class="board-actions">
-      <button class="secondary" onclick="saveGame()">💾 Save</button>
-      <button class="secondary" onclick="confirmNewGame()">↺ New</button>
-    </div>
   </div>
   <div class="side-panel">
     <div class="player-card" id="card0">
