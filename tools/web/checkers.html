@@ -224,7 +224,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   pointer-events: none;
 }
 .cell.valid-target:hover { background: rgba(56,189,248,0.12); }
-.cell.dark.valid-target:hover { background: color-mix(in srgb, var(--board-dark) 80%, var(--accent) 20%); }
+.cell.dark.valid-target:hover { background: #6d6153; }
 
 /* ── Pieces ── */
 .piece {
@@ -539,7 +539,7 @@ function startGame() {
   const n0 = (document.getElementById('name0').value.trim() || 'Player 1').slice(0,20);
   const n1 = (document.getElementById('name1').value.trim() || 'Player 2').slice(0,20);
   gs = buildInitialState(n0, n1);
-  gs.mustJump = computeMustJump();
+  gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
   showPhase('playing');
   render();
 }
@@ -554,7 +554,7 @@ function inBounds(r, c) {
   return r >= 0 && r < 8 && c >= 0 && c < 8;
 }
 
-function getValidMoves(idx, board, player) {
+function getMoves(idx, board, player, jumpsOnly = false) {
   const piece = board[idx];
   if (!piece || piece.player !== player) return [];
   const row = Math.floor(idx / 8), col = idx % 8;
@@ -570,40 +570,22 @@ function getValidMoves(idx, board, player) {
         jumps.push({ from: idx, to: lr*8+lc, captures: [mr*8+mc] });
       }
     }
-    if (inBounds(mr, mc) && !board[mr*8+mc]) {
+    if (!jumpsOnly && inBounds(mr, mc) && !board[mr*8+mc]) {
       walks.push({ from: idx, to: mr*8+mc, captures: [] });
     }
   }
-  return jumps.length ? jumps : walks;
+  return jumpsOnly ? jumps : (jumps.length ? jumps : walks);
 }
 
-function getJumpsFrom(idx, board, player) {
-  const piece = board[idx];
-  if (!piece || piece.player !== player) return [];
-  const row = Math.floor(idx / 8), col = idx % 8;
-  const dirs = piece.king ? DIRS_KING : DIRS_FWD[player];
-  const jumps = [];
-  for (const [dr, dc] of dirs) {
-    const mr = row + dr, mc = col + dc;
-    const lr = row + 2*dr, lc = col + 2*dc;
-    if (inBounds(mr, mc) && inBounds(lr, lc)) {
-      const mid = board[mr*8+mc];
-      if (mid && mid.player !== player && !board[lr*8+lc]) {
-        jumps.push({ from: idx, to: lr*8+lc, captures: [mr*8+mc] });
-      }
-    }
-  }
-  return jumps;
-}
-
-function computeMustJump() {
-  return gs.board.some((c, i) =>
-    c && c.player === gs.currentPlayer && getJumpsFrom(i, gs.board, gs.currentPlayer).length > 0
+function computeMustJump(board, player) {
+  return board.some((c, i) =>
+    c && c.player === player && getMoves(i, board, player, true).length > 0
   );
 }
 
 function executeMove(move) {
   const piece = { ...gs.board[move.from] };
+  const wasKing = piece.king;
   gs.board[move.from] = null;
   for (const ci of move.captures) {
     gs.board[ci] = null;
@@ -617,10 +599,7 @@ function executeMove(move) {
     }
   }
   gs.board[move.to] = piece;
-  return piece.king && (
-    (gs.currentPlayer === 0 && landRow === 0) ||
-    (gs.currentPlayer === 1 && landRow === 7)
-  );
+  return !wasKing && piece.king;
 }
 
 // ── Interaction ────────────────────────────────────────────────────────────
@@ -638,7 +617,7 @@ function handleCellClick(idx) {
 
     // Check for multi-jump continuation (only if piece didn't just king)
     if (move.captures.length && !justKinged) {
-      const furtherJumps = getJumpsFrom(move.to, gs.board, gs.currentPlayer);
+      const furtherJumps = getMoves(move.to, gs.board, gs.currentPlayer, true);
       if (furtherJumps.length) {
         gs.midJump = move.to;
         gs.selectedCell = move.to;
@@ -653,11 +632,8 @@ function handleCellClick(idx) {
     return;
   }
 
-  // Locked in multi-jump — only allow clicking the locked piece
+  // Locked in multi-jump — ignore everything except valid targets (handled above)
   if (gs.midJump !== null) {
-    if (idx === gs.midJump) {
-      // deselect / reselect — same piece, do nothing
-    }
     render();
     return;
   }
@@ -665,12 +641,12 @@ function handleCellClick(idx) {
   // Selecting a piece
   if (cell && cell.player === gs.currentPlayer) {
     if (gs.mustJump) {
-      const jumps = getJumpsFrom(idx, gs.board, gs.currentPlayer);
+      const jumps = getMoves(idx, gs.board, gs.currentPlayer, true);
       if (!jumps.length) { render(); return; } // must pick a piece that can jump
       gs.selectedCell = idx;
       gs.validMoves = jumps;
     } else {
-      const moves = getValidMoves(idx, gs.board, gs.currentPlayer);
+      const moves = getMoves(idx, gs.board, gs.currentPlayer);
       if (!moves.length) { render(); return; }
       gs.selectedCell = idx;
       gs.validMoves = moves;
@@ -700,7 +676,7 @@ function endTurn() {
     return;
   }
 
-  gs.mustJump = computeMustJump();
+  gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
   render();
 }
 
@@ -709,7 +685,7 @@ function checkWin() {
   const hasPieces = gs.board.some(c => c && c.player === next);
   if (!hasPieces) { gs.winner = gs.currentPlayer; return true; }
   const hasMoves = gs.board.some((c, i) =>
-    c && c.player === next && getValidMoves(i, gs.board, next).length > 0
+    c && c.player === next && getMoves(i, gs.board, next).length > 0
   );
   if (!hasMoves) { gs.winner = gs.currentPlayer; return true; }
   return false;
@@ -749,7 +725,7 @@ function renderBoard() {
 
       const isCurrentPlayer = cell.player === gs.currentPlayer;
       const canSelect = gs.phase === 'playing' && isCurrentPlayer && gs.midJump === null;
-      const hasJump = gs.mustJump ? getJumpsFrom(i, gs.board, cell.player).length > 0 : true;
+      const hasJump = gs.mustJump ? getMoves(i, gs.board, cell.player, true).length > 0 : true;
       const movable = canSelect && hasJump;
 
       if (movable) {
@@ -867,14 +843,16 @@ function loadGame() {
       try {
         const data = JSON.parse(r.result);
         const loaded = data.version ? data.gameState : data;
-        // Sanitise and restore
+        if (!loaded || !Array.isArray(loaded.board) || loaded.board.length !== 64) {
+          throw new Error('Invalid save file structure');
+        }
         gs = loaded;
         gs.selectedCell = null;
         gs.validMoves = [];
         gs.midJump = null;
         gs.mustJump = false;
         if (gs.phase === 'playing') {
-          gs.mustJump = computeMustJump();
+          gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
           showPhase('playing');
           render();
         } else if (gs.phase === 'gameover') {
