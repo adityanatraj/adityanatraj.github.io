@@ -24,16 +24,19 @@
   --piece-r-rim: #7f1d1d;
   --piece-w: #f0ebe0;
   --piece-w-rim: #c8b89a;
+  --board-size: min(480px, calc(100vw - 200px));
 }
 
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
+html, body { margin: 0; min-height: 100vh; }
+
+body {
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Header ── */
@@ -45,181 +48,114 @@ header {
   gap: 10px;
   border-bottom: 1px solid var(--line);
 }
-
-.header-top {
-  display: flex;
-  align-items: center;
-}
-
-header h1 {
-  font-size: 18px;
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
+.header-top { display: flex; align-items: center; }
+header h1 { font-size: 18px; margin: 0; flex: 1; text-align: center; }
 .back-link {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: color 0.2s;
-  white-space: nowrap;
+  color: var(--muted); text-decoration: none; font-size: 0.8rem;
+  font-weight: 500; transition: color 0.2s; white-space: nowrap;
 }
 .back-link:hover { color: var(--accent); }
-
 .menu-toggle {
-  background: transparent;
-  color: var(--muted);
-  font-size: 18px;
-  font-weight: 400;
-  min-width: unset;
-  min-height: unset;
-  padding: 4px 6px;
-  line-height: 1;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
+  background: transparent; color: var(--muted); font-size: 18px;
+  font-weight: 400; min-width: unset; min-height: unset;
+  padding: 4px 6px; line-height: 1; border: none; cursor: pointer; border-radius: 4px;
 }
 .menu-toggle:hover { color: var(--accent); }
-
-.controls {
-  margin-top: 6px;
-  display: none;
-  gap: 8px;
-}
+.controls { margin-top: 6px; display: none; gap: 8px; }
 .controls.open { display: flex; }
 .controls button { flex: 1; }
 
 /* ── Buttons ── */
 button {
-  background: var(--accent);
-  border: none;
-  color: var(--bg);
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+  background: var(--accent); border: none; color: var(--bg);
+  border-radius: 6px; font-weight: 600; cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s;
-  touch-action: manipulation;
-  min-width: 48px;
-  min-height: 36px;
-  padding: 0 14px;
-  font-size: 14px;
+  touch-action: manipulation; min-width: 48px; min-height: 36px;
+  padding: 0 14px; font-size: 14px;
 }
 button:hover:not(:disabled) { opacity: 0.85; }
-button:active:not(:disabled) {
-  transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(56,189,248,0.4);
-}
-button.secondary {
-  background: var(--line);
-  color: var(--text);
-}
+button:active:not(:disabled) { transform: scale(0.95); box-shadow: 0 2px 8px rgba(56,189,248,0.4); }
+button.secondary { background: var(--line); color: var(--text); }
 button.secondary:hover:not(:disabled) { background: var(--line-hover); opacity: 1; }
 button.secondary:active:not(:disabled) { box-shadow: 0 2px 8px rgba(51,65,85,0.4); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* ── Setup card ── */
+/* ── Setup ── */
 .setup-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex: 1;
+  display: flex; justify-content: center; align-items: flex-start;
   padding: 32px 16px;
-  min-height: calc(100vh - 90px);
 }
-
 .card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 380px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 28px 24px; width: 100%; max-width: 380px;
 }
-
-.card h2 {
-  margin: 0 0 20px;
-  font-size: 1.1rem;
-  color: var(--text-accent);
-}
-
-.field {
-  margin-bottom: 14px;
-}
+.card h2 { margin: 0 0 20px; font-size: 1.1rem; color: var(--text-accent); }
+.field { margin-bottom: 14px; }
 .field label {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin-bottom: 5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  display: block; font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
 }
 .field input {
-  width: 100%;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 15px;
-  padding: 9px 12px;
-  outline: none;
-  transition: border-color 0.2s;
+  width: 100%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; color: var(--text); font-size: 15px;
+  padding: 9px 12px; outline: none; transition: border-color 0.2s;
 }
 .field input:focus { border-color: var(--accent); }
-
-.setup-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 22px;
-}
+.setup-actions { display: flex; gap: 8px; margin-top: 22px; }
 .setup-actions button { flex: 1; height: 42px; }
 
 /* ── Game layout ── */
 #game {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 12px;
-  padding: 12px;
-  align-items: start;
+  gap: 12px; padding: 12px; align-items: start;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
+#game.visible { opacity: 1; transform: translateY(0); }
 
-/* ── Board ── */
-.board-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
+/* ── Board column ── */
+.board-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
 .board {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  width: min(480px, calc(100vw - 200px));
+  width: var(--board-size);
   aspect-ratio: 1;
   border: 2px solid var(--line);
-  border-radius: 4px;
   overflow: hidden;
   user-select: none;
 }
 
-.cell {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── Board status strip ── */
+.board-status {
+  width: var(--board-size);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 14px;
+  font-size: 0.85rem; color: var(--muted); line-height: 1.5; text-align: center;
 }
+.board-status strong { color: var(--accent); display: block; font-size: 0.9rem; }
+.board-status .jump-notice {
+  color: var(--danger); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
+}
+
+/* ── Board quick-actions (mobile only) ── */
+.board-actions { display: flex; gap: 8px; width: var(--board-size); }
+@media (min-width: 640px) { .board-actions { display: none; } }
+
+/* ── Cells ── */
+.cell { position: relative; display: flex; align-items: center; justify-content: center; }
 .cell.light { background: var(--board-light); }
 .cell.dark  { background: var(--board-dark); }
-.cell.selected { box-shadow: inset 0 0 0 3px var(--accent); z-index: 1; }
+.cell.selectable-cell { cursor: pointer; }
 .cell.valid-target { cursor: pointer; }
 .cell.valid-target::after {
   content: '';
   display: block;
-  width: 32%;
-  height: 32%;
-  background: rgba(56,189,248,0.65);
+  width: 46%; height: 46%;
+  border: 2.5px solid rgba(56,189,248,0.78);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -227,26 +163,24 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .cell.dark.valid-target:hover { background: #6d6153; }
 
 /* ── Pieces ── */
+@keyframes pieceSelect {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  45%  { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
 .piece {
-  width: 76%;
-  height: 76%;
+  width: 85%; height: 85%;
   border-radius: 50%;
-  position: absolute;
-  top: 50%; left: 50%;
+  position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1em;
-  transition: transform 0.1s ease;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
   cursor: default;
 }
-.piece.selectable {
-  cursor: pointer;
-}
-.piece.selectable:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-}
+.piece.selectable { cursor: pointer; }
+.piece.selectable:hover { transform: translate(-50%, -50%) scale(1.08); }
+
 .piece.player0 {
   background: radial-gradient(circle at 35% 35%, #c53030, var(--piece-r));
   border: 3px solid var(--piece-r-rim);
@@ -257,129 +191,83 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   border: 3px solid var(--piece-w-rim);
   box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
 }
+.piece.selected-piece.player0 {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+              0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+.piece.selected-piece.player1 {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+              0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.piece.bounce { animation: pieceSelect 180ms ease-out forwards; }
+
 .piece.king::after {
   content: '♛';
   position: absolute;
-  font-size: 0.55em;
+  font-size: 0.7em;
   line-height: 1;
-  color: gold;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
 }
+.piece.player0.king::after { color: #ffd700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+.piece.player1.king::after { color: #6b2d0e; }
 
 /* ── Side panel ── */
-.side-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 160px;
-}
+.side-panel { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
 
 .player-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 14px 16px;
-  transition: border-color 0.2s;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 14px 16px;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
 }
-.player-card.active {
-  border-color: var(--accent);
-}
+.player-card.active { border-color: var(--accent); background: rgba(56,189,248,0.07); }
+.player-card.inactive { opacity: 0.55; }
 .player-card .p-name {
-  font-weight: 700;
-  font-size: 0.95rem;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .player-card .p-piece {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  vertical-align: middle;
-  margin-right: 5px;
+  display: inline-block; width: 14px; height: 14px;
+  border-radius: 50%; vertical-align: middle; margin-right: 5px;
 }
 .player-card .p-piece.p0 { background: var(--piece-r); border: 1px solid var(--piece-r-rim); }
 .player-card .p-piece.p1 { background: var(--piece-w); border: 1px solid var(--piece-w-rim); }
-.player-card .p-captures {
-  font-size: 0.78rem;
-  color: var(--muted);
+.p-stats { display: flex; gap: 10px; font-size: 0.78rem; color: var(--muted); }
+.p-stats span { color: var(--text); font-weight: 600; }
+.p-turn {
+  font-size: 0.72rem; color: var(--accent); font-weight: 600;
+  margin-top: 5px; visibility: hidden; letter-spacing: 0.02em;
 }
-.player-card .p-captures span {
-  color: var(--text);
-  font-weight: 600;
-}
+.player-card.active .p-turn { visibility: visible; }
 
-.status-bar {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.4;
-}
-.status-bar strong {
-  color: var(--accent);
-  display: block;
-  font-size: 0.9rem;
-}
-.status-bar .jump-notice {
-  color: var(--danger);
-  font-weight: 600;
-  margin-top: 3px;
-}
-
-.panel-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.panel-actions { display: flex; flex-direction: column; gap: 8px; }
 .panel-actions button { width: 100%; }
+@media (max-width: 639px) { .panel-actions { display: none; } }
 
 /* ── Modal ── */
 .modal-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(2,6,23,0.8);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
+  display: none; position: fixed; inset: 0;
+  background: rgba(2,6,23,0.8); z-index: 100;
+  align-items: center; justify-content: center; padding: 16px;
 }
 .modal-backdrop.show { display: flex; }
 .modal {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 360px;
-  text-align: center;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 28px 24px;
+  width: 100%; max-width: 360px; text-align: center;
 }
 .modal h2 { margin: 0 0 6px; font-size: 1.4rem; }
 .modal .modal-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
 .modal-stats {
-  background: var(--panel);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  text-align: left;
-  font-size: 0.88rem;
+  background: var(--panel); border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 20px;
+  text-align: left; font-size: 0.88rem;
 }
 .modal-stats .stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between;
+  padding: 4px 0; border-bottom: 1px solid var(--line);
 }
 .modal-stats .stat-row:last-child { border-bottom: none; }
 .modal-stats .stat-val { font-weight: 700; color: var(--text-accent); }
-.modal-actions {
-  display: flex;
-  gap: 10px;
-}
+.modal-actions { display: flex; gap: 10px; }
 .modal-actions button { flex: 1; height: 42px; }
 
 /* ── Utilities ── */
@@ -387,21 +275,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── Responsive ── */
 @media (max-width: 639px) {
-  #game {
-    grid-template-columns: 1fr;
-    padding: 8px;
-  }
-  .board {
-    width: min(420px, calc(100vw - 16px));
-  }
-  .side-panel {
-    min-width: unset;
-  }
+  :root { --board-size: min(420px, calc(100vw - 16px)); }
+  #game { grid-template-columns: 1fr; padding: 8px; }
+  .side-panel { min-width: unset; }
   .board-wrap { order: -1; }
 }
-
 @media (max-width: 380px) {
-  .board { width: calc(100vw - 16px); }
+  :root { --board-size: calc(100vw - 16px); }
 }
 </style>
 </head>
@@ -445,17 +325,29 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 <div id="game" class="hidden">
   <div class="board-wrap">
     <div id="board" class="board"></div>
+    <div id="board-status" class="board-status"></div>
+    <div class="board-actions">
+      <button class="secondary" onclick="saveGame()">💾 Save</button>
+      <button class="secondary" onclick="confirmNewGame()">↺ New</button>
+    </div>
   </div>
   <div class="side-panel">
     <div class="player-card" id="card0">
       <div class="p-name"><span class="p-piece p0"></span><span id="pname0">Player 1</span></div>
-      <div class="p-captures">Captured: <span id="pcap0">0</span></div>
+      <div class="p-stats">
+        <span>Pieces: <span id="prem0">12</span></span>
+        <span>Captured: <span id="pcap0">0</span></span>
+      </div>
+      <div class="p-turn">▶ Your turn</div>
     </div>
     <div class="player-card" id="card1">
       <div class="p-name"><span class="p-piece p1"></span><span id="pname1">Player 2</span></div>
-      <div class="p-captures">Captured: <span id="pcap1">0</span></div>
+      <div class="p-stats">
+        <span>Pieces: <span id="prem1">12</span></span>
+        <span>Captured: <span id="pcap1">0</span></span>
+      </div>
+      <div class="p-turn">▶ Your turn</div>
     </div>
-    <div class="status-bar" id="status"></div>
     <div class="panel-actions">
       <button class="secondary" onclick="saveGame()">Save Game</button>
       <button class="secondary" onclick="confirmNewGame()">New Game</button>
@@ -499,7 +391,7 @@ const DIRS_KING = [[-1,-1],[-1,1],[1,-1],[1,1]];
 
 // ── State ──────────────────────────────────────────────────────────────────
 
-let gs; // gameState
+let gs;
 
 // ── Init ───────────────────────────────────────────────────────────────────
 
@@ -518,6 +410,7 @@ function buildInitialState(n0, n1) {
     validMoves: [],
     mustJump: false,
     midJump: null,
+    justSelected: null,
     savedAt: null
   };
 }
@@ -591,6 +484,7 @@ function executeMove(move) {
     gs.board[ci] = null;
     gs.players[gs.currentPlayer].captured++;
   }
+  if (move.captures.length) vibrate(30);
   const landRow = Math.floor(move.to / 8);
   if (!piece.king) {
     if ((gs.currentPlayer === 0 && landRow === 0) ||
@@ -599,7 +493,9 @@ function executeMove(move) {
     }
   }
   gs.board[move.to] = piece;
-  return !wasKing && piece.king;
+  const justKinged = !wasKing && piece.king;
+  if (justKinged) vibrate([15, 10, 15]);
+  return justKinged;
 }
 
 // ── Interaction ────────────────────────────────────────────────────────────
@@ -614,14 +510,15 @@ function handleCellClick(idx) {
     const justKinged = executeMove(move);
     gs.selectedCell = null;
     gs.validMoves = [];
+    gs.justSelected = null;
 
-    // Check for multi-jump continuation (only if piece didn't just king)
     if (move.captures.length && !justKinged) {
       const furtherJumps = getMoves(move.to, gs.board, gs.currentPlayer, true);
       if (furtherJumps.length) {
         gs.midJump = move.to;
         gs.selectedCell = move.to;
         gs.validMoves = furtherJumps;
+        gs.justSelected = move.to;
         render();
         return;
       }
@@ -642,7 +539,7 @@ function handleCellClick(idx) {
   if (cell && cell.player === gs.currentPlayer) {
     if (gs.mustJump) {
       const jumps = getMoves(idx, gs.board, gs.currentPlayer, true);
-      if (!jumps.length) { render(); return; } // must pick a piece that can jump
+      if (!jumps.length) { render(); return; }
       gs.selectedCell = idx;
       gs.validMoves = jumps;
     } else {
@@ -651,6 +548,8 @@ function handleCellClick(idx) {
       gs.selectedCell = idx;
       gs.validMoves = moves;
     }
+    gs.justSelected = idx;
+    vibrate(10);
     render();
     return;
   }
@@ -658,6 +557,7 @@ function handleCellClick(idx) {
   // Clicking empty or opponent — deselect
   gs.selectedCell = null;
   gs.validMoves = [];
+  gs.justSelected = null;
   render();
 }
 
@@ -668,6 +568,7 @@ function endTurn() {
   gs.selectedCell = null;
   gs.validMoves = [];
   gs.midJump = null;
+  gs.justSelected = null;
 
   if (checkWin()) {
     gs.phase = 'gameover';
@@ -703,15 +604,14 @@ function renderBoard() {
   const el = document.getElementById('board');
   el.innerHTML = '';
   const validTargets = new Set(gs.validMoves.map(m => m.to));
+  const justSelected = gs.justSelected;
+  gs.justSelected = null;
 
   for (let i = 0; i < 64; i++) {
     const row = Math.floor(i / 8), col = i % 8;
     const isDark = (row + col) % 2 === 1;
     const div = document.createElement('div');
     div.className = 'cell ' + (isDark ? 'dark' : 'light');
-
-    const isSelected = gs.selectedCell === i || gs.midJump === i;
-    if (isSelected) div.classList.add('selected');
 
     if (validTargets.has(i)) {
       div.classList.add('valid-target');
@@ -723,17 +623,20 @@ function renderBoard() {
       const piece = document.createElement('div');
       piece.className = 'piece player' + cell.player + (cell.king ? ' king' : '');
 
+      const isSelected = gs.selectedCell === i || gs.midJump === i;
+      if (isSelected) {
+        piece.classList.add('selected-piece');
+        if (i === justSelected) piece.classList.add('bounce');
+      }
+
       const isCurrentPlayer = cell.player === gs.currentPlayer;
       const canSelect = gs.phase === 'playing' && isCurrentPlayer && gs.midJump === null;
       const hasJump = gs.mustJump ? getMoves(i, gs.board, cell.player, true).length > 0 : true;
-      const movable = canSelect && hasJump;
 
-      if (movable) {
+      if (canSelect && hasJump) {
         piece.classList.add('selectable');
-        piece.addEventListener('click', (e) => {
-          e.stopPropagation();
-          handleCellClick(i);
-        });
+        div.classList.add('selectable-cell');
+        div.addEventListener('click', () => handleCellClick(i));
       }
 
       div.appendChild(piece);
@@ -744,7 +647,7 @@ function renderBoard() {
 }
 
 function renderStatus() {
-  const el = document.getElementById('status');
+  const el = document.getElementById('board-status');
   if (gs.phase === 'gameover') {
     el.innerHTML = `<strong>Game Over</strong><span style="color:var(--success)">${esc(gs.players[gs.winner].name)} wins!</span>`;
     return;
@@ -754,7 +657,7 @@ function renderStatus() {
   if (gs.midJump !== null) {
     html += `<div class="jump-notice">Continue jumping!</div>`;
   } else if (gs.mustJump) {
-    html += `<div class="jump-notice">Must jump!</div>`;
+    html += `<div class="jump-notice">Jump required!</div>`;
   } else if (gs.selectedCell !== null) {
     html += `<span style="color:var(--muted)">Select a destination</span>`;
   } else {
@@ -765,10 +668,13 @@ function renderStatus() {
 
 function renderPlayerCards() {
   for (let p = 0; p < 2; p++) {
+    const remaining = gs.board.filter(c => c && c.player === p).length;
     document.getElementById('pname' + p).textContent = gs.players[p].name;
     document.getElementById('pcap' + p).textContent = gs.players[p].captured;
-    document.getElementById('card' + p).classList.toggle('active',
-      gs.phase === 'playing' && gs.currentPlayer === p);
+    document.getElementById('prem' + p).textContent = remaining;
+    const isActive = gs.phase === 'playing' && gs.currentPlayer === p;
+    document.getElementById('card' + p).classList.toggle('active', isActive);
+    document.getElementById('card' + p).classList.toggle('inactive', !isActive && gs.phase === 'playing');
   }
 }
 
@@ -803,7 +709,12 @@ function confirmNewGame() {
 
 function showPhase(phase) {
   document.getElementById('setup').classList.toggle('hidden', phase !== 'setup');
-  document.getElementById('game').classList.toggle('hidden', phase === 'setup');
+  const gameEl = document.getElementById('game');
+  gameEl.classList.toggle('hidden', phase === 'setup');
+  if (phase === 'playing') {
+    gameEl.classList.remove('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => gameEl.classList.add('visible')));
+  }
   document.getElementById('btn-save').disabled = phase === 'setup';
   toggleMenu(false);
 }
@@ -850,6 +761,7 @@ function loadGame() {
         gs.selectedCell = null;
         gs.validMoves = [];
         gs.midJump = null;
+        gs.justSelected = null;
         gs.mustJump = false;
         if (gs.phase === 'playing') {
           gs.mustJump = computeMustJump(gs.board, gs.currentPlayer);
@@ -873,6 +785,10 @@ function loadGame() {
 
 // ── Utilities ──────────────────────────────────────────────────────────────
 
+function vibrate(pattern) {
+  try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(_) {}
+}
+
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -887,7 +803,6 @@ function toggleMenu(force) {
 
 document.getElementById('btn-save').disabled = true;
 
-// Allow pressing Enter in name inputs to start
 ['name0','name1'].forEach(id => {
   document.getElementById(id).addEventListener('keydown', e => {
     if (e.key === 'Enter') startGame();
