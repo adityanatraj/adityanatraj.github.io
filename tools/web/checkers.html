@@ -7,23 +7,23 @@
 
 <style>
 :root {
-  --bg: #020617;
-  --panel: #0f172a;
-  --card: #111827;
-  --line: #334155;
-  --line-hover: #3d4f63;
-  --accent: #38bdf8;
-  --text: #e5e7eb;
-  --text-accent: #efefef;
-  --muted: #94a3b8;
-  --danger: #ef4444;
-  --success: #22c55e;
-  --board-light: #c8a96e;
-  --board-dark: #7a4a2a;
-  --piece-r: #991b1b;
-  --piece-r-rim: #7f1d1d;
-  --piece-w: #f0ebe0;
-  --piece-w-rim: #c8b89a;
+  --bg: #030b17;
+  --panel: #0d1829;
+  --card: #111d2e;
+  --line: #2d3f55;
+  --line-hover: #3a5068;
+  --accent: #7dd3fc;
+  --text: #e2e8f0;
+  --text-accent: #f0f4f8;
+  --muted: #8da4be;
+  --danger: #f87171;
+  --success: #4ade80;
+  --board-light: #d9bc8e;
+  --board-dark: #8c5e3c;
+  --piece-r: #b84040;
+  --piece-r-rim: #8f2d2d;
+  --piece-w: #f5f0e6;
+  --piece-w-rim: #d4c4a8;
   --board-size: min(480px, calc(100vw - 200px));
 }
 
@@ -74,7 +74,7 @@ button {
   padding: 0 14px; font-size: 14px;
 }
 button:hover:not(:disabled) { opacity: 0.85; }
-button:active:not(:disabled) { transform: scale(0.95); box-shadow: 0 2px 8px rgba(56,189,248,0.4); }
+button:active:not(:disabled) { transform: scale(0.95); box-shadow: 0 2px 8px rgba(125,211,252,0.35); }
 button.secondary { background: var(--line); color: var(--text); }
 button.secondary:hover:not(:disabled) { background: var(--line-hover); opacity: 1; }
 button.secondary:active:not(:disabled) { box-shadow: 0 2px 8px rgba(51,65,85,0.4); }
@@ -150,14 +150,15 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .cell.valid-target { cursor: pointer; }
 .cell.valid-target::after {
   content: '';
-  display: block;
-  width: 46%; height: 46%;
-  border: 2.5px solid rgba(56,189,248,0.78);
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border: 2.5px solid rgba(125,211,252,0.85);
   border-radius: 50%;
   pointer-events: none;
 }
-.cell.valid-target:hover { background: rgba(56,189,248,0.12); }
-.cell.dark.valid-target:hover { background: #6d6153; }
+.cell.valid-target:hover { background: rgba(125,211,252,0.12); }
+.cell.dark.valid-target:hover { background: #897562; }
 
 /* ── Pieces ── */
 @keyframes pieceSelect {
@@ -179,7 +180,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .piece.selectable:hover { transform: translate(-50%, -50%) scale(1.08); }
 
 .piece.player0 {
-  background: radial-gradient(circle at 35% 35%, #c53030, var(--piece-r));
+  background: radial-gradient(circle at 35% 35%, #d45050, var(--piece-r));
   border: 3px solid var(--piece-r-rim);
   box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
 }
@@ -189,11 +190,11 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
 }
 .piece.selected-piece.player0 {
-  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(125,211,252,0.35),
               0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
 }
 .piece.selected-piece.player1 {
-  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(56,189,248,0.4),
+  box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(125,211,252,0.35),
               0 3px 7px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.2);
 }
 .piece.bounce { animation: pieceSelect 180ms ease-out forwards; }
@@ -204,7 +205,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   font-size: 0.9em;
   line-height: 1;
 }
-.piece.player0.king::after { color: #ffd700; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+.piece.player0.king::after { color: #fbbf24; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
 .piece.player1.king::after { color: #6b2d0e; }
 
 /* ── Side panel ── */
@@ -215,7 +216,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   border-radius: 10px; padding: 14px 16px;
   transition: border-color 0.2s, background 0.2s, opacity 0.2s;
 }
-.player-card.active { border-color: var(--accent); background: rgba(56,189,248,0.07); }
+.player-card.active { border-color: var(--accent); background: rgba(125,211,252,0.07); }
 .player-card.inactive { opacity: 0.55; }
 .player-card .p-name {
   font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;
@@ -241,7 +242,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 /* ── Modal ── */
 .modal-backdrop {
   display: none; position: fixed; inset: 0;
-  background: rgba(2,6,23,0.8); z-index: 100;
+  background: rgba(3,11,23,0.82); z-index: 100;
   align-items: center; justify-content: center; padding: 16px;
 }
 .modal-backdrop.show { display: flex; }
