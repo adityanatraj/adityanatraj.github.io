@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Minimal timezone overlap scheduler">
+  <title>Timezone Overlap</title>
+  <style>
+    :root {
+      --bg: #FAFAF9;
+      --text: #2C2C2C;
+      --work-hours: #EBE3D5;
+      --current-line: #A89080;
+      --divider: #EAEAE8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      font-weight: 300;
+    }
+
+    #theme-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 1.25rem;
+      cursor: pointer;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    #theme-toggle:hover {
+      opacity: 1;
+      background: var(--divider);
+    }
+
+    #theme-toggle:focus {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+      opacity: 1;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 0 0 3rem 0;
+      border-bottom: none;
+      margin-bottom: 3rem;
+    }
+
+    #current-time {
+      font-size: clamp(48px, 8vw, 72px);
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-weight: 200;
+      display: block;
+      letter-spacing: -0.02em;
+    }
+
+    #current-date {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    #current-location {
+      font-size: 0.75rem;
+      color: #AAA;
+      margin-top: 0.25rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #timezone-controls {
+      margin-bottom: 3rem;
+    }
+
+    .timezone-input {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    #tz-input {
+      width: 100%;
+      padding: 0.875rem 0;
+      font-size: 0.95rem;
+      border: none;
+      border-bottom: 1px solid var(--divider);
+      border-radius: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 300;
+    }
+
+    #tz-input:focus {
+      outline: none;
+      border-bottom-color: var(--text);
+    }
+
+    #tz-input::placeholder {
+      color: #999;
+    }
+
+    #tz-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      background: var(--bg);
+      border: 1px solid var(--divider);
+      border-radius: 0;
+      margin-top: 0;
+      list-style: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      z-index: 100;
+    }
+
+    #tz-dropdown.hidden {
+      display: none;
+    }
+
+    .dropdown-group {
+      padding: 0.5rem 0;
+    }
+
+    .dropdown-group-title {
+      padding: 0.75rem 0;
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .dropdown-item {
+      padding: 0.875rem 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid transparent;
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item.focused {
+      background: transparent;
+      border-bottom-color: var(--divider);
+    }
+
+    .dropdown-item-city {
+      font-weight: 300;
+    }
+
+    .dropdown-item-zone {
+      font-size: 0.8rem;
+      color: #999;
+      font-weight: 300;
+    }
+
+    #tz-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tz-list-item {
+      padding: 0.5rem 0.875rem;
+      background: transparent;
+      border: 1px solid var(--divider);
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      position: relative;
+      font-weight: 300;
+    }
+
+    .tz-list-item:not(.base) {
+      cursor: grab;
+    }
+
+    .tz-list-item:not(.base):active {
+      cursor: grabbing;
+    }
+
+    .tz-list-item.dragging {
+      opacity: 0.5;
+    }
+
+    .tz-list-item.drag-over {
+      border-top: 2px solid var(--text);
+    }
+
+    .tz-list-item:hover {
+      border-color: var(--text);
+      background: transparent;
+    }
+
+    .tz-list-item:focus {
+      outline: 2px solid var(--current-line);
+      outline-offset: 2px;
+    }
+
+    .tz-list-item.base {
+      background: transparent;
+      border-color: var(--text);
+      font-weight: 400;
+    }
+
+    .tz-list-item .base-label {
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .tz-list-item .remove-btn {
+      opacity: 0;
+      margin-left: 0.5rem;
+      color: #999;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .tz-list-item:hover .remove-btn,
+    .tz-list-item:focus .remove-btn {
+      opacity: 1;
+    }
+
+    #timeline-container {
+      position: relative;
+      margin-top: 3rem;
+      overflow: visible;
+      border: 1px solid var(--divider);
+      border-radius: 0;
+    }
+
+    .timeline {
+      display: table;
+      border-collapse: collapse;
+      min-width: 100%;
+    }
+
+    .timeline-row {
+      display: table-row;
+    }
+
+    .tz-label {
+      display: table-cell;
+      font-weight: 300;
+      padding: 0.5rem;
+      text-align: right;
+      font-size: 0.8rem;
+      vertical-align: middle;
+      background: var(--bg);
+      border-right: 1px solid var(--divider);
+      border-bottom: 1px solid var(--divider);
+      white-space: nowrap;
+      position: sticky;
+      left: 0;
+      z-index: 5;
+      line-height: 1.3;
+      height: 100%;
+      letter-spacing: 0.01em;
+      width: 1%;
+    }
+
+    .timeline-row:last-child .tz-label {
+      border-bottom: none;
+    }
+
+    .tz-label small {
+      display: block;
+      font-size: 0.75rem;
+      color: #666;
+      font-weight: 400;
+    }
+
+    .hours-container {
+      display: table-cell;
+      padding: 0;
+      vertical-align: middle;
+      height: 100%;
+    }
+
+    .hours-grid {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: stretch;
+    }
+
+    .hour-cell {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 0.5rem 0.2rem;
+      text-align: center;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 0.7rem;
+      font-weight: 300;
+      border-right: 1px solid var(--divider);
+      border-bottom: 1px solid var(--divider);
+      background: var(--bg);
+      white-space: nowrap;
+      contain: layout style;
+      line-height: 1.3;
+      overflow: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.01em;
+      position: relative;
+    }
+
+    .timeline-row:last-child .hour-cell {
+      border-bottom: none;
+    }
+
+    .hour-cell:last-child {
+      border-right: none;
+    }
+
+    .hour-cell.work {
+      background: var(--work-hours);
+    }
+
+    .day-offset {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 8px 8px 0;
+    }
+
+    .day-offset.next {
+      border-color: transparent #8BA898 transparent transparent;
+    }
+
+    .day-offset.prev {
+      border-color: transparent #C07856 transparent transparent;
+    }
+
+    #current-time-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--current-line);
+      pointer-events: none;
+      z-index: 10;
+      display: none;
+      opacity: 0.8;
+    }
+
+    #current-time-line.active {
+      display: block;
+    }
+
+    .error-message {
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--divider);
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      font-weight: 300;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    #cell-tooltip {
+      position: fixed;
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 0.01em;
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      border-radius: 2px;
+    }
+
+    #cell-tooltip.visible {
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    body.dark-mode {
+      --bg: #1A1918;
+      --text: #E8E6E3;
+      --work-hours: #3D3530;
+      --current-line: #B89A88;
+      --divider: #3A3735;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+
+      #theme-toggle {
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .tz-label {
+        font-size: 0.7rem;
+        padding: 0.4rem;
+      }
+
+      .hour-cell {
+        font-size: 0.65rem;
+        padding: 0.4rem 0.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" aria-label="Toggle dark mode">☾</button>
+
+  <main>
+    <header id="clock-section">
+      <time id="current-time" aria-live="polite">--:-- --</time>
+      <div id="current-date"></div>
+      <div id="current-location"></div>
+    </header>
+
+    <section id="timezone-controls">
+      <div class="error-message" id="error-message" role="alert"></div>
+
+      <div class="timezone-input">
+        <input
+          type="text"
+          placeholder="Add timezone (type to search)"
+          id="tz-input"
+          autocomplete="off"
+          aria-autocomplete="list"
+          aria-controls="tz-dropdown"
+          aria-expanded="false"
+        >
+        <ul id="tz-dropdown" class="hidden" role="listbox"></ul>
+      </div>
+
+      <ul id="tz-list" role="list"></ul>
+    </section>
+
+    <section id="timeline-container" role="region" aria-label="Timezone timeline">
+      <div class="timeline" id="timeline"></div>
+      <div id="current-time-line"></div>
+    </section>
+  </main>
+
+  <div id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="cell-tooltip"></div>
+
+  <script>
+    // State management
+    const state = {
+      version: 1,
+      timezones: [],
+      base: null,
+      lastUpdated: Date.now(),
+      userTimezone: null
+    };
+
+    // Major timezones data
+    const MAJOR_TIMEZONES = [
+      // Americas - North
+      { zone: 'America/New_York', city: 'New York', region: 'Americas' },
+      { zone: 'America/Chicago', city: 'Chicago', region: 'Americas' },
+      { zone: 'America/Denver', city: 'Denver', region: 'Americas' },
+      { zone: 'America/Phoenix', city: 'Phoenix', region: 'Americas' },
+      { zone: 'America/Los_Angeles', city: 'Los Angeles', region: 'Americas' },
+      { zone: 'America/Anchorage', city: 'Anchorage', region: 'Americas' },
+      { zone: 'America/Toronto', city: 'Toronto', region: 'Americas' },
+      { zone: 'America/Vancouver', city: 'Vancouver', region: 'Americas' },
+      { zone: 'America/Halifax', city: 'Halifax', region: 'Americas' },
+      { zone: 'America/Mexico_City', city: 'Mexico City', region: 'Americas' },
+      { zone: 'America/Monterrey', city: 'Monterrey', region: 'Americas' },
+
+      // Americas - South & Central
+      { zone: 'America/Sao_Paulo', city: 'São Paulo', region: 'Americas' },
+      { zone: 'America/Buenos_Aires', city: 'Buenos Aires', region: 'Americas' },
+      { zone: 'America/Bogota', city: 'Bogotá', region: 'Americas' },
+      { zone: 'America/Lima', city: 'Lima', region: 'Americas' },
+      { zone: 'America/Santiago', city: 'Santiago', region: 'Americas' },
+      { zone: 'America/Caracas', city: 'Caracas', region: 'Americas' },
+      { zone: 'America/Panama', city: 'Panama City', region: 'Americas' },
+      { zone: 'America/Costa_Rica', city: 'San José', region: 'Americas' },
+
+      // Europe - West
+      { zone: 'Europe/London', city: 'London', region: 'Europe' },
+      { zone: 'Europe/Dublin', city: 'Dublin', region: 'Europe' },
+      { zone: 'Europe/Lisbon', city: 'Lisbon', region: 'Europe' },
+      { zone: 'Atlantic/Reykjavik', city: 'Reykjavik', region: 'Europe' },
+
+      // Europe - Central
+      { zone: 'Europe/Paris', city: 'Paris', region: 'Europe' },
+      { zone: 'Europe/Berlin', city: 'Berlin', region: 'Europe' },
+      { zone: 'Europe/Rome', city: 'Rome', region: 'Europe' },
+      { zone: 'Europe/Madrid', city: 'Madrid', region: 'Europe' },
+      { zone: 'Europe/Amsterdam', city: 'Amsterdam', region: 'Europe' },
+      { zone: 'Europe/Brussels', city: 'Brussels', region: 'Europe' },
+      { zone: 'Europe/Vienna', city: 'Vienna', region: 'Europe' },
+      { zone: 'Europe/Zurich', city: 'Zurich', region: 'Europe' },
+      { zone: 'Europe/Prague', city: 'Prague', region: 'Europe' },
+      { zone: 'Europe/Warsaw', city: 'Warsaw', region: 'Europe' },
+      { zone: 'Europe/Stockholm', city: 'Stockholm', region: 'Europe' },
+      { zone: 'Europe/Copenhagen', city: 'Copenhagen', region: 'Europe' },
+      { zone: 'Europe/Oslo', city: 'Oslo', region: 'Europe' },
+
+      // Europe - East
+      { zone: 'Europe/Athens', city: 'Athens', region: 'Europe' },
+      { zone: 'Europe/Istanbul', city: 'Istanbul', region: 'Europe' },
+      { zone: 'Europe/Bucharest', city: 'Bucharest', region: 'Europe' },
+      { zone: 'Europe/Kiev', city: 'Kyiv', region: 'Europe' },
+      { zone: 'Europe/Moscow', city: 'Moscow', region: 'Europe' },
+
+      // Asia - Middle East
+      { zone: 'Asia/Dubai', city: 'Dubai', region: 'Asia' },
+      { zone: 'Asia/Riyadh', city: 'Riyadh', region: 'Asia' },
+      { zone: 'Asia/Kuwait', city: 'Kuwait City', region: 'Asia' },
+      { zone: 'Asia/Doha', city: 'Doha', region: 'Asia' },
+      { zone: 'Asia/Muscat', city: 'Muscat', region: 'Asia' },
+      { zone: 'Asia/Bahrain', city: 'Manama', region: 'Asia' },
+      { zone: 'Asia/Baghdad', city: 'Baghdad', region: 'Asia' },
+      { zone: 'Asia/Tehran', city: 'Tehran', region: 'Asia' },
+      { zone: 'Asia/Jerusalem', city: 'Jerusalem', region: 'Asia' },
+      { zone: 'Asia/Beirut', city: 'Beirut', region: 'Asia' },
+
+      // Asia - South Asia (India & neighbors)
+      { zone: 'Asia/Karachi', city: 'Karachi', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Mumbai', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Delhi', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Bangalore', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Chennai', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Hyderabad', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Pune', region: 'Asia' },
+      { zone: 'Asia/Kolkata', city: 'Kolkata', region: 'Asia' },
+      { zone: 'Asia/Dhaka', city: 'Dhaka', region: 'Asia' },
+      { zone: 'Asia/Kathmandu', city: 'Kathmandu', region: 'Asia' },
+      { zone: 'Asia/Colombo', city: 'Colombo', region: 'Asia' },
+
+      // Asia - Southeast Asia
+      { zone: 'Asia/Bangkok', city: 'Bangkok', region: 'Asia' },
+      { zone: 'Asia/Ho_Chi_Minh', city: 'Ho Chi Minh City', region: 'Asia' },
+      { zone: 'Asia/Jakarta', city: 'Jakarta', region: 'Asia' },
+      { zone: 'Asia/Singapore', city: 'Singapore', region: 'Asia' },
+      { zone: 'Asia/Kuala_Lumpur', city: 'Kuala Lumpur', region: 'Asia' },
+      { zone: 'Asia/Manila', city: 'Manila', region: 'Asia' },
+      { zone: 'Asia/Yangon', city: 'Yangon', region: 'Asia' },
+
+      // Asia - East Asia
+      { zone: 'Asia/Hong_Kong', city: 'Hong Kong', region: 'Asia' },
+      { zone: 'Asia/Shanghai', city: 'Shanghai', region: 'Asia' },
+      { zone: 'Asia/Beijing', city: 'Beijing', region: 'Asia' },
+      { zone: 'Asia/Taipei', city: 'Taipei', region: 'Asia' },
+      { zone: 'Asia/Tokyo', city: 'Tokyo', region: 'Asia' },
+      { zone: 'Asia/Seoul', city: 'Seoul', region: 'Asia' },
+      { zone: 'Asia/Pyongyang', city: 'Pyongyang', region: 'Asia' },
+      { zone: 'Asia/Ulaanbaatar', city: 'Ulaanbaatar', region: 'Asia' },
+
+      // Pacific - Australia & NZ
+      { zone: 'Australia/Sydney', city: 'Sydney', region: 'Pacific' },
+      { zone: 'Australia/Melbourne', city: 'Melbourne', region: 'Pacific' },
+      { zone: 'Australia/Brisbane', city: 'Brisbane', region: 'Pacific' },
+      { zone: 'Australia/Perth', city: 'Perth', region: 'Pacific' },
+      { zone: 'Australia/Adelaide', city: 'Adelaide', region: 'Pacific' },
+      { zone: 'Pacific/Auckland', city: 'Auckland', region: 'Pacific' },
+      { zone: 'Pacific/Wellington', city: 'Wellington', region: 'Pacific' },
+
+      // Pacific - Islands
+      { zone: 'Pacific/Fiji', city: 'Fiji', region: 'Pacific' },
+      { zone: 'Pacific/Honolulu', city: 'Honolulu', region: 'Pacific' },
+      { zone: 'Pacific/Guam', city: 'Guam', region: 'Pacific' },
+      { zone: 'Pacific/Pago_Pago', city: 'Pago Pago', region: 'Pacific' },
+
+      // Africa
+      { zone: 'Africa/Cairo', city: 'Cairo', region: 'Africa' },
+      { zone: 'Africa/Johannesburg', city: 'Johannesburg', region: 'Africa' },
+      { zone: 'Africa/Lagos', city: 'Lagos', region: 'Africa' },
+      { zone: 'Africa/Nairobi', city: 'Nairobi', region: 'Africa' },
+      { zone: 'Africa/Accra', city: 'Accra', region: 'Africa' },
+      { zone: 'Africa/Casablanca', city: 'Casablanca', region: 'Africa' },
+      { zone: 'Africa/Algiers', city: 'Algiers', region: 'Africa' },
+      { zone: 'Africa/Tunis', city: 'Tunis', region: 'Africa' },
+      { zone: 'Africa/Addis_Ababa', city: 'Addis Ababa', region: 'Africa' },
+      { zone: 'Africa/Dar_es_Salaam', city: 'Dar es Salaam', region: 'Africa' },
+
+      // Other
+      { zone: 'UTC', city: 'UTC', region: 'Other' }
+    ];
+
+    let clockInterval;
+    let focusedDropdownIndex = -1;
+
+    // Utility functions
+    function detectBrowserTimezone() {
+      try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch {
+        return 'UTC';
+      }
+    }
+
+    function isValidTimezone(tz) {
+      try {
+        Intl.DateTimeFormat('en-US', { timeZone: tz });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function getDefaultState() {
+      const browserTz = detectBrowserTimezone();
+      return {
+        version: 1,
+        timezones: [browserTz],
+        base: browserTz,
+        lastUpdated: Date.now(),
+        userTimezone: browserTz
+      };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('timezone-overlap', JSON.stringify(state));
+      } catch (e) {
+        console.warn('Cannot save state:', e);
+      }
+    }
+
+    function validateAndMigrateState(loaded) {
+      if (loaded.version !== 1) return getDefaultState();
+
+      const validTimezones = loaded.timezones.filter(isValidTimezone);
+      if (validTimezones.length === 0) return getDefaultState();
+
+      if (!validTimezones.includes(loaded.base)) {
+        loaded.base = validTimezones[0];
+      }
+
+      const browserTz = detectBrowserTimezone();
+
+      return {
+        version: 1,
+        timezones: validTimezones,
+        base: loaded.base,
+        lastUpdated: Date.now(),
+        userTimezone: browserTz
+      };
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('timezone-overlap');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return validateAndMigrateState(parsed);
+        }
+      } catch {
+        return getDefaultState();
+      }
+      return getDefaultState();
+    }
+
+    // Timezone functions
+    function filterTimezones(query) {
+      if (!query) return [];
+
+      const lowerQuery = query.toLowerCase();
+      const filtered = MAJOR_TIMEZONES.filter(tz =>
+        tz.city.toLowerCase().includes(lowerQuery) ||
+        tz.zone.toLowerCase().includes(lowerQuery)
+      );
+
+      // Group by region
+      const grouped = {};
+      filtered.forEach(tz => {
+        if (!grouped[tz.region]) grouped[tz.region] = [];
+        grouped[tz.region].push(tz);
+      });
+
+      return grouped;
+    }
+
+    function getCurrentTimeIn(tz) {
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+        return formatter.format(new Date());
+      } catch (e) {
+        console.error('Time formatting failed for', tz, e);
+        return 'N/A';
+      }
+    }
+
+    function getCurrentDateIn(tz) {
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        return formatter.format(new Date());
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function getHourIn(tz) {
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: 'numeric',
+          hour12: true
+        });
+        const parts = formatter.formatToParts(new Date());
+        const hour = parseInt(parts.find(p => p.type === 'hour').value);
+        const dayPeriod = parts.find(p => p.type === 'dayPeriod').value;
+        return { hour, ampm: dayPeriod };
+      } catch (e) {
+        return { hour: 12, ampm: 'AM' };
+      }
+    }
+
+    function convertHour(hour, ampm, baseTz, targetTz) {
+      try {
+        // Convert to 24-hour format
+        let hour24 = hour;
+        if (ampm === 'PM' && hour !== 12) hour24 += 12;
+        if (ampm === 'AM' && hour === 12) hour24 = 0;
+
+        // Get current hour in base timezone
+        const now = new Date();
+        const baseFormatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: baseTz,
+          hour: 'numeric',
+          hour12: false
+        });
+        const currentBaseHour = parseInt(baseFormatter.format(now));
+
+        // Calculate offset from current hour, handling day wrap
+        let hourDiff = hour24 - currentBaseHour;
+        if (hourDiff < -12) hourDiff += 24;
+        if (hourDiff > 12) hourDiff -= 24;
+
+        // Get the target moment
+        const targetMoment = new Date(now.getTime() + hourDiff * 3600000);
+
+        // Format in target timezone
+        const targetFormatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: targetTz,
+          hour: 'numeric',
+          hour12: true,
+          day: 'numeric'
+        });
+        const parts = targetFormatter.formatToParts(targetMoment);
+
+        // Calculate day offset
+        const baseDayFormatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: baseTz,
+          day: 'numeric'
+        });
+        const baseDay = parseInt(baseDayFormatter.format(targetMoment));
+        const targetDay = parseInt(parts.find(p => p.type === 'day').value);
+
+        let dayOffset = targetDay - baseDay;
+        if (dayOffset > 1) dayOffset = -1;
+        if (dayOffset < -1) dayOffset = 1;
+
+        return {
+          hour: parseInt(parts.find(p => p.type === 'hour').value),
+          ampm: parts.find(p => p.type === 'dayPeriod').value,
+          dayOffset
+        };
+      } catch (e) {
+        console.error('Hour conversion failed', e);
+        return { hour, ampm, dayOffset: 0 };
+      }
+    }
+
+    function isWorkHour(hour, ampm) {
+      // 9AM, 10AM, 11AM
+      if (ampm === 'AM' && hour >= 9 && hour <= 11) return true;
+      // 12PM (noon)
+      if (ampm === 'PM' && hour === 12) return true;
+      // 1PM, 2PM, 3PM, 4PM, 5PM
+      if (ampm === 'PM' && hour >= 1 && hour <= 5) return true;
+      return false;
+    }
+
+    function calculateOverlap(baseHour, baseAmpm) {
+      // Simple: is this a work hour (9AM-5PM)?
+      if (!isWorkHour(baseHour, baseAmpm)) {
+        return null;
+      }
+
+      // It's a work hour, color it
+      return 'work';
+    }
+
+    // UI functions
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+      setTimeout(() => errorEl.classList.remove('show'), 3000);
+    }
+
+    function announceToScreenReader(message) {
+      const announcer = document.getElementById('sr-announcer');
+      announcer.textContent = message;
+      setTimeout(() => announcer.textContent = '', 1000);
+    }
+
+    const debounce = (func, wait) => {
+      let timeout;
+      return function executedFunction(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+      };
+    };
+
+    function updateDropdown(query) {
+      const dropdown = document.getElementById('tz-dropdown');
+      const input = document.getElementById('tz-input');
+
+      if (!query) {
+        dropdown.classList.add('hidden');
+        input.setAttribute('aria-expanded', 'false');
+        return;
+      }
+
+      const grouped = filterTimezones(query);
+      const regions = Object.keys(grouped);
+
+      if (regions.length === 0) {
+        dropdown.classList.add('hidden');
+        input.setAttribute('aria-expanded', 'false');
+        return;
+      }
+
+      dropdown.innerHTML = '';
+      regions.forEach(region => {
+        const group = document.createElement('div');
+        group.className = 'dropdown-group';
+
+        const title = document.createElement('div');
+        title.className = 'dropdown-group-title';
+        title.textContent = region;
+        group.appendChild(title);
+
+        grouped[region].forEach(tz => {
+          const item = document.createElement('li');
+          item.className = 'dropdown-item';
+          item.setAttribute('role', 'option');
+          item.setAttribute('data-zone', tz.zone);
+
+          const citySpan = document.createElement('span');
+          citySpan.className = 'dropdown-item-city';
+          citySpan.textContent = tz.city;
+          item.appendChild(citySpan);
+
+          const zoneSpan = document.createElement('span');
+          zoneSpan.className = 'dropdown-item-zone';
+          zoneSpan.textContent = tz.zone;
+          item.appendChild(zoneSpan);
+
+          item.addEventListener('click', () => selectTimezone(tz.zone));
+          group.appendChild(item);
+        });
+
+        dropdown.appendChild(group);
+      });
+
+      dropdown.classList.remove('hidden');
+      input.setAttribute('aria-expanded', 'true');
+      focusedDropdownIndex = -1;
+    }
+
+    const debouncedUpdateDropdown = debounce(updateDropdown, 150);
+
+    function selectTimezone(tz) {
+      addTimezone(tz);
+      const input = document.getElementById('tz-input');
+      input.value = '';
+      updateDropdown('');
+      input.focus();
+    }
+
+    function addTimezone(tz) {
+      if (!isValidTimezone(tz)) {
+        showError('Invalid timezone');
+        return;
+      }
+
+      if (state.timezones.includes(tz)) {
+        showError('Timezone already added');
+        return;
+      }
+
+      if (state.timezones.length >= 8) {
+        showError('Maximum 8 timezones');
+        return;
+      }
+
+      state.timezones.push(tz);
+      saveState();
+      renderTimeline();
+      renderTimezoneList();
+
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz;
+      announceToScreenReader(`${cityName} timezone added`);
+    }
+
+    function removeTimezone(tz) {
+      if (state.timezones.length === 1) {
+        showError('Cannot remove last timezone');
+        return;
+      }
+
+      state.timezones = state.timezones.filter(t => t !== tz);
+
+      if (state.base === tz) {
+        state.base = state.timezones[0];
+      }
+
+      saveState();
+      renderTimeline();
+      renderTimezoneList();
+
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz;
+      announceToScreenReader(`${cityName} timezone removed`);
+    }
+
+    function setBaseTimezone(tz) {
+      state.base = tz;
+      saveState();
+      renderTimeline();
+      renderTimezoneList();
+      updateCurrentTime();
+
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz;
+      announceToScreenReader(`${cityName} set as base timezone`);
+    }
+
+    function renderTimezoneList() {
+      const list = document.getElementById('tz-list');
+      list.innerHTML = '';
+
+      // Create ordered list: base first, then others, user timezone last
+      const userTz = state.userTimezone;
+      const orderedTimezones = [];
+
+      // Base timezone first
+      if (state.timezones.includes(state.base)) {
+        orderedTimezones.push(state.base);
+      }
+
+      // Other timezones (except base and user)
+      state.timezones
+        .filter(tz => tz !== state.base && tz !== userTz)
+        .forEach(tz => orderedTimezones.push(tz));
+
+      // User timezone last (if in list and not base)
+      if (state.timezones.includes(userTz) && userTz !== state.base) {
+        orderedTimezones.push(userTz);
+      }
+
+      orderedTimezones.forEach(tz => {
+        const li = document.createElement('li');
+        li.className = 'tz-list-item';
+        li.setAttribute('tabindex', '0');
+        li.setAttribute('role', 'button');
+        li.setAttribute('data-timezone', tz);
+
+        const isBase = tz === state.base;
+        if (isBase) {
+          li.classList.add('base');
+        } else {
+          li.setAttribute('draggable', 'true');
+        }
+
+        const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz.split('/').pop();
+        const isUserTz = tz === state.userTimezone && !isBase;
+
+        if (isBase) {
+          const star = document.createElement('span');
+          star.className = 'base-label';
+          star.textContent = '⭐ ';
+          li.appendChild(star);
+        } else if (isUserTz) {
+          const pin = document.createElement('span');
+          pin.className = 'base-label';
+          pin.textContent = '📍 ';
+          li.appendChild(pin);
+        }
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = cityName;
+        li.appendChild(nameSpan);
+
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-btn';
+        removeBtn.setAttribute('aria-label', 'Remove timezone');
+        removeBtn.textContent = '×';
+        li.appendChild(removeBtn);
+
+        list.appendChild(li);
+      });
+    }
+
+    // Drag and drop handlers
+    const DragDrop = {
+      draggedElement: null,
+
+      handleStart(e) {
+        this.draggedElement = e.target;
+        e.target.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.innerHTML);
+      },
+
+      handleEnd(e) {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.tz-list-item').forEach(item => {
+          item.classList.remove('drag-over');
+        });
+      },
+
+      handleOver(e) {
+        e.preventDefault();
+        const target = e.target.closest('.tz-list-item');
+        if (target && !target.classList.contains('base') && target !== this.draggedElement) {
+          e.dataTransfer.dropEffect = 'move';
+          target.classList.add('drag-over');
+        }
+        return false;
+      },
+
+      handleLeave(e) {
+        const target = e.target.closest('.tz-list-item');
+        if (target) target.classList.remove('drag-over');
+      },
+
+      handleDrop(e) {
+        e.stopPropagation();
+        const target = e.target.closest('.tz-list-item');
+
+        if (this.draggedElement !== target && target && !target.classList.contains('base')) {
+          const draggedTz = this.draggedElement.getAttribute('data-timezone');
+          const targetTz = target.getAttribute('data-timezone');
+          const draggedIndex = state.timezones.indexOf(draggedTz);
+          const targetIndex = state.timezones.indexOf(targetTz);
+
+          if (draggedIndex !== -1 && targetIndex !== -1) {
+            state.timezones.splice(draggedIndex, 1);
+            const newTargetIndex = state.timezones.indexOf(targetTz);
+            state.timezones.splice(newTargetIndex, 0, draggedTz);
+
+            saveState();
+            renderTimezoneList();
+            renderTimeline();
+          }
+        }
+        return false;
+      }
+    };
+
+    function renderTimeline() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = '';
+
+      const fragment = document.createDocumentFragment();
+
+      // Ensure user timezone is in the list if not base and under limit
+      const userTz = state.userTimezone;
+      if (userTz && userTz !== state.base && !state.timezones.includes(userTz) && state.timezones.length < 8) {
+        state.timezones.push(userTz);
+        saveState();
+      }
+
+      // Render base timezone first
+      fragment.appendChild(createTimelineRow(state.base, true));
+
+      // Collect other timezones
+      const otherTimezones = state.timezones.filter(tz => tz !== state.base);
+
+      // Separate user timezone from others
+      const userTzInList = otherTimezones.includes(userTz);
+
+      // Render non-user timezones first
+      otherTimezones
+        .filter(tz => tz !== userTz)
+        .forEach(tz => {
+          fragment.appendChild(createTimelineRow(tz, false));
+        });
+
+      // Render user timezone last if it's in the list
+      if (userTzInList) {
+        fragment.appendChild(createTimelineRow(userTz, false));
+      }
+
+      timeline.appendChild(fragment);
+      positionCurrentTimeLine();
+    }
+
+    function createTimelineRow(tz, isBase) {
+      const row = document.createElement('div');
+      row.className = 'timeline-row';
+
+      const label = document.createElement('div');
+      label.className = 'tz-label';
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz.split('/').pop();
+      const isUserTz = tz === state.userTimezone && !isBase;
+      label.textContent = isBase ? `⭐ ${cityName}` : (isUserTz ? `📍 ${cityName}` : cityName);
+      row.appendChild(label);
+
+      const hoursContainer = document.createElement('div');
+      hoursContainer.className = 'hours-container';
+
+      const hoursGrid = document.createElement('div');
+      hoursGrid.className = 'hours-grid';
+
+      // Generate 24 hours based on base timezone
+      const baseHours = [];
+      for (let i = 0; i < 24; i++) {
+        const hour12 = i === 0 || i === 12 ? 12 : i % 12;
+        const ampm = i < 12 ? 'AM' : 'PM';
+        baseHours.push({ hour: hour12, ampm, index: i });
+      }
+
+      baseHours.forEach(({ hour, ampm, index }) => {
+        const cell = document.createElement('div');
+        cell.className = 'hour-cell';
+        cell.setAttribute('data-hour-index', index);
+        cell.setAttribute('data-timezone', tz);
+        cell.setAttribute('data-base-hour', hour);
+        cell.setAttribute('data-base-ampm', ampm);
+
+        // For non-base timezones, convert the base hour to this timezone's hour
+        let displayHour = hour;
+        let displayAmpm = ampm;
+        let dayOffset = 0;
+
+        if (!isBase) {
+          const converted = convertHour(hour, ampm, state.base, tz);
+          displayHour = converted.hour;
+          displayAmpm = converted.ampm;
+          dayOffset = converted.dayOffset || 0;
+        }
+
+        // Use A/P instead of AM/PM
+        const timeText = `${displayHour}${displayAmpm[0]}`;
+        cell.textContent = timeText;
+
+        if (dayOffset !== 0) {
+          const offsetIndicator = document.createElement('div');
+          offsetIndicator.className = `day-offset ${dayOffset > 0 ? 'next' : 'prev'}`;
+          cell.appendChild(offsetIndicator);
+        }
+
+        // Calculate color based on base work hours
+        const colorClass = calculateOverlap(hour, ampm);
+
+        if (colorClass) {
+          cell.classList.add(colorClass);
+        }
+
+        hoursGrid.appendChild(cell);
+      });
+
+      hoursContainer.appendChild(hoursGrid);
+      row.appendChild(hoursContainer);
+      return row;
+    }
+
+    function updateCurrentTime() {
+      const time = getCurrentTimeIn(state.base);
+      const date = getCurrentDateIn(state.base);
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === state.base)?.city || state.base.split('/').pop();
+
+      document.getElementById('current-time').textContent = time;
+      document.getElementById('current-date').textContent = date;
+      document.getElementById('current-location').textContent = cityName;
+
+      positionCurrentTimeLine();
+    }
+
+    function positionCurrentTimeLine() {
+      const line = document.getElementById('current-time-line');
+      const { hour, ampm } = getHourIn(state.base);
+
+      let hour24 = hour;
+      if (ampm === 'PM' && hour !== 12) hour24 += 12;
+      if (ampm === 'AM' && hour === 12) hour24 = 0;
+
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const hourFraction = minutes / 60;
+      const totalHours = hour24 + hourFraction;
+
+      // Find first timeline row to get accurate measurements
+      const firstRow = document.querySelector('.timeline-row');
+      if (!firstRow) return;
+
+      const firstCell = firstRow.querySelector('.hour-cell');
+      const label = firstRow.querySelector('.tz-label');
+      if (!firstCell || !label) return;
+
+      const cellWidth = firstCell.offsetWidth;
+      const labelWidth = label.offsetWidth;
+
+      requestAnimationFrame(() => {
+        const position = labelWidth + (totalHours * cellWidth);
+        line.style.left = position + 'px';
+        line.classList.add('active');
+      });
+    }
+
+
+    function startClock() {
+      updateCurrentTime();
+      clockInterval = setInterval(updateCurrentTime, 60000);
+    }
+
+    function stopClock() {
+      if (clockInterval) {
+        clearInterval(clockInterval);
+      }
+    }
+
+    // Tooltip management
+    function showCellTooltip(cell, e) {
+      const tooltip = document.getElementById('cell-tooltip');
+      const tz = cell.getAttribute('data-timezone');
+      const baseHour = parseInt(cell.getAttribute('data-base-hour'));
+      const baseAmpm = cell.getAttribute('data-base-ampm');
+
+      // Create a date for this specific hour
+      const now = new Date();
+      let targetHour24 = baseHour;
+      if (baseAmpm === 'PM' && baseHour !== 12) targetHour24 += 12;
+      if (baseAmpm === 'AM' && baseHour === 12) targetHour24 = 0;
+
+      // Find the date that matches this hour in base timezone
+      let bestMatch = now;
+      let minDiff = Infinity;
+      for (let offset = -12; offset <= 12; offset++) {
+        const testDate = new Date(now.getTime() + offset * 3600000);
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: state.base,
+          hour: 'numeric',
+          hour12: false
+        });
+        const testHour = parseInt(formatter.format(testDate));
+        const diff = Math.abs(testHour - targetHour24);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestMatch = testDate;
+        }
+        if (diff === 0) break;
+      }
+
+      // Format full date and time for this cell's timezone
+      const dateFormatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      const cityName = MAJOR_TIMEZONES.find(t => t.zone === tz)?.city || tz.split('/').pop();
+      tooltip.textContent = `${cityName} · ${dateFormatter.format(bestMatch)}`;
+
+      // Position tooltip with viewport edge detection
+      let left = e.pageX + 10;
+      let top = e.pageY + 10;
+
+      // Check right edge
+      const tooltipWidth = 200; // Approximate max width
+      if (left + tooltipWidth > window.innerWidth + window.scrollX) {
+        left = e.pageX - tooltipWidth - 10;
+      }
+
+      // Check bottom edge
+      const tooltipHeight = 40; // Approximate height
+      if (top + tooltipHeight > window.innerHeight + window.scrollY) {
+        top = e.pageY - tooltipHeight - 10;
+      }
+
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+      tooltip.classList.add('visible');
+    }
+
+    function hideCellTooltip() {
+      const tooltip = document.getElementById('cell-tooltip');
+      tooltip.classList.remove('visible');
+    }
+
+    // Event listeners
+    function attachEventListeners() {
+      const input = document.getElementById('tz-input');
+      const dropdown = document.getElementById('tz-dropdown');
+
+      input.addEventListener('input', (e) => {
+        debouncedUpdateDropdown(e.target.value);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        const items = dropdown.querySelectorAll('.dropdown-item');
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          focusedDropdownIndex = Math.min(focusedDropdownIndex + 1, items.length - 1);
+          updateDropdownFocus(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          focusedDropdownIndex = Math.max(focusedDropdownIndex - 1, 0);
+          updateDropdownFocus(items);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (focusedDropdownIndex >= 0 && items[focusedDropdownIndex]) {
+            const zone = items[focusedDropdownIndex].getAttribute('data-zone');
+            selectTimezone(zone);
+          }
+        } else if (e.key === 'Escape') {
+          input.value = '';
+          updateDropdown('');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.add('hidden');
+          input.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopClock();
+        } else {
+          startClock();
+        }
+      });
+
+      window.addEventListener('resize', debounce(() => {
+        positionCurrentTimeLine();
+      }, 150));
+
+      // Cell tooltip on hover
+      document.addEventListener('mouseover', (e) => {
+        const cell = e.target.closest('.hour-cell');
+        if (cell) {
+          showCellTooltip(cell, e);
+        }
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const cell = e.target.closest('.hour-cell');
+        if (cell) {
+          hideCellTooltip();
+        }
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        const tooltip = document.getElementById('cell-tooltip');
+        if (tooltip.classList.contains('visible')) {
+          tooltip.style.left = e.pageX + 10 + 'px';
+          tooltip.style.top = e.pageY + 10 + 'px';
+        }
+      });
+
+      // Timezone list interactions (delegated)
+      const tzList = document.getElementById('tz-list');
+
+      tzList.addEventListener('click', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (!item) return;
+
+        const tz = item.getAttribute('data-timezone');
+        if (e.target.classList.contains('remove-btn')) {
+          removeTimezone(tz);
+        } else {
+          setBaseTimezone(tz);
+        }
+      });
+
+      tzList.addEventListener('keydown', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (!item) return;
+
+        const tz = item.getAttribute('data-timezone');
+        if (e.key === 'Enter') {
+          setBaseTimezone(tz);
+        } else if (e.key === 'Delete' || e.key === 'Backspace') {
+          removeTimezone(tz);
+        }
+      });
+
+      tzList.addEventListener('dragstart', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (item && !item.classList.contains('base')) {
+          DragDrop.handleStart(e);
+        }
+      });
+
+      tzList.addEventListener('dragend', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (item) DragDrop.handleEnd(e);
+      });
+
+      tzList.addEventListener('dragover', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (item && !item.classList.contains('base')) {
+          DragDrop.handleOver(e);
+        }
+      });
+
+      tzList.addEventListener('drop', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (item && !item.classList.contains('base')) {
+          DragDrop.handleDrop(e);
+        }
+      });
+
+      tzList.addEventListener('dragleave', (e) => {
+        const item = e.target.closest('.tz-list-item');
+        if (item) DragDrop.handleLeave(e);
+      });
+    }
+
+    function updateDropdownFocus(items) {
+      items.forEach((item, index) => {
+        if (index === focusedDropdownIndex) {
+          item.classList.add('focused');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('focused');
+        }
+      });
+    }
+
+    // Theme management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        updateThemeIcon();
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const button = document.getElementById('theme-toggle');
+      const isDark = document.body.classList.contains('dark-mode');
+      button.textContent = isDark ? '☀' : '☾';
+      button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+
+    // Initialization
+    function init() {
+      initTheme();
+      Object.assign(state, loadState());
+
+      renderTimezoneList();
+      renderTimeline();
+      startClock();
+      attachEventListeners();
+
+      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
