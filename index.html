@@ -368,6 +368,56 @@
 			.tool-row.hidden {
 				display: none;
 			}
+
+			/* Filter Pills */
+			.filter-pills {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1.5rem;
+				flex-wrap: wrap;
+			}
+
+			.pill {
+				padding: 0.5rem 1.25rem;
+				border: 1px solid var(--border-color);
+				border-radius: 20px;
+				background: var(--bg-secondary);
+				color: var(--text-secondary);
+				font-size: 0.875rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: var(--transition);
+				font-family: inherit;
+			}
+
+			.pill:hover {
+				border-color: var(--accent-color);
+				color: var(--text-primary);
+			}
+
+			.pill.active {
+				background: var(--accent-color);
+				border-color: var(--accent-color);
+				color: var(--bg-primary);
+			}
+
+			/* Category Sections */
+			.category-section {
+				margin-bottom: 2.5rem;
+			}
+
+			.category-title {
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: var(--text-tertiary);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				margin-bottom: 1rem;
+			}
+
+			.category-section.hidden {
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -397,22 +447,38 @@
 
 			<main>
 				<div class="section-header">
-					<h2 class="section-title">All Tools</h2>
+					<div class="filter-pills">
+						<button class="pill active" data-filter="all">All</button>
+						<button class="pill" data-filter="tools">Tools</button>
+						<button class="pill" data-filter="games">Games</button>
+						<button class="pill" data-filter="learn">Learn</button>
+					</div>
 					<div class="search-box">
 						<input
 							type="text"
 							id="searchInput"
-							placeholder="Search tools..."
+							placeholder="Search..."
 							autocomplete="off"
 						/>
 					</div>
 				</div>
 
-				<div class="tools-list" id="toolsList"></div>
+				<div class="category-section" data-category="tools">
+					<h2 class="category-title">Tools</h2>
+					<div class="tools-list" id="list-tools"></div>
+				</div>
+				<div class="category-section" data-category="games">
+					<h2 class="category-title">Games</h2>
+					<div class="tools-list" id="list-games"></div>
+				</div>
+				<div class="category-section" data-category="learn">
+					<h2 class="category-title">Learn</h2>
+					<div class="tools-list" id="list-learn"></div>
+				</div>
 
 				<div id="noResults" class="no-results" style="display: none">
 					<div class="no-results-icon">🔍</div>
-					<div class="no-results-text">No tools found matching your search</div>
+					<div class="no-results-text">No results matching your search</div>
 				</div>
 			</main>
 
@@ -424,110 +490,170 @@
 		<script>
 			const tools = [
 				{
-					href: "tools/web/upc_scanner.html",
+					href: "tools/web/tools/upc_scanner.html",
 					icon: "🔍",
 					title: "UPC Scanner",
 					tag: "Utility",
+					category: "tools",
 					description:
 						"Scan barcodes and UPC codes with your camera. Keeps a running list of all codes found.",
 					tags: "utility barcode upc ean scanner camera",
 				},
 				{
-					href: "tools/web/qr_coder.html",
+					href: "tools/web/tools/qr_coder.html",
 					icon: "📱",
 					title: "QR Code Generator",
 					tag: "Utility",
+					category: "tools",
 					description:
 						"Generate QR codes from URLs. Simple and fast QR code creation.",
 					tags: "utility qr code generator url",
 				},
 				{
-					href: "tools/web/timezone_overlap.html",
+					href: "tools/web/tools/timezone_overlap.html",
 					icon: "🌍",
 					title: "Timezone Overlap",
 					tag: "Utility",
+					category: "tools",
 					description:
 						"Schedule across time zones. See working-hours overlap at a glance for distributed teams.",
 					tags: "utility timezone schedule overlap time work remote team",
 				},
 				{
-					href: "tools/web/yahtzee.html",
+					href: "tools/web/games/yahtzee.html",
 					icon: "🎲",
 					title: "Yahtzee",
 					tag: "Game",
+					category: "games",
 					description:
 						"Play Yahtzee locally. Multiplayer dice game with peer-to-peer connection.",
 					tags: "game dice multiplayer yahtzee",
 				},
 				{
-					href: "tools/web/hangman.html",
+					href: "tools/web/games/hangman.html",
 					icon: "🎯",
 					title: "Hangman",
 					tag: "Game",
+					category: "games",
 					description:
 						"Classic word guessing game for two players. Guess the secret word before running out of tries.",
 					tags: "game word puzzle hangman two player offline",
 				},
 				{
-					href: "tools/web/checkers.html",
+					href: "tools/web/games/checkers.html",
 					icon: "♟",
 					title: "Checkers",
 					tag: "Game",
+					category: "games",
 					description:
 						"Classic checkers for two players. Pass-and-play with kings, multi-jumps, and save/restore.",
 					tags: "game checkers draughts board two player offline",
 				},
 				{
-					href: "tools/web/language/vietnamese_conversations.html",
+					href: "tools/web/learn/vietnamese_conversations.html",
 					icon: "🇻🇳",
 					title: "Vietnamese Conversations",
 					tag: "Language",
+					category: "learn",
 					description:
 						"Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.",
 					tags: "language learning vietnamese education",
 				},
 				{
-					href: "tools/web/language/vietnamese_hotel.html",
+					href: "tools/web/learn/vietnamese_hotel.html",
 					icon: "🏨",
 					title: "Vietnamese Hotel Conversations",
 					tag: "Language",
+					category: "learn",
 					description:
 						"Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.",
 					tags: "language learning vietnamese hotel travel education",
 				},
 				{
-					href: "tools/web/language/italian-guide.html",
+					href: "tools/web/learn/italian-guide.html",
 					icon: "🇮🇹",
 					title: "Italian for Travelers",
 					tag: "Language",
+					category: "learn",
 					description:
 						"Essential Italian phrases for travelers. Common expressions to help you get around Italy.",
 					tags: "language learning italian travel education",
 				},
 			];
 
-			const toolsList = document.getElementById("toolsList");
+			const categories = ["tools", "games", "learn"];
+
+			categories.forEach((cat) => {
+				const list = document.getElementById(`list-${cat}`);
+				list.innerHTML = tools
+					.filter((t) => t.category === cat)
+					.map(
+						(t) => `
+					<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
+						<div class="tool-icon-row">${t.icon}</div>
+						<div class="tool-content">
+							<div class="tool-header">
+								<h3 class="tool-title-row">${t.title}</h3>
+								<span class="tag">${t.tag}</span>
+							</div>
+							<p class="tool-description-row">${t.description}</p>
+						</div>
+						<div class="tool-arrow">→</div>
+					</a>`,
+					)
+					.join("");
+			});
+
 			const noResults = document.getElementById("noResults");
 			const searchInput = document.getElementById("searchInput");
+			const pills = document.querySelectorAll(".pill");
+			const categorySections = document.querySelectorAll(".category-section");
 
-			toolsList.innerHTML = tools
-				.map(
-					(t) => `
-				<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
-					<div class="tool-icon-row">${t.icon}</div>
-					<div class="tool-content">
-						<div class="tool-header">
-							<h3 class="tool-title-row">${t.title}</h3>
-							<span class="tag">${t.tag}</span>
-						</div>
-						<p class="tool-description-row">${t.description}</p>
-					</div>
-					<div class="tool-arrow">→</div>
-				</a>`,
-				)
-				.join("");
+			let activeFilter = "all";
 
-			const toolRows = toolsList.querySelectorAll(".tool-row");
+			function applyFilter() {
+				const term = searchInput.value.toLowerCase().trim();
+				let anyVisible = false;
+
+				categorySections.forEach((section) => {
+					const catId = section.dataset.category;
+					if (activeFilter !== "all" && activeFilter !== catId) {
+						section.classList.add("hidden");
+						return;
+					}
+
+					const rows = section.querySelectorAll(".tool-row");
+					let count = 0;
+					rows.forEach((row) => {
+						const matches =
+							term === "" ||
+							["title", "description", "tags"].some((k) =>
+								row.dataset[k]?.toLowerCase().includes(term),
+							);
+						row.classList.toggle("hidden", !matches);
+						if (matches) count++;
+					});
+
+					if (count === 0 && term !== "") {
+						section.classList.add("hidden");
+					} else {
+						section.classList.remove("hidden");
+						anyVisible = true;
+					}
+				});
+
+				noResults.style.display =
+					!anyVisible && term !== "" ? "block" : "none";
+			}
+
+			pills.forEach((pill) => {
+				pill.addEventListener("click", () => {
+					pills.forEach((p) => p.classList.remove("active"));
+					pill.classList.add("active");
+					activeFilter = pill.dataset.filter;
+					applyFilter();
+				});
+			});
 
 			function debounce(func, wait) {
 				let timeout;
@@ -537,31 +663,11 @@
 				};
 			}
 
-			function filterTools(searchTerm) {
-				const term = searchTerm.toLowerCase().trim();
-				let visibleCount = 0;
-				toolRows.forEach((row) => {
-					const matches = ["title", "description", "tags"].some((key) =>
-						row.dataset[key]?.toLowerCase().includes(term),
-					);
-					if (matches || term === "") {
-						row.classList.remove("hidden");
-						visibleCount++;
-					} else {
-						row.classList.add("hidden");
-					}
-				});
-				noResults.style.display =
-					visibleCount === 0 && term !== "" ? "block" : "none";
-				toolsList.style.display =
-					visibleCount === 0 && term !== "" ? "none" : "grid";
-			}
-
 			searchInput.addEventListener(
 				"input",
-				debounce((e) => filterTools(e.target.value), 150),
+				debounce(() => applyFilter(), 150),
 			);
-			filterTools("");
+			applyFilter();
 		</script>
 	</body>
 </html>
