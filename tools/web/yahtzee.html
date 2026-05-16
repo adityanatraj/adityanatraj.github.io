@@ -923,7 +923,14 @@
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
 					type: "application/json",
 				});
-				const fname = "yahtzee-game.json";
+				const now = new Date();
+				const ts = now.getFullYear().toString()
+					+ String(now.getMonth() + 1).padStart(2, "0")
+					+ String(now.getDate()).padStart(2, "0")
+					+ String(now.getHours()).padStart(2, "0")
+					+ String(now.getMinutes()).padStart(2, "0")
+					+ String(now.getSeconds()).padStart(2, "0");
+				const fname = `yahtzee-${ts}.json`;
 
 				try {
 					const file = new File([blob], fname, { type: "application/json" });
@@ -999,12 +1006,30 @@
 				}
 			}
 
-			function recordGame() {
+			function getLocation() {
+				return new Promise((resolve) => {
+					if (!navigator.geolocation) return resolve(null);
+					navigator.geolocation.getCurrentPosition(
+						(pos) => resolve({
+							latitude: pos.coords.latitude,
+							longitude: pos.coords.longitude,
+							accuracy: Math.round(pos.coords.accuracy),
+							capturedAt: new Date().toISOString(),
+						}),
+						() => resolve(null),
+						{ timeout: 5000, maximumAge: 60000 },
+					);
+				});
+			}
+
+			async function recordGame() {
 				const games = getPastGames();
 				if (games === null) return;
+				const location = await getLocation();
 				games.push({
 					startedAt: gameState.startedAt,
 					endedAt: gameState.endedAt,
+					location: location,
 					players: gameState.players.map((p) => ({
 						name: p.name,
 						scores: { ...p.scores },
@@ -1012,6 +1037,12 @@
 					})),
 				});
 				savePastGames(games);
+			}
+
+			function formatCoords(loc) {
+				const lat = Math.abs(loc.latitude).toFixed(2) + "°" + (loc.latitude >= 0 ? "N" : "S");
+				const lng = Math.abs(loc.longitude).toFixed(2) + "°" + (loc.longitude >= 0 ? "E" : "W");
+				return `${lat}, ${lng}`;
 			}
 
 			function computeStats(games) {
@@ -1106,6 +1137,20 @@
 					Object.entries(playerTotals).forEach(([name, totals]) => {
 						const avg = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
 						html += `<p>${name}: ${avg} (${totals.length} game${totals.length !== 1 ? "s" : ""})</p>`;
+					});
+				}
+
+				const locationCounts = {};
+				games.forEach((g) => {
+					if (!g.location) return;
+					const key = formatCoords(g.location);
+					locationCounts[key] = (locationCounts[key] || 0) + 1;
+				});
+				const locationEntries = Object.entries(locationCounts);
+				if (locationEntries.length > 0) {
+					html += `<h4>Locations</h4>`;
+					locationEntries.forEach(([coords, count]) => {
+						html += `<p>${coords} — ${count} game${count !== 1 ? "s" : ""}</p>`;
 					});
 				}
 
