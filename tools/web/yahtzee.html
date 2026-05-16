@@ -929,7 +929,7 @@
 			============================================================================ */
 			function saveGame() {
 				const saveData = {
-					version: "1.3",
+					version: "1.4",
 					savedAt: localISOString(new Date()),
 					gameState: gameState,
 					pastGames: getPastGames() || [],
@@ -938,13 +938,7 @@
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
 					type: "application/json",
 				});
-				const now = new Date();
-				const ts = now.getFullYear().toString()
-					+ String(now.getMonth() + 1).padStart(2, "0")
-					+ String(now.getDate()).padStart(2, "0")
-					+ String(now.getHours()).padStart(2, "0")
-					+ String(now.getMinutes()).padStart(2, "0")
-					+ String(now.getSeconds()).padStart(2, "0");
+				const ts = localISOString(new Date()).slice(0, 19).replace(/[-T:]/g, "");
 				const fname = `yahtzee-${ts}.json`;
 
 				try {
@@ -1037,13 +1031,13 @@
 			}
 
 			async function recordGame() {
-				if (getPastGames() === null) return;
 				const location = await getLocation();
-				const games = getPastGames() || [];
+				const games = getPastGames();
+				if (games === null) return;
 				games.push({
 					startedAt: gameState.startedAt,
 					endedAt: gameState.endedAt,
-					location: location,
+					location,
 					players: gameState.players.map((p) => ({
 						name: p.name,
 						scores: { ...p.scores },
