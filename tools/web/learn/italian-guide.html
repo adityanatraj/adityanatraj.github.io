@@ -216,18 +216,24 @@
     width: 32px;
     height: 32px;
     min-width: 32px;
-    display: flex;
+    min-height: 32px;
+    aspect-ratio: 1 / 1;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
     cursor: pointer;
     color: var(--terracotta);
     font-size: 0.85rem;
+    line-height: 1;
     transition: all 0.2s;
     flex-shrink: 0;
-    margin-top: 2px;
+    box-sizing: content-box;
+    vertical-align: middle;
   }
   .speak-btn:hover { background: var(--terracotta); color: white; border-color: var(--terracotta); }
   .speak-btn.playing { background: var(--terracotta); color: white; border-color: var(--terracotta); animation: pulse 0.8s infinite; }
+  .speak-sm { width: 22px; height: 22px; min-width: 22px; min-height: 22px; font-size: 0.62rem; margin-left: 4px; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 
   /* PHRASE CARDS */
@@ -552,23 +558,23 @@
       <tr><th>Vowel</th><th>Sound</th><th>In context</th></tr>
       <tr><td><strong>A</strong></td><td>father</td><td>
         <span class="it">casa</span> — house
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('casa')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('casa')">▶</button>
       </td></tr>
       <tr><td><strong>E</strong></td><td>bed or café</td><td>
         <span class="it">bene</span> — good/well
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('bene')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('bene')">▶</button>
       </td></tr>
       <tr><td><strong>I</strong></td><td>"ee" as in machine</td><td>
         <span class="it">vino</span> — wine
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('vino')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('vino')">▶</button>
       </td></tr>
       <tr><td><strong>O</strong></td><td>note (no "ow")</td><td>
         <span class="it">poco</span> — a little
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('poco')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('poco')">▶</button>
       </td></tr>
       <tr><td><strong>U</strong></td><td>"oo" as in boot</td><td>
         <span class="it">uno</span> — one
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('uno')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('uno')">▶</button>
       </td></tr>
     </table>
   </div>
@@ -580,35 +586,35 @@
       <tr><th>Letter(s)</th><th>Rule</th><th>Example</th></tr>
       <tr><td><strong>C + E/I</strong></td><td>like "ch"</td><td>
         <span class="it">ciao</span> = "chow"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('ciao')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('ciao')">▶</button>
       </td></tr>
       <tr><td><strong>C + A/O/U</strong></td><td>like "k"</td><td>
         <span class="it">caffè</span> = "kaf-feh"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('caffè')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('caffè')">▶</button>
       </td></tr>
       <tr><td><strong>G + E/I</strong></td><td>like "j"</td><td>
         <span class="it">gelato</span> = "jeh-LAH-toh"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('gelato')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('gelato')">▶</button>
       </td></tr>
       <tr><td><strong>G + A/O/U</strong></td><td>hard "g"</td><td>
         <span class="it">grazie</span>
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('grazie')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('grazie')">▶</button>
       </td></tr>
       <tr><td><strong>GN</strong></td><td>"ny" in canyon</td><td>
         <span class="it">gnocchi</span> = "nyoh-kee"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('gnocchi')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('gnocchi')">▶</button>
       </td></tr>
       <tr><td><strong>GL + I</strong></td><td>"ly" in million</td><td>
         <span class="it">figlio</span> = "FEEL-yoh"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('figlio')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('figlio')">▶</button>
       </td></tr>
       <tr><td><strong>SC + E/I</strong></td><td>like "sh"</td><td>
         <span class="it">scena</span> = "SHEH-nah"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('scena')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('scena')">▶</button>
       </td></tr>
       <tr><td><strong>Z</strong></td><td>"ts" or "dz"</td><td>
         <span class="it">pizza</span> = "PEET-tsah"
-        <button class="speak-btn" style="display:inline-flex;width:24px;height:24px;font-size:0.7rem;vertical-align:middle;margin-left:6px" onclick="speak('pizza')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('pizza')">▶</button>
       </td></tr>
       <tr><td><strong>H</strong></td><td>always silent</td><td><span class="it">ho</span> = "oh" (I have)</td></tr>
     </table>
@@ -637,6 +643,85 @@
         <span class="en-text">table — TAH-voh-loh, stress on first</span>
       </div>
       <button class="speak-btn" onclick="speak('tavolo')">▶</button>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Practice Phrases — Chew On These</h3>
+    <p>Each phrase is genuinely useful <em>and</em> targets a specific sound challenge. Say them slowly, then build speed.</p>
+
+    <table class="it-table">
+      <colgroup><col style="width:44%"><col style="width:30%"><col style="width:26%"></colgroup>
+      <tr><th>Phrase</th><th>Meaning</th><th>Challenge</th></tr>
+      <tr>
+        <td>
+          <em class="it">Vorrei delle tagliatelle al ragù, per favore.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Vorrei delle tagliatelle al ragù, per favore.')">▶</button>
+        </td>
+        <td>I'd like tagliatelle with meat sauce, please.</td>
+        <td>GL sound in <em>tagliatelle</em> — "tal-ya-TEL-leh"</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Gli gnocchi della nonna sono buonissimi.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Gli gnocchi della nonna sono buonissimi.')">▶</button>
+        </td>
+        <td>Grandma's gnocchi are absolutely delicious.</td>
+        <td>GN + GL + double N all in one sentence</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Scusi, c'è una chiesa qui vicino?</em>
+          <button class="speak-btn speak-sm" onclick="speak('Scusi, c\'è una chiesa qui vicino?')">▶</button>
+        </td>
+        <td>Excuse me, is there a church nearby?</td>
+        <td>SC + soft CH — "SHEH-zah" vs "kye-ZAH"</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Questo formaggio stagionato è straordinario.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Questo formaggio stagionato è straordinario.')">▶</button>
+        </td>
+        <td>This aged cheese is extraordinary.</td>
+        <td>GG sound + four full final vowels — don't clip any</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Non ho capito — può ripetere più lentamente?</em>
+          <button class="speak-btn speak-sm" onclick="speak('Non ho capito, può ripetere più lentamente?')">▶</button>
+        </td>
+        <td>I didn't understand — can you repeat more slowly?</td>
+        <td>Silent H in <em>ho</em>; stress on ri-PE-te-re</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Prendo un cappuccino e una brioche, grazie.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Prendo un cappuccino e una brioche, grazie.')">▶</button>
+        </td>
+        <td>I'll have a cappuccino and a croissant, thanks.</td>
+        <td>Double P + double C — held consonants back to back</td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Vorrei sapere dov'è la stazione ferroviaria.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Vorrei sapere dov\'è la stazione ferroviaria.')">▶</button>
+        </td>
+        <td>I'd like to know where the train station is.</td>
+        <td>-zione ending + rolling R in <em>ferroviaria</em></td>
+      </tr>
+      <tr>
+        <td>
+          <em class="it">Ho già mangiato, ma assaggio volentieri!</em>
+          <button class="speak-btn speak-sm" onclick="speak('Ho già mangiato, ma assaggio volentieri!')">▶</button>
+        </td>
+        <td>I've already eaten, but I'll happily taste it!</td>
+        <td>GI sound + double GG + accent on <em>già</em></td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <div class="icon">🎯</div>
+      <p>Pick one phrase per day. Say it ten times, then use it at the first opportunity. Italians will almost always correct you gently if you ask — <em>"Lo dico bene?"</em> (Am I saying it right?) opens a lovely conversation.</p>
     </div>
   </div>
 </div>
@@ -669,6 +754,53 @@
   </div>
 
   <div class="lesson">
+    <h3>Common Nouns by Gender — Reference Table</h3>
+    <p>Learn these with their articles from day one — the article is part of the word.</p>
+    <div class="two-col">
+      <table class="it-table">
+        <tr><th colspan="3">Masculine — il / un</th></tr>
+        <tr><th>Article</th><th>Italian</th><th>English</th></tr>
+        <tr><td class="it">il</td><td class="it">treno</td><td>train</td></tr>
+        <tr><td class="it">il</td><td class="it">vino</td><td>wine</td></tr>
+        <tr><td class="it">il</td><td class="it">mercato</td><td>market</td></tr>
+        <tr><td class="it">il</td><td class="it">conto</td><td>bill</td></tr>
+        <tr><td class="it">il</td><td class="it">posto</td><td>place / seat</td></tr>
+        <tr><td class="it">il</td><td class="it">prezzo</td><td>price</td></tr>
+        <tr><td class="it">il</td><td class="it">bagno</td><td>bathroom</td></tr>
+        <tr><td class="it">il</td><td class="it">formaggio</td><td>cheese</td></tr>
+        <tr><td class="it">il</td><td class="it">pane</td><td>bread</td></tr>
+        <tr><td class="it">il</td><td class="it">tavolo</td><td>table</td></tr>
+        <tr><td class="it">l'</td><td class="it">olio</td><td>oil</td></tr>
+        <tr><td class="it">l'</td><td class="it">albergo</td><td>hotel</td></tr>
+        <tr><td class="it">lo</td><td class="it">zaino</td><td>backpack</td></tr>
+        <tr><td class="it">lo</td><td class="it">spuntino</td><td>snack</td></tr>
+      </table>
+      <table class="it-table">
+        <tr><th colspan="3">Feminine — la / una</th></tr>
+        <tr><th>Article</th><th>Italian</th><th>English</th></tr>
+        <tr><td class="it">la</td><td class="it">stazione</td><td>station</td></tr>
+        <tr><td class="it">la</td><td class="it">piazza</td><td>square</td></tr>
+        <tr><td class="it">la</td><td class="it">strada</td><td>street / road</td></tr>
+        <tr><td class="it">la</td><td class="it">chiesa</td><td>church</td></tr>
+        <tr><td class="it">la</td><td class="it">camera</td><td>bedroom / hotel room</td></tr>
+        <tr><td class="it">la</td><td class="it">pasta</td><td>pasta / dough</td></tr>
+        <tr><td class="it">la</td><td class="it">birra</td><td>beer</td></tr>
+        <tr><td class="it">la</td><td class="it">carta</td><td>card / menu / paper</td></tr>
+        <tr><td class="it">la</td><td class="it">borsa</td><td>bag / handbag</td></tr>
+        <tr><td class="it">la</td><td class="it">farmacia</td><td>pharmacy</td></tr>
+        <tr><td class="it">l'</td><td class="it">acqua</td><td>water</td></tr>
+        <tr><td class="it">l'</td><td class="it">arancia</td><td>orange</td></tr>
+        <tr><td class="it">la</td><td class="it">colazione</td><td>breakfast</td></tr>
+        <tr><td class="it">la</td><td class="it">ricetta</td><td>recipe</td></tr>
+      </table>
+    </div>
+    <div class="tip">
+      <div class="icon">📌</div>
+      <p>Nouns ending in <strong>-e</strong> can be either gender — <em>il pane</em> (m.), <em>la stazione</em> (f.). These need to be learned individually, but there are fewer of them and they come up naturally with use.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
     <h3>Definite Articles ("the")</h3>
     <table class="it-table">
       <colgroup><col style="width:25%"><col style="width:37%"><col style="width:38%"></colgroup>
@@ -692,12 +824,12 @@
       <tr><th>Gender</th><th>Form</th><th>In use</th></tr>
       <tr><td>Masculine</td><td class="it">un</td><td>
         <span class="it">un pomodoro</span> — a tomato
-        <button class="speak-btn" style="display:inline-flex;width:22px;height:22px;font-size:0.65rem;vertical-align:middle;margin-left:4px" onclick="speak('un pomodoro')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('un pomodoro')">▶</button>
       </td></tr>
       <tr><td>Masculine (s+cons, z)</td><td class="it">uno</td><td><span class="it">uno spicchio d'aglio</span> — a clove of garlic</td></tr>
       <tr><td>Feminine</td><td class="it">una</td><td>
         <span class="it">una mozzarella</span> — a mozzarella
-        <button class="speak-btn" style="display:inline-flex;width:22px;height:22px;font-size:0.65rem;vertical-align:middle;margin-left:4px" onclick="speak('una mozzarella')">▶</button>
+        <button class="speak-btn speak-sm" onclick="speak('una mozzarella')">▶</button>
       </td></tr>
       <tr><td>Feminine (before vowel)</td><td class="it">un'</td><td><span class="it">un'arancia</span> — an orange</td></tr>
     </table>
@@ -758,6 +890,458 @@
       <tr><td>voi</td><td class="it">parlate</td><td class="it">vedete</td><td class="it">partite</td></tr>
       <tr><td>loro</td><td class="it">parlano</td><td class="it">vedono</td><td class="it">partono</td></tr>
     </table>
+  </div>
+
+  <!-- ─── VERB VOCABULARY TABLES ─── -->
+  <div class="lesson">
+    <h3>-ARE Verbs — A Working Vocabulary <span class="badge">30 verbs</span></h3>
+    <p>The largest family. All follow the <em>parlare</em> pattern above. Knowing these thirty gives you the backbone of everyday conversation.</p>
+    <table class="it-table">
+      <colgroup><col style="width:28%"><col style="width:30%"><col style="width:42%"></colgroup>
+      <tr><th>Infinitive</th><th>English</th><th>Quick example</th></tr>
+      <tr>
+        <td class="it">parlare</td><td>to speak</td>
+        <td><em>Parli italiano?</em> — Do you speak Italian?
+          <button class="speak-btn speak-sm" onclick="speak('Parli italiano?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">mangiare</td><td>to eat</td>
+        <td><em>Mangiamo fuori stasera.</em> — We're eating out tonight.
+          <button class="speak-btn speak-sm" onclick="speak('Mangiamo fuori stasera.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">bere*</td><td>to drink</td>
+        <td><em>Cosa bevi?</em> — What are you drinking? <span style="font-size:0.75rem;color:#aaa">(*irregular)</span>
+          <button class="speak-btn speak-sm" onclick="speak('Cosa bevi?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">comprare</td><td>to buy</td>
+        <td><em>Compro del pane.</em> — I'm buying some bread.
+          <button class="speak-btn speak-sm" onclick="speak('Compro del pane.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">cercare</td><td>to look for</td>
+        <td><em>Cerco un buon ristorante.</em> — I'm looking for a good restaurant.
+          <button class="speak-btn speak-sm" onclick="speak('Cerco un buon ristorante.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">portare</td><td>to bring / carry</td>
+        <td><em>Mi porta il conto?</em> — Can you bring me the bill?
+          <button class="speak-btn speak-sm" onclick="speak('Mi porta il conto?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">aspettare</td><td>to wait</td>
+        <td><em>Aspetta un momento.</em> — Wait a moment.
+          <button class="speak-btn speak-sm" onclick="speak('Aspetta un momento.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">trovare</td><td>to find</td>
+        <td><em>Non trovo il mio passaporto.</em> — I can't find my passport.
+          <button class="speak-btn speak-sm" onclick="speak('Non trovo il mio passaporto.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">chiamare</td><td>to call</td>
+        <td><em>Come si chiama?</em> — What is it called?
+          <button class="speak-btn speak-sm" onclick="speak('Come si chiama?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">pagare</td><td>to pay</td>
+        <td><em>Posso pagare con la carta?</em> — Can I pay by card?
+          <button class="speak-btn speak-sm" onclick="speak('Posso pagare con la carta?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">provare</td><td>to try / taste</td>
+        <td><em>Posso provare?</em> — Can I try this?
+          <button class="speak-btn speak-sm" onclick="speak('Posso provare?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">camminare</td><td>to walk</td>
+        <td><em>Si cammina bene da qui.</em> — It's a pleasant walk from here.
+          <button class="speak-btn speak-sm" onclick="speak('Si cammina bene da qui.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">prenotare</td><td>to book / reserve</td>
+        <td><em>Ho prenotato un tavolo.</em> — I've booked a table.
+          <button class="speak-btn speak-sm" onclick="speak('Ho prenotato un tavolo.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">visitare</td><td>to visit</td>
+        <td><em>Visitiamo il Colosseo domani.</em> — We're visiting the Colosseum tomorrow.
+          <button class="speak-btn speak-sm" onclick="speak('Visitiamo il Colosseo domani.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">ascoltare</td><td>to listen</td>
+        <td><em>Ascolta — senti la musica?</em> — Listen — do you hear the music?
+          <button class="speak-btn speak-sm" onclick="speak('Ascolta, senti la musica?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">guardare</td><td>to look at / watch</td>
+        <td><em>Guarda che vista!</em> — Look at that view!
+          <button class="speak-btn speak-sm" onclick="speak('Guarda che vista!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">lasciare</td><td>to leave (something)</td>
+        <td><em>Lascio i bagagli qui?</em> — Can I leave my bags here?
+          <button class="speak-btn speak-sm" onclick="speak('Lascio i bagagli qui?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">aiutare</td><td>to help</td>
+        <td><em>Può aiutarmi?</em> — Can you help me?
+          <button class="speak-btn speak-sm" onclick="speak('Può aiutarmi?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">cambiare</td><td>to change</td>
+        <td><em>Dove posso cambiare i soldi?</em> — Where can I change money?
+          <button class="speak-btn speak-sm" onclick="speak('Dove posso cambiare i soldi?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">pensare</td><td>to think</td>
+        <td><em>Penso di sì.</em> — I think so.
+          <button class="speak-btn speak-sm" onclick="speak('Penso di sì.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">tornare</td><td>to return / come back</td>
+        <td><em>Torno domani.</em> — I'm coming back tomorrow.
+          <button class="speak-btn speak-sm" onclick="speak('Torno domani.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">imparare</td><td>to learn</td>
+        <td><em>Imparo l'italiano!</em> — I'm learning Italian!
+          <button class="speak-btn speak-sm" onclick="speak('Imparo l\'italiano!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">sperare</td><td>to hope</td>
+        <td><em>Spero di sì.</em> — I hope so.
+          <button class="speak-btn speak-sm" onclick="speak('Spero di sì.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">fermarsi</td><td>to stop</td>
+        <td><em>Si ferma qui il treno?</em> — Does the train stop here?
+          <button class="speak-btn speak-sm" onclick="speak('Si ferma qui il treno?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">abitare</td><td>to live (reside)</td>
+        <td><em>Abito a Roma.</em> — I live in Rome.
+          <button class="speak-btn speak-sm" onclick="speak('Abito a Roma.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">lavorare</td><td>to work</td>
+        <td><em>Lavora in questo ristorante?</em> — Do you work at this restaurant?
+          <button class="speak-btn speak-sm" onclick="speak('Lavora in questo ristorante?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">usare</td><td>to use</td>
+        <td><em>Usa il tartufo?</em> — Do you use truffle?
+          <button class="speak-btn speak-sm" onclick="speak('Usa il tartufo?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">ricordare</td><td>to remember</td>
+        <td><em>Non ricordo il nome.</em> — I don't remember the name.
+          <button class="speak-btn speak-sm" onclick="speak('Non ricordo il nome.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">sembrare</td><td>to seem</td>
+        <td><em>Sembra buono!</em> — It looks/seems good!
+          <button class="speak-btn speak-sm" onclick="speak('Sembra buono!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">spiegare</td><td>to explain</td>
+        <td><em>Può spiegare come funziona?</em> — Can you explain how it works?
+          <button class="speak-btn speak-sm" onclick="speak('Può spiegare come funziona?')">▶</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>-ERE Verbs — A Working Vocabulary <span class="badge">20 verbs</span></h3>
+    <p>The second family. Slightly smaller, but contains many of the most useful action verbs for travel and daily life.</p>
+    <table class="it-table">
+      <colgroup><col style="width:28%"><col style="width:30%"><col style="width:42%"></colgroup>
+      <tr><th>Infinitive</th><th>English</th><th>Quick example</th></tr>
+      <tr>
+        <td class="it">vedere</td><td>to see</td>
+        <td><em>Vedo il mare da qui.</em> — I can see the sea from here.
+          <button class="speak-btn speak-sm" onclick="speak('Vedo il mare da qui.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">prendere</td><td>to take / have (food)</td>
+        <td><em>Prendo le tagliatelle.</em> — I'll have the tagliatelle.
+          <button class="speak-btn speak-sm" onclick="speak('Prendo le tagliatelle.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">chiedere</td><td>to ask</td>
+        <td><em>Posso chiedere una cosa?</em> — Can I ask something?
+          <button class="speak-btn speak-sm" onclick="speak('Posso chiedere una cosa?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">leggere</td><td>to read</td>
+        <td><em>Leggo il menù.</em> — I'm reading the menu.
+          <button class="speak-btn speak-sm" onclick="speak('Leggo il menù.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">scrivere</td><td>to write</td>
+        <td><em>Può scrivere l'indirizzo?</em> — Can you write the address down?
+          <button class="speak-btn speak-sm" onclick="speak('Può scrivere l\'indirizzo?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">mettere</td><td>to put / place</td>
+        <td><em>Metta tutto insieme.</em> — Put it all together (on one bill).
+          <button class="speak-btn speak-sm" onclick="speak('Metta tutto insieme.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">vivere</td><td>to live</td>
+        <td><em>Vivi qui?</em> — Do you live here?
+          <button class="speak-btn speak-sm" onclick="speak('Vivi qui?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">conoscere</td><td>to know (people/places)</td>
+        <td><em>Conosci un buon gelataio?</em> — Do you know a good ice cream maker?
+          <button class="speak-btn speak-sm" onclick="speak('Conosci un buon gelataio?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">sapere*</td><td>to know (facts)</td>
+        <td><em>Sa dov'è la stazione?</em> — Do you know where the station is?
+          <button class="speak-btn speak-sm" onclick="speak('Sa dov\'è la stazione?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">credere</td><td>to believe / think</td>
+        <td><em>Credo di sì.</em> — I believe so / I think so.
+          <button class="speak-btn speak-sm" onclick="speak('Credo di sì.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">ricevere</td><td>to receive</td>
+        <td><em>Ho ricevuto il resto sbagliato.</em> — I received the wrong change.
+          <button class="speak-btn speak-sm" onclick="speak('Ho ricevuto il resto sbagliato.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">rispondere</td><td>to answer / reply</td>
+        <td><em>Nessuno risponde.</em> — Nobody is answering.
+          <button class="speak-btn speak-sm" onclick="speak('Nessuno risponde.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">perdere</td><td>to lose / miss</td>
+        <td><em>Ho perso il treno.</em> — I missed the train.
+          <button class="speak-btn speak-sm" onclick="speak('Ho perso il treno.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">correre</td><td>to run</td>
+        <td><em>Devo correre — il treno parte!</em> — I have to run — the train is leaving!
+          <button class="speak-btn speak-sm" onclick="speak('Devo correre, il treno parte!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">vendere</td><td>to sell</td>
+        <td><em>Vendono prodotti locali?</em> — Do they sell local products?
+          <button class="speak-btn speak-sm" onclick="speak('Vendono prodotti locali?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">accendere</td><td>to turn on / light</td>
+        <td><em>Come si accende la luce?</em> — How do you turn on the light?
+          <button class="speak-btn speak-sm" onclick="speak('Come si accende la luce?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">dipendere</td><td>to depend</td>
+        <td><em>Dipende dal prezzo.</em> — It depends on the price.
+          <button class="speak-btn speak-sm" onclick="speak('Dipende dal prezzo.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">spendere</td><td>to spend (money)</td>
+        <td><em>Non voglio spendere troppo.</em> — I don't want to spend too much.
+          <button class="speak-btn speak-sm" onclick="speak('Non voglio spendere troppo.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">godere</td><td>to enjoy</td>
+        <td><em>Godiamoci questa serata!</em> — Let's enjoy this evening!
+          <button class="speak-btn speak-sm" onclick="speak('Godiamoci questa serata!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">sorridere</td><td>to smile</td>
+        <td><em>Sorride sempre.</em> — She always smiles.
+          <button class="speak-btn speak-sm" onclick="speak('Sorride sempre.')">▶</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="lesson">
+    <h3>-IRE Verbs — A Working Vocabulary <span class="badge">20 verbs</span></h3>
+    <p>The third family. Some -ire verbs insert <strong>-isc-</strong> between the stem and ending (marked ✦) — a common pattern worth noticing.</p>
+    <table class="it-table">
+      <colgroup><col style="width:28%"><col style="width:30%"><col style="width:42%"></colgroup>
+      <tr><th>Infinitive</th><th>English</th><th>Quick example</th></tr>
+      <tr>
+        <td class="it">partire</td><td>to leave / depart</td>
+        <td><em>Il treno parte alle dieci.</em> — The train leaves at ten.
+          <button class="speak-btn speak-sm" onclick="speak('Il treno parte alle dieci.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">dormire</td><td>to sleep</td>
+        <td><em>Dormo in un piccolo albergo.</em> — I'm sleeping in a small hotel.
+          <button class="speak-btn speak-sm" onclick="speak('Dormo in un piccolo albergo.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">sentire</td><td>to hear / feel</td>
+        <td><em>Senti che profumo!</em> — Can you smell that aroma!
+          <button class="speak-btn speak-sm" onclick="speak('Senti che profumo!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">aprire</td><td>to open</td>
+        <td><em>A che ora apre il museo?</em> — What time does the museum open?
+          <button class="speak-btn speak-sm" onclick="speak('A che ora apre il museo?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">coprire</td><td>to cover</td>
+        <td><em>Copre il servizio?</em> — Does that cover the service charge?
+          <button class="speak-btn speak-sm" onclick="speak('Copre il servizio?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">offrire</td><td>to offer</td>
+        <td><em>Offro io!</em> — It's on me! / My treat!
+          <button class="speak-btn speak-sm" onclick="speak('Offro io!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">seguire</td><td>to follow</td>
+        <td><em>Segua me.</em> — Follow me (formal).
+          <button class="speak-btn speak-sm" onclick="speak('Segua me.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">servire</td><td>to serve / need</td>
+        <td><em>Cosa le serve?</em> — What do you need?
+          <button class="speak-btn speak-sm" onclick="speak('Cosa le serve?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">salire</td><td>to go up / board</td>
+        <td><em>Si sale da questa parte.</em> — You board from this side.
+          <button class="speak-btn speak-sm" onclick="speak('Si sale da questa parte.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">uscire*</td><td>to go out / exit</td>
+        <td><em>Usciamo dopo cena?</em> — Shall we go out after dinner?
+          <button class="speak-btn speak-sm" onclick="speak('Usciamo dopo cena?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">finire ✦</td><td>to finish</td>
+        <td><em>A che ora finisce?</em> — What time does it finish?
+          <button class="speak-btn speak-sm" onclick="speak('A che ora finisce?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">capire ✦</td><td>to understand</td>
+        <td><em>Capisce?</em> — Do you understand? / <em>Non capisco.</em> — I don't understand.
+          <button class="speak-btn speak-sm" onclick="speak('Non capisco.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">preferire ✦</td><td>to prefer</td>
+        <td><em>Preferisce il rosso o il bianco?</em> — Do you prefer red or white (wine)?
+          <button class="speak-btn speak-sm" onclick="speak('Preferisce il rosso o il bianco?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">spedire ✦</td><td>to send / ship</td>
+        <td><em>Posso spedire questo in Inghilterra?</em> — Can I send this to England?
+          <button class="speak-btn speak-sm" onclick="speak('Posso spedire questo in Inghilterra?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">costruire ✦</td><td>to build</td>
+        <td><em>Quando è stato costruito?</em> — When was it built?
+          <button class="speak-btn speak-sm" onclick="speak('Quando è stato costruito?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">pulire ✦</td><td>to clean</td>
+        <td><em>La camera non è stata pulita.</em> — The room hasn't been cleaned.
+          <button class="speak-btn speak-sm" onclick="speak('La camera non è stata pulita.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">guarire ✦</td><td>to recover / heal</td>
+        <td><em>Guarisce presto!</em> — Get well soon!
+          <button class="speak-btn speak-sm" onclick="speak('Guarisce presto!')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">restituire ✦</td><td>to return / give back</td>
+        <td><em>Posso restituire questo?</em> — Can I return this?
+          <button class="speak-btn speak-sm" onclick="speak('Posso restituire questo?')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">stabilire ✦</td><td>to establish / set</td>
+        <td><em>Stabiliamo un punto d'incontro.</em> — Let's establish a meeting point.
+          <button class="speak-btn speak-sm" onclick="speak('Stabiliamo un punto d\'incontro.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">proibire ✦</td><td>to forbid / prohibit</td>
+        <td><em>È proibito fotografare qui.</em> — Photography is prohibited here.
+          <button class="speak-btn speak-sm" onclick="speak('È proibito fotografare qui.')">▶</button>
+        </td>
+      </tr>
+    </table>
+    <div class="tip">
+      <div class="icon">✦</div>
+      <p><strong>The -isc- pattern:</strong> verbs marked ✦ insert <em>-isc-</em> in all singular forms and the third person plural. So <em>finire</em> → <em>finisco, finisci, finisce, finiamo, finite, finiscono</em>. Once you spot the pattern, it's easy to apply.</p>
+    </div>
   </div>
 
   <div class="lesson">
@@ -1062,6 +1646,91 @@
         <tr><td>1000</td><td class="it">mille</td></tr>
         <tr><td>2000</td><td class="it">duemila</td></tr>
       </table>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Weights & Measures — At the Market</h3>
+    <p>These words come up the moment you're standing at a stall. Know them before you shop.</p>
+    <table class="it-table">
+      <colgroup><col style="width:22%"><col style="width:12%"><col style="width:22%"><col style="width:44%"></colgroup>
+      <tr><th>Italian</th><th>Abbrev.</th><th>Equivalent</th><th>At the stall</th></tr>
+      <tr>
+        <td class="it">un chilo</td><td>1 kg</td><td>2.2 lbs</td>
+        <td><em>Un chilo di pomodori.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Un chilo di pomodori.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">mezzo chilo</td><td>500 g</td><td>1.1 lbs</td>
+        <td><em>Mezzo chilo di mele.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Mezzo chilo di mele.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">un etto</td><td>100 g</td><td>3.5 oz</td>
+        <td><em>Due etti di prosciutto.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Due etti di prosciutto.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">mezzo etto</td><td>50 g</td><td>1.75 oz</td>
+        <td><em>Mezzo etto di pecorino.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Mezzo etto di pecorino.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">un litro</td><td>1 L</td><td>34 fl oz</td>
+        <td><em>Un litro d'olio, per favore.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Un litro d\'olio, per favore.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">mezzo litro</td><td>500 ml</td><td>17 fl oz</td>
+        <td><em>Mezzo litro di vino sfuso.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Mezzo litro di vino sfuso.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">un pezzo</td><td>—</td><td>a piece / chunk</td>
+        <td><em>Un bel pezzo di parmigiano.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Un bel pezzo di parmigiano.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">una fetta</td><td>—</td><td>a slice</td>
+        <td><em>Due fette di mortadella.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Due fette di mortadella.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">un mazzo</td><td>—</td><td>a bunch</td>
+        <td><em>Un mazzo di basilico.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Un mazzo di basilico.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">una bottiglia</td><td>—</td><td>a bottle</td>
+        <td><em>Una bottiglia di aceto balsamico.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Una bottiglia di aceto balsamico.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">un vasetto</td><td>—</td><td>a small jar</td>
+        <td><em>Un vasetto di miele locale.</em>
+          <button class="speak-btn speak-sm" onclick="speak('Un vasetto di miele locale.')">▶</button>
+        </td>
+      </tr>
+      <tr>
+        <td class="it">quanto al chilo?</td><td>—</td><td>how much per kg?</td>
+        <td><em>Quanto al chilo le zucchine?</em>
+          <button class="speak-btn speak-sm" onclick="speak('Quanto al chilo le zucchine?')">▶</button>
+        </td>
+      </tr>
+    </table>
+    <div class="tip">
+      <div class="icon">💡</div>
+      <p><em>Un etto</em> (100g) is the standard deli unit — learn it first. For quantities, Italians often say <em>"me ne dia due etti"</em> (give me 200g of it) rather than a precise number of items.</p>
     </div>
   </div>
 
@@ -1495,9 +2164,231 @@
       <tr><td class="it">i legumi secchi</td><td>dried pulses / legumes</td></tr>
     </table>
   </div>
-</div>
 
-<!-- ═══ SCENARIOS ═══ -->
+  <hr class="divider">
+
+  <!-- CHEESE STALL -->
+  <div class="lesson">
+    <h3>🧀 At a Specialist Cheese Stall — Formaggeria</h3>
+    <div class="tip" style="margin-bottom:1rem">
+      <div class="icon">🧀</div>
+      <p>A dedicated cheese vendor is a treasure. They expect questions, love pairing suggestions, and almost always offer tastes unprompted. Engage fully — this is one of the great pleasures of Italian markets.</p>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-header">🧀 Formaggeria — Cheese Specialist</div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Formaggiaio</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Buongiorno! Vuole assaggiare qualcosa?</span>
+          <span class="dialogue-en">Good morning! Would you like to taste something?</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Buongiorno! Vuole assaggiare qualcosa?')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Sì, volentieri. Sto cercando qualcosa di locale — cosa mi consiglia?</span>
+          <span class="dialogue-en">Yes, gladly. I'm looking for something local — what do you recommend?</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Sto cercando qualcosa di locale. Cosa mi consiglia?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Formaggiaio</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Questo pecorino viene da un piccolo caseificio qui in zona — stagionato sei mesi. E questo è un caprino fresco di ieri.</span>
+          <span class="dialogue-en">This pecorino comes from a small dairy farm nearby — aged six months. And this is a fresh goat's cheese from yesterday.</span>
+          <span class="dialogue-note">caseificio = dairy / cheese-making farm; caprino = goat's cheese</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Questo pecorino viene da un piccolo caseificio qui in zona, stagionato sei mesi.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Mmm — il pecorino è fantastico. Ha più sapore di quello che trovo a casa. È fatto con latte crudo?</span>
+          <span class="dialogue-en">Mmm — the pecorino is fantastic. It has more flavour than what I find at home. Is it made with raw milk?</span>
+          <span class="dialogue-note">latte crudo = raw milk — a meaningful quality marker</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('È fatto con latte crudo?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Formaggiaio</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Sì, latte crudo di pecora. È per questo che ha quel carattere. Con cosa lo vuole abbinare?</span>
+          <span class="dialogue-en">Yes, raw sheep's milk. That's why it has that character. What would you like to pair it with?</span>
+          <span class="dialogue-note">abbinare = to pair — a beautiful word to know</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('È latte crudo di pecora. Con cosa lo vuole abbinare?')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Con del vino rosso locale e del miele. Ha qualcosa da suggerire?</span>
+          <span class="dialogue-en">With a local red wine and some honey. Do you have any suggestions?</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Con del vino rosso locale e del miele. Ha qualcosa da suggerire?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Formaggiaio</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Perfetto — il pecorino stagionato va benissimo con un Montepulciano e un miele di castagno. Gliene prendo un bel pezzo?</span>
+          <span class="dialogue-en">Perfect — aged pecorino goes beautifully with a Montepulciano and chestnut honey. Shall I cut you a nice piece?</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Il pecorino stagionato va benissimo con un Montepulciano e un miele di castagno.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Sì — un pezzo da circa due etti. E un vasetto di miele di castagno, se ce l'ha.</span>
+          <span class="dialogue-en">Yes — a piece of about 200g. And a jar of chestnut honey, if you have it.</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Un pezzo da circa due etti. E un vasetto di miele di castagno.')">▶</button></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.5rem">Cheese Vocabulary</h3>
+    <table class="it-table">
+      <colgroup><col style="width:40%"><col style="width:60%"></colgroup>
+      <tr><th>Italian</th><th>English</th></tr>
+      <tr><td class="it">il caseificio</td><td>dairy / cheese farm</td></tr>
+      <tr><td class="it">il latte crudo</td><td>raw milk</td></tr>
+      <tr><td class="it">stagionato / fresco</td><td>aged / fresh</td></tr>
+      <tr><td class="it">abbinare</td><td>to pair (food & wine)</td></tr>
+      <tr><td class="it">il sapore / il profumo</td><td>flavour / aroma</td></tr>
+      <tr><td class="it">di pecora / di capra / di vacca</td><td>sheep's / goat's / cow's milk</td></tr>
+      <tr><td class="it">la crosta</td><td>the rind</td></tr>
+      <tr><td class="it">piccante / delicato</td><td>sharp / mild</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- RESTAURANT SPECIALITIES -->
+  <div class="lesson">
+    <h3>🍴 The Curious Foodie — Exploring Specialities</h3>
+    <div class="tip" style="margin-bottom:1rem">
+      <div class="icon">🍴</div>
+      <p>The best meals in Italy come from asking questions. A chef or waiter who sees genuine curiosity will guide you to dishes that never appear on the tourist menu. These phrases unlock that experience.</p>
+    </div>
+    <div class="dialogue">
+      <div class="dialogue-header">🍴 Ristorante — Exploring the Kitchen</div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Scusi — prima di ordinare, vorrei chiederle una cosa. Quali sono i piatti della casa?</span>
+          <span class="dialogue-en">Excuse me — before ordering, I'd like to ask you something. What are the house specialities?</span>
+          <span class="dialogue-note">piatti della casa = house dishes — different from piatto del giorno (daily special)</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Quali sono i piatti della casa?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Cameriere</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">I nostri piatti forti sono il risotto al tartufo nero e la bistecca di chianina. Ma se vuole qualcosa di più locale, le consiglio i pici al cinghiale.</span>
+          <span class="dialogue-en">Our signature dishes are black truffle risotto and Chianina beef steak. But if you want something more local, I'd recommend pici with wild boar.</span>
+          <span class="dialogue-note">piatti forti = signature dishes; pici = thick Tuscan pasta; cinghiale = wild boar</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('I nostri piatti forti sono il risotto al tartufo nero e i pici al cinghiale.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Interessante! I pici — è una pasta fatta in casa?</span>
+          <span class="dialogue-en">Interesting! The pici — is it homemade pasta?</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('I pici, è una pasta fatta in casa?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Cameriere</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Assolutamente — li tira la nostra nonna ogni mattina. È un formato tipico di questa zona.</span>
+          <span class="dialogue-en">Absolutely — our grandmother rolls them every morning. It's a pasta shape typical of this area.</span>
+          <span class="dialogue-note">tirare la pasta = to roll pasta by hand</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Li tira la nostra nonna ogni mattina. È un formato tipico di questa zona.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Meraviglioso. Prendo quelli. E per il secondo — c'è qualcosa che non è sul menù? Qualcosa di stagionale?</span>
+          <span class="dialogue-en">Marvellous. I'll have those. And for the main — is there anything not on the menu? Something seasonal?</span>
+          <span class="dialogue-note">Asking for off-menu items is a mark of genuine interest — chefs appreciate it.</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('C\'è qualcosa che non è sul menù? Qualcosa di stagionale?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Cameriere</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Oggi abbiamo dei funghi porcini freschi appena arrivati — lo chef li prepara trifolati con aglio e prezzemolo. Non sono sul menù perché li abbiamo solo oggi.</span>
+          <span class="dialogue-en">Today we have fresh porcini mushrooms that just arrived — the chef prepares them sautéed with garlic and parsley. They're not on the menu because we only have them today.</span>
+          <span class="dialogue-note">trifolati = sautéed in olive oil, garlic, parsley — a classic Italian preparation</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Abbiamo dei funghi porcini freschi. Lo chef li prepara trifolati con aglio e prezzemolo.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Perfetto — li prendo! E per il vino, cosa abbinerebbe lei con il cinghiale e i porcini?</span>
+          <span class="dialogue-en">Perfect — I'll have those! And for wine, what would you pair with the boar and the porcini?</span>
+          <span class="dialogue-note">abbinerebbe = conditional of abbinare — polite and elegant</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Per il vino, cosa abbinerebbe lei con il cinghiale e i porcini?')">▶</button></div>
+      </div>
+      <div class="dialogue-line them">
+        <div class="dialogue-speaker">Cameriere</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Un Rosso di Montalcino — non troppo pesante ma con abbastanza struttura. O se vuole restare locale, ho un Morellino di Scansano ottimo.</span>
+          <span class="dialogue-en">A Rosso di Montalcino — not too heavy but with enough structure. Or if you want to stay local, I have an excellent Morellino di Scansano.</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Un Rosso di Montalcino, non troppo pesante ma con abbastanza struttura.')">▶</button></div>
+      </div>
+      <div class="dialogue-line you">
+        <div class="dialogue-speaker">Tu</div>
+        <div class="dialogue-content">
+          <span class="dialogue-it">Il Morellino — restiamo locali. Alla fine del pasto, vorrei fare i complimenti allo chef se è possibile.</span>
+          <span class="dialogue-en">The Morellino — let's stay local. At the end of the meal, I'd like to compliment the chef if possible.</span>
+        </div>
+        <div class="dialogue-audio"><button class="speak-btn" onclick="speak('Vorrei fare i complimenti allo chef se è possibile.')">▶</button></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.5rem">Foodie Phrases to Know</h3>
+    <div class="example">
+      <div class="example-text">
+        <span class="it-text">Da dove viene questo ingrediente?</span>
+        <span class="en-text">Where does this ingredient come from?</span>
+      </div>
+      <button class="speak-btn" onclick="speak('Da dove viene questo ingrediente?')">▶</button>
+    </div>
+    <div class="example">
+      <div class="example-text">
+        <span class="it-text">Come viene preparato? Con quali ingredienti?</span>
+        <span class="en-text">How is it prepared? With which ingredients?</span>
+      </div>
+      <button class="speak-btn" onclick="speak('Come viene preparato? Con quali ingredienti?')">▶</button>
+    </div>
+    <div class="example">
+      <div class="example-text">
+        <span class="it-text">È un piatto tipico di questa regione?</span>
+        <span class="en-text">Is this a typical dish of this region?</span>
+      </div>
+      <button class="speak-btn" onclick="speak('È un piatto tipico di questa regione?')">▶</button>
+    </div>
+    <div class="example">
+      <div class="example-text">
+        <span class="it-text">Complimenti allo chef — è stato un pasto indimenticabile.</span>
+        <span class="en-text">Compliments to the chef — it was an unforgettable meal.</span>
+      </div>
+      <button class="speak-btn" onclick="speak('Complimenti allo chef, è stato un pasto indimenticabile.')">▶</button>
+    </div>
+    <div class="example">
+      <div class="example-text">
+        <span class="it-text">Potrebbe darmi la ricetta? Solo i segreti principali!</span>
+        <span class="en-text">Could you give me the recipe? Just the main secrets!</span>
+      </div>
+      <button class="speak-btn" onclick="speak('Potrebbe darmi la ricetta? Solo i segreti principali!')">▶</button>
+    </div>
+  </div>
+</div>
 <div id="scenarios" class="section">
   <div class="section-header">
     <div class="num">Capitolo Otto</div>
