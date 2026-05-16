@@ -60,6 +60,21 @@
       opacity: 1;
     }
 
+    .back-link {
+      display: inline-block;
+      color: #999;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
     main {
       max-width: 1400px;
       margin: 0 auto;
@@ -476,6 +491,7 @@
   <button id="theme-toggle" aria-label="Toggle dark mode">☾</button>
 
   <main>
+    <a class="back-link" href="/">← Tools</a>
     <header id="clock-section">
       <time id="current-time" aria-live="polite">--:-- --</time>
       <div id="current-date"></div>
