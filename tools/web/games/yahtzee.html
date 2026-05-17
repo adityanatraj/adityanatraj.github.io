@@ -679,16 +679,6 @@
 				captureLocation();
 				render();
 			}
-			const _saved = loadCurrentGame();
-			if (_saved && !_saved.gameEnded) {
-				gameState = _saved;
-				if (!gameState.locations) gameState.locations = [];
-				captureLocation();
-				render();
-			} else {
-				newGame();
-			}
-
 			/* ============================================================================
 			   RENDER
 			============================================================================ */
@@ -1379,6 +1369,18 @@
 					rollDice();
 				}
 			});
+
+			// Bootstrap must follow all const declarations (PIPS, count, etc.) to
+			// avoid temporal dead zone errors when render() is called on restore.
+			const _saved = loadCurrentGame();
+			if (_saved && !_saved.gameEnded && isValidGameState(_saved)) {
+				gameState = _saved;
+				gameState.locations = gameState.locations || [];
+				captureLocation();
+				render();
+			} else {
+				newGame();
+			}
 		</script>
 		<footer>
 			<p>© Aditya N</p>
