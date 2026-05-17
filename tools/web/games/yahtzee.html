@@ -558,6 +558,7 @@
 
 			let gameState;
 			let flashCell = null;
+			let pendingLocation = null;
 
 			/* ============================================================================
 			   INIT
@@ -582,6 +583,8 @@
 						.sort((a, b) => calcTotals(b).grand - calcTotals(a).grand)
 						.map((p) => p.name);
 				}
+
+				pendingLocation = getLocation();
 
 				gameState = {
 					players: [
@@ -1046,7 +1049,8 @@
 				games.push(record);
 				savePastGames(games);
 
-				const location = await getLocation();
+				const location = await (pendingLocation || getLocation());
+				pendingLocation = null;
 				if (!location) return;
 				const fresh = getPastGames();
 				if (!fresh) return;
