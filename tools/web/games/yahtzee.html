@@ -982,6 +982,7 @@
 							const data = JSON.parse(r.result);
 
 							if (data.version) {
+								stopLocationWatch();
 								gameState = data.gameState;
 								// v1.3+: pastGames array; v1.2: statistics key — discard silently
 								if (data.pastGames && data.pastGames.length > 0) {
@@ -989,6 +990,7 @@
 								}
 							} else {
 								// Pre-versioned format — data IS the gameState
+								stopLocationWatch();
 								gameState = data;
 							}
 
