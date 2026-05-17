@@ -568,7 +568,6 @@
 
 			let gameState;
 			let flashCell = null;
-			let watchId = null;
 
 			/* ============================================================================
 			   INIT
@@ -611,10 +610,18 @@
 					endedAt: null,
 					locations: [],
 				};
-				startLocationWatch();
+				captureLocation();
 				render();
 			}
-			newGame();
+			const _saved = loadCurrentGame();
+			if (_saved && !_saved.gameEnded) {
+				gameState = _saved;
+				if (!gameState.locations) gameState.locations = [];
+				captureLocation();
+				render();
+			} else {
+				newGame();
+			}
 
 			/* ============================================================================
 			   RENDER
@@ -623,6 +630,7 @@
 				renderScorecard();
 				renderDice();
 				renderControls();
+				if (gameState && !gameState.gameEnded) saveCurrentGame();
 			}
 
 			function renderScorecard() {
@@ -807,7 +815,6 @@
 				if (allScored) {
 					gameState.gameEnded = true;
 					gameState.endedAt = localISOString(new Date());
-					stopLocationWatch();
 					showWinnerModal();
 				}
 			}
@@ -983,6 +990,7 @@
 
 							if (data.version) {
 								gameState = data.gameState;
+								if (!gameState.locations) gameState.locations = [];
 								// v1.3+: pastGames array; v1.2: statistics key — discard silently
 								if (data.pastGames && data.pastGames.length > 0) {
 									showPastGamesLoadModal(data.pastGames);
@@ -990,8 +998,10 @@
 							} else {
 								// Pre-versioned format — data IS the gameState
 								gameState = data;
+								if (!gameState.locations) gameState.locations = [];
 							}
 
+							captureLocation();
 							render();
 						} catch (err) {
 							alert("Error loading save file: " + err.message);
@@ -1029,12 +1039,10 @@
 				}
 			}
 
-			function startLocationWatch() {
-				stopLocationWatch();
+			function captureLocation() {
 				if (!navigator.geolocation) return;
-				watchId = navigator.geolocation.watchPosition(
+				navigator.geolocation.getCurrentPosition(
 					(pos) => {
-						if (!gameState || gameState.gameEnded) return;
 						if (pos.coords.accuracy > 150) return;
 						const point = {
 							latitude: pos.coords.latitude,
@@ -1045,6 +1053,7 @@
 						const last = gameState.locations[gameState.locations.length - 1];
 						if (!last || haversineKm(last, point) * 1000 >= 250) {
 							gameState.locations.push(point);
+							saveCurrentGame();
 						}
 					},
 					(err) => { console.debug("geolocation unavailable:", err.code); },
@@ -1052,10 +1061,23 @@
 				);
 			}
 
-			function stopLocationWatch() {
-				if (watchId !== null) {
-					navigator.geolocation.clearWatch(watchId);
-					watchId = null;
+			function saveCurrentGame() {
+				try {
+					if (typeof localStorage !== "undefined") {
+						localStorage.setItem("yahtzeeCurrentGame", JSON.stringify(gameState));
+					}
+				} catch (e) {
+					console.warn("Failed to save current game:", e);
+				}
+			}
+
+			function loadCurrentGame() {
+				try {
+					if (typeof localStorage === "undefined") return null;
+					const stored = localStorage.getItem("yahtzeeCurrentGame");
+					return stored ? JSON.parse(stored) : null;
+				} catch (e) {
+					return null;
 				}
 			}
 
@@ -1073,6 +1095,7 @@
 					})),
 				});
 				savePastGames(games);
+				try { localStorage.removeItem("yahtzeeCurrentGame"); } catch (_) {}
 			}
 
 			function formatCoords(loc) {
