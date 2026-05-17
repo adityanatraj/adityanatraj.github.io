@@ -17,7 +17,6 @@
 				--accent: #38bdf8;
 				--accent2: #22c55e;
 				--text: #e5e7eb;
-				--text-accent: #efefef;
 				--muted: #94a3b8;
 				--danger: #ef4444;
 				--die-face: #f8fafc;
@@ -163,6 +162,8 @@
 				border-top: 1px solid var(--line);
 				color: var(--muted);
 				font-size: 0.875rem;
+				padding: 12px 16px;
+				padding-bottom: calc(12px + env(safe-area-inset-bottom));
 			}
 
 			@media (max-width: 900px) {
@@ -246,6 +247,19 @@
 				font-style: italic;
 			}
 
+			.scorecard td.score.pending {
+				background-color: rgba(56, 189, 248, 0.15);
+				color: var(--accent);
+				font-style: normal;
+				font-weight: 700;
+				outline: 2px solid var(--accent);
+				outline-offset: -2px;
+			}
+
+			.scorecard td.score.pending:hover {
+				background-color: rgba(56, 189, 248, 0.25);
+			}
+
 			@keyframes scoreFlash {
 				from {
 					background-color: rgba(56, 189, 248, 0.35);
@@ -263,7 +277,7 @@
 				padding-top: 2px;
 				padding-bottom: 4px;
 				font-weight: 700;
-				color: var(--text-accent);
+				color: var(--text);
 				background-color: var(--bg);
 				border-bottom: 1px dashed var(--line);
 			}
@@ -481,30 +495,30 @@
 			</div>
 		</main>
 
-		<div id="winnerModal" class="modal">
+		<div id="winnerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="winnerTitle">
 			<div class="modal-content">
 				<h2 id="winnerTitle"></h2>
 				<div id="winnerScores"></div>
 				<div class="modal-actions">
-					<button class="secondary" onclick="closeWinnerModal()">Close</button>
+					<button class="secondary" onclick="closeModal('winnerModal')">Close</button>
 					<button onclick="startNewGameFromModal()">Start New Game</button>
 				</div>
 			</div>
 		</div>
 
-		<div id="statsModal" class="modal">
+		<div id="statsModal" class="modal" role="dialog" aria-modal="true" aria-label="Game Statistics">
 			<div class="modal-content">
 				<div id="statsContent"></div>
 				<div class="modal-actions">
 					<button class="secondary" onclick="clearPastGames()">Clear Stats</button>
-					<button onclick="closeStatsModal()">Close</button>
+					<button onclick="closeModal('statsModal')">Close</button>
 				</div>
 			</div>
 		</div>
 
-		<div id="statsLoadModal" class="modal">
+		<div id="statsLoadModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="statsLoadModalTitle">
 			<div class="modal-content">
-				<h2>Load Past Games</h2>
+				<h2 id="statsLoadModalTitle">Load Past Games</h2>
 				<p style="color: var(--muted); margin: 16px 0">
 					This save file contains past game records. What would you like to do?
 				</p>
@@ -522,6 +536,14 @@
 		</div>
 
 		<script>
+			function escHtml(s) {
+				return String(s)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;");
+			}
+
 			function localISOString(date) {
 				const pad = (n) => String(n).padStart(2, "0");
 				const off = -date.getTimezoneOffset();
@@ -568,6 +590,50 @@
 
 			let gameState;
 			let flashCell = null;
+			let pendingScore = null;
+			let _rolling = false;
+
+			/* ============================================================================
+			   MODAL MANAGEMENT
+			============================================================================ */
+			function openModal(id) {
+				const modal = document.getElementById(id);
+				if (!modal.classList.contains("show")) {
+					modal._returnFocus = document.activeElement;
+					modal._trapFocus = (e) => {
+						if (e.key !== "Tab") return;
+						const els = Array.from(modal.querySelectorAll(
+							'button:not(:disabled), input, [tabindex]:not([tabindex="-1"])'
+						));
+						if (!els.length) return;
+						const first = els[0], last = els[els.length - 1];
+						if (e.shiftKey && document.activeElement === first) {
+							e.preventDefault(); last.focus();
+						} else if (!e.shiftKey && document.activeElement === last) {
+							e.preventDefault(); first.focus();
+						}
+					};
+					modal.addEventListener("keydown", modal._trapFocus);
+				}
+				modal.classList.add("show");
+				const first = modal.querySelector(
+					'button:not(:disabled), input, [tabindex]:not([tabindex="-1"])'
+				);
+				if (first) first.focus();
+			}
+
+			function closeModal(id) {
+				const modal = document.getElementById(id);
+				modal.classList.remove("show");
+				if (modal._trapFocus) {
+					modal.removeEventListener("keydown", modal._trapFocus);
+					modal._trapFocus = null;
+				}
+				if (modal._returnFocus) {
+					try { modal._returnFocus.focus(); } catch (_) {}
+					modal._returnFocus = null;
+				}
+			}
 
 			/* ============================================================================
 			   INIT
@@ -586,13 +652,13 @@
 
 				let playerNames = ["Player 1", "Player 2"];
 
-				// Preserve and reorder players if there's an existing game
 				if (gameState && gameState.players) {
 					playerNames = [...gameState.players]
 						.sort((a, b) => calcTotals(b).grand - calcTotals(a).grand)
 						.map((p) => p.name);
 				}
 
+				pendingScore = null;
 				gameState = {
 					players: [
 						{ name: playerNames[0], scores: {} },
@@ -637,7 +703,6 @@
 				const el = document.getElementById("scorecard");
 				el.innerHTML = "";
 
-				const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 				const table = document.createElement("table");
 
 				// Header
@@ -645,11 +710,11 @@
 				head.innerHTML = `
 			    <th></th>
 			    <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
-			      <input class="player-name" value="${esc(gameState.players[0].name)}"
+			      <input class="player-name" value="${escHtml(gameState.players[0].name)}"
 			        onchange="gameState.players[0].name=this.value">
 			    </th>
 			    <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
-			      <input class="player-name" value="${esc(gameState.players[1].name)}"
+			      <input class="player-name" value="${escHtml(gameState.players[1].name)}"
 			        onchange="gameState.players[1].name=this.value">
 			    </th>`;
 				table.appendChild(head);
@@ -665,7 +730,6 @@
 
 				table.appendChild(sectionRow("Bottom"));
 
-				// Add categories up to and including yahtzee
 				CATEGORIES.filter((c) => !c.upper).forEach((c) => {
 					addCategoryRow(table, c);
 				});
@@ -715,18 +779,25 @@
 
 						// Apply color coding based on par (only for upper section)
 						if (cat.par !== undefined) {
-							if (val >= cat.par) {
-								td.classList.add("at-par");
-							} else {
-								td.classList.add("below-par");
-							}
+							td.classList.add(val >= cat.par ? "at-par" : "below-par");
 						} else {
 							td.classList.add(val > 0 ? "at-par" : "below-par");
 						}
 					} else if (i === gameState.currentPlayer && gameState.rollsLeft < 3) {
+						const isPending = pendingScore === cat.key;
 						td.textContent = calcScore(cat.key);
-						td.classList.add("preview");
-						td.onclick = () => assignScore(cat.key);
+						td.classList.add(isPending ? "pending" : "preview");
+						td.setAttribute("tabindex", "0");
+						td.setAttribute("role", "button");
+						td.setAttribute("aria-pressed", isPending ? "true" : "false");
+						td.onclick = () => selectScore(cat.key);
+						td.onkeydown = (e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.preventDefault();
+								e.stopPropagation();
+								selectScore(cat.key);
+							}
+						};
 					}
 					tr.appendChild(td);
 				});
@@ -739,7 +810,7 @@
 				const c = document.getElementById("diceContainer");
 				c.innerHTML = "";
 				const unrolled = gameState.rollsLeft === 3;
-				gameState.dice.forEach((d) => {
+				gameState.dice.forEach((d, idx) => {
 					const el = document.createElement("div");
 					el.className =
 						"die" +
@@ -747,6 +818,11 @@
 						(unrolled ? " unrolled" : "") +
 						(d.rolling ? " rolling" : "");
 					el.textContent = unrolled ? "·" : PIPS[d.value];
+					el.setAttribute("aria-label",
+						unrolled
+							? "Die not yet rolled"
+							: `Die ${idx + 1}: ${d.value}${d.held ? ", held" : ""}`
+					);
 					el.onclick = () => {
 						if (gameState.rollsLeft < 3) {
 							d.held = !d.held;
@@ -760,16 +836,16 @@
 			function renderControls() {
 				document.getElementById("turnIndicator").textContent =
 					`${gameState.players[gameState.currentPlayer].name}'s Turn (${gameState.rollsLeft} left)`;
-				// document.getElementById("rollInfo").textContent =
-				// 	`Rolls left: ${gameState.rollsLeft}`;
-				document.getElementById("rollBtn").disabled = gameState.rollsLeft === 0;
+				document.getElementById("rollBtn").disabled = gameState.rollsLeft === 0 || _rolling;
 			}
 
 			/* ============================================================================
 			   GAMEPLAY
 			============================================================================ */
 			function rollDice() {
-				if (gameState.gameEnded || !gameState.rollsLeft) return;
+				if (gameState.gameEnded || !gameState.rollsLeft || _rolling) return;
+				pendingScore = null;
+				_rolling = true;
 				gameState.dice.forEach((d) => {
 					if (!d.held) {
 						d.value = Math.floor(Math.random() * 6) + 1;
@@ -779,21 +855,30 @@
 				gameState.rollsLeft--;
 				render();
 				setTimeout(() => {
+					_rolling = false;
 					gameState.dice.forEach((d) => (d.rolling = false));
 					renderDice();
+					renderControls();
 				}, 220);
+			}
+
+			function selectScore(cat) {
+				if (gameState.gameEnded) return;
+				if (pendingScore === cat) {
+					assignScore(cat);
+				} else {
+					pendingScore = cat;
+					renderScorecard();
+				}
 			}
 
 			function assignScore(cat) {
 				if (gameState.gameEnded) return;
 				const p = gameState.players[gameState.currentPlayer];
 				if (p.scores[cat] != null) return;
-				const score = calcScore(cat);
-				const catLabel = CATEGORIES.find((c) => c.key === cat).label;
-				if (!confirm(`Assign ${score} points to ${catLabel}?`)) return;
+				pendingScore = null;
 				flashCell = { playerIndex: gameState.currentPlayer, catKey: cat };
-				p.scores[cat] = score;
-
+				p.scores[cat] = calcScore(cat);
 				endTurn();
 			}
 
@@ -824,33 +909,28 @@
 					.map((p) => ({ name: p.name, score: calcTotals(p).grand }))
 					.sort((a, b) => b.score - a.score);
 
-				const winner = scores[0];
+				const isTie = scores[0].score === scores[1].score;
 
 				recordGame();
 
-				document.getElementById("winnerTitle").textContent =
-					`🏆 ${winner.name} Wins! 🏆`;
+				document.getElementById("winnerTitle").textContent = isTie
+					? "It's a Tie!"
+					: `🏆 ${scores[0].name} Wins! 🏆`;
 
-				const scoresHtml = scores
-					.map(
-						(s, i) => `
-			    <div class="score-line ${i === 0 ? "winner" : ""}">
-			      ${i + 1}. ${s.name}: ${s.score} points
-			    </div>
-			  `,
-					)
+				document.getElementById("winnerScores").innerHTML = scores
+					.map((s, i) => {
+						const highlight = isTie || i === 0;
+						return `<div class="score-line ${highlight ? "winner" : ""}">
+						  ${i + 1}. ${escHtml(s.name)}: ${s.score} points
+						</div>`;
+					})
 					.join("");
 
-				document.getElementById("winnerScores").innerHTML = scoresHtml;
-				document.getElementById("winnerModal").classList.add("show");
-			}
-
-			function closeWinnerModal() {
-				document.getElementById("winnerModal").classList.remove("show");
+				openModal("winnerModal");
 			}
 
 			function startNewGameFromModal() {
-				document.getElementById("winnerModal").classList.remove("show");
+				closeModal("winnerModal");
 				newGame();
 			}
 
@@ -863,51 +943,24 @@
 				const s = v.reduce((a, b) => a + b, 0);
 				let result;
 				switch (cat) {
-					case "ones":
-						result = (c[1] || 0) * 1;
-						break;
-					case "twos":
-						result = (c[2] || 0) * 2;
-						break;
-					case "threes":
-						result = (c[3] || 0) * 3;
-						break;
-					case "fours":
-						result = (c[4] || 0) * 4;
-						break;
-					case "fives":
-						result = (c[5] || 0) * 5;
-						break;
-					case "sixes":
-						result = (c[6] || 0) * 6;
-						break;
-					case "threeKind":
-						result = has(c, 3) ? s : 0;
-						break;
-					case "fourKind":
-						result = has(c, 4) ? s : 0;
-						break;
-					case "fullHouse":
-						result = fh(c) ? 25 : 0;
-						break;
-					case "smallStraight":
-						result = ss(v) ? 30 : 0;
-						break;
-					case "largeStraight":
-						result = ls(v) ? 40 : 0;
-						break;
-					case "yahtzee":
-						result = has(c, 5) ? 50 : 0;
-						break;
-					case "chance":
-						result = s;
-						break;
-					default:
-						result = 0;
+					case "ones":          result = (c[1] || 0) * 1; break;
+					case "twos":          result = (c[2] || 0) * 2; break;
+					case "threes":        result = (c[3] || 0) * 3; break;
+					case "fours":         result = (c[4] || 0) * 4; break;
+					case "fives":         result = (c[5] || 0) * 5; break;
+					case "sixes":         result = (c[6] || 0) * 6; break;
+					case "threeKind":     result = has(c, 3) ? s : 0; break;
+					case "fourKind":      result = has(c, 4) ? s : 0; break;
+					case "fullHouse":     result = fh(c) ? 25 : 0; break;
+					case "smallStraight": result = ss(v) ? 30 : 0; break;
+					case "largeStraight": result = ls(v) ? 40 : 0; break;
+					case "yahtzee":       result = has(c, 5) ? 50 : 0; break;
+					case "chance":        result = s; break;
+					default:              result = 0;
 				}
-				// Ensure we always return a valid number, never NaN
 				return typeof result === "number" && !isNaN(result) ? result : 0;
 			}
+
 			const count = (v) =>
 				v.reduce((a, x) => ((a[x] = (a[x] || 0) + 1), a), {});
 			const has = (c, n) => Object.values(c).some((x) => x >= n);
@@ -924,31 +977,22 @@
 				["1,2,3,4,5", "2,3,4,5,6"].includes([...new Set(v)].sort().join());
 
 			function calcTotals(p) {
-				let u = 0,
-					l = 0;
+				let u = 0, l = 0;
 				CATEGORIES.forEach((c) => {
 					const v = p.scores[c.key];
 					if (v != null) {
-						// Ensure we're adding valid numbers only
-						const validValue = typeof v === "number" && !isNaN(v) ? v : 0;
-						c.upper ? (u += validValue) : (l += validValue);
+						const n = typeof v === "number" && !isNaN(v) ? v : 0;
+						c.upper ? (u += n) : (l += n);
 					}
 				});
 				const ub = u >= 63 ? 35 : 0;
-				const grand = u + ub + l;
-				// Defensive check to ensure totals are valid numbers
-				return {
-					upper: u,
-					upperBonus: ub,
-					lower: l,
-					grand: grand,
-				};
+				return { upper: u, upperBonus: ub, lower: l, grand: u + ub + l };
 			}
 
 			/* ============================================================================
 			   SAVE / LOAD
 			============================================================================ */
-			function saveGame() {
+			async function saveGame() {
 				const saveData = {
 					version: "1.5",
 					savedAt: localISOString(new Date()),
@@ -966,16 +1010,32 @@
 					const file = new File([blob], fname, { type: "application/json" });
 					if (navigator.share && navigator.canShare &&
 						navigator.canShare({ files: [file] })) {
-						navigator.share({ title: fname, files: [file] });
+						await navigator.share({ title: fname, files: [file] });
 						return;
 					}
-				} catch (_) {}
+				} catch (err) {
+					if (err.name !== "AbortError") console.warn("Share failed:", err);
+					// AbortError = user cancelled share sheet; fall through to download
+				}
 
 				const a = document.createElement("a");
 				a.href = URL.createObjectURL(blob);
 				a.download = fname;
+				document.body.appendChild(a);
 				a.click();
-				setTimeout(() => URL.revokeObjectURL(a.href), 0);
+				document.body.removeChild(a);
+				setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+			}
+
+			function isValidGameState(s) {
+				return s &&
+					typeof s === "object" &&
+					Array.isArray(s.players) && s.players.length >= 2 &&
+					Array.isArray(s.dice) && s.dice.length === 5 &&
+					s.players.every(
+						(p) => typeof p.name === "string" &&
+							typeof p.scores === "object" && p.scores !== null
+					);
 			}
 
 			function loadGame() {
@@ -989,16 +1049,24 @@
 							const data = JSON.parse(r.result);
 
 							if (data.version) {
+								if (!isValidGameState(data.gameState)) {
+									alert("Save file appears corrupted.");
+									return;
+								}
 								gameState = data.gameState;
-								if (!gameState.locations) gameState.locations = [];
+								gameState.locations = gameState.locations || [];
 								// v1.3+: pastGames array; v1.2: statistics key — discard silently
 								if (data.pastGames && data.pastGames.length > 0) {
 									showPastGamesLoadModal(data.pastGames);
 								}
 							} else {
 								// Pre-versioned format — data IS the gameState
+								if (!isValidGameState(data)) {
+									alert("Save file appears corrupted.");
+									return;
+								}
 								gameState = data;
-								if (!gameState.locations) gameState.locations = [];
+								gameState.locations = gameState.locations || [];
 							}
 
 							captureLocation();
@@ -1149,35 +1217,11 @@
 				});
 			}
 
-			function clearPastGames() {
-				if (confirm("Clear all past games? This cannot be undone.")) {
-					try {
-						localStorage.removeItem("yahtzeeGames");
-						showStatsModal();
-					} catch (e) {
-						console.warn("Failed to clear past games:", e);
-					}
-				}
-			}
-
-			function showStatsModal() {
-				const games = getPastGames();
-				const modal = document.getElementById("statsModal");
-				const content = document.getElementById("statsContent");
-
-				if (games === null) {
-					content.innerHTML = `<p style="color:var(--muted)">Statistics unavailable — storage is disabled in this browser.</p>`;
-					modal.classList.add("show");
-					return;
-				}
-
+			function buildStatsHtml(games) {
 				let html = `<h3 style="margin-top:0">📊 Game Statistics</h3>`;
 
 				if (games.length === 0) {
-					html += `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
-					content.innerHTML = html;
-					modal.classList.add("show");
-					return;
+					return html + `<p style="color: var(--muted); margin-top: 20px;">No games completed yet.</p>`;
 				}
 
 				const { gamesPlayed, playerWins, playerTotals, highestScore } = computeStats(games);
@@ -1185,7 +1229,7 @@
 				html += `<p><strong>Total Games:</strong> ${gamesPlayed}</p>`;
 
 				if (highestScore.score > 0) {
-					html += `<p><strong>Highest Score:</strong> ${highestScore.name} — ${highestScore.score}</p>`;
+					html += `<p><strong>Highest Score:</strong> ${escHtml(highestScore.name)} — ${highestScore.score}</p>`;
 				}
 
 				if (Object.keys(playerWins).length > 0) {
@@ -1193,7 +1237,7 @@
 					Object.entries(playerWins)
 						.sort((a, b) => b[1] - a[1])
 						.forEach(([name, wins]) => {
-							html += `<p>${name}: ${wins} win${wins !== 1 ? "s" : ""}</p>`;
+							html += `<p>${escHtml(name)}: ${wins} win${wins !== 1 ? "s" : ""}</p>`;
 						});
 				}
 
@@ -1201,7 +1245,7 @@
 					html += `<h4>Average Scores</h4>`;
 					Object.entries(playerTotals).forEach(([name, totals]) => {
 						const avg = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
-						html += `<p>${name}: ${avg} (${totals.length} game${totals.length !== 1 ? "s" : ""})</p>`;
+						html += `<p>${escHtml(name)}: ${avg} (${totals.length} game${totals.length !== 1 ? "s" : ""})</p>`;
 					});
 				}
 
@@ -1231,12 +1275,32 @@
 					}
 				}
 
-				content.innerHTML = html;
-				modal.classList.add("show");
+				return html;
 			}
 
-			function closeStatsModal() {
-				document.getElementById("statsModal").classList.remove("show");
+			function clearPastGames() {
+				if (confirm("Clear all past games? This cannot be undone.")) {
+					try {
+						localStorage.removeItem("yahtzeeGames");
+						document.getElementById("statsContent").innerHTML =
+							buildStatsHtml(getPastGames() || []);
+					} catch (e) {
+						console.warn("Failed to clear past games:", e);
+					}
+				}
+			}
+
+			function showStatsModal() {
+				const games = getPastGames();
+				const content = document.getElementById("statsContent");
+
+				if (games === null) {
+					content.innerHTML = `<p style="color:var(--muted)">Statistics unavailable — storage is disabled in this browser.</p>`;
+				} else {
+					content.innerHTML = buildStatsHtml(games);
+				}
+
+				openModal("statsModal");
 			}
 
 			/* ============================================================================
@@ -1256,7 +1320,7 @@
 				let preview = '<div style="font-size: 14px;">';
 				preview += `<p><strong>Save file:</strong> ${loaded.gamesPlayed} game${loaded.gamesPlayed !== 1 ? "s" : ""}`;
 				if (loaded.highestScore.score > 0) {
-					preview += `, best: ${loaded.highestScore.name} ${loaded.highestScore.score}`;
+					preview += `, best: ${escHtml(loaded.highestScore.name)} ${loaded.highestScore.score}`;
 				}
 				preview += "</p>";
 
@@ -1264,7 +1328,7 @@
 				if (currentGames.length > 0) {
 					preview += `${current.gamesPlayed} game${current.gamesPlayed !== 1 ? "s" : ""}`;
 					if (current.highestScore.score > 0) {
-						preview += `, best: ${current.highestScore.name} ${current.highestScore.score}`;
+						preview += `, best: ${escHtml(current.highestScore.name)} ${current.highestScore.score}`;
 					}
 				} else {
 					preview += `<span style="color: var(--muted);">no records</span>`;
@@ -1272,11 +1336,11 @@
 				preview += "</p></div>";
 
 				document.getElementById("statsLoadPreview").innerHTML = preview;
-				document.getElementById("statsLoadModal").classList.add("show");
+				openModal("statsLoadModal");
 			}
 
 			function handlePastGamesLoad(action) {
-				document.getElementById("statsLoadModal").classList.remove("show");
+				closeModal("statsLoadModal");
 				if (!pendingLoadedGames) return;
 
 				if (action === "replace") {
