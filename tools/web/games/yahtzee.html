@@ -1031,20 +1031,30 @@
 			}
 
 			async function recordGame() {
-				const location = await getLocation();
 				const games = getPastGames();
 				if (games === null) return;
-				games.push({
+				const record = {
 					startedAt: gameState.startedAt,
 					endedAt: gameState.endedAt,
-					location,
+					location: null,
 					players: gameState.players.map((p) => ({
 						name: p.name,
 						scores: { ...p.scores },
 						total: calcTotals(p).grand,
 					})),
-				});
+				};
+				games.push(record);
 				savePastGames(games);
+
+				const location = await getLocation();
+				if (!location) return;
+				const fresh = getPastGames();
+				if (!fresh) return;
+				const idx = fresh.findIndex((g) => g.startedAt === record.startedAt);
+				if (idx !== -1) {
+					fresh[idx] = { ...fresh[idx], location };
+					savePastGames(fresh);
+				}
 			}
 
 			function formatCoords(loc) {
