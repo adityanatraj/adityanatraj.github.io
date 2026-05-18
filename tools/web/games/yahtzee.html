@@ -331,7 +331,6 @@
 				justify-content: center;
 				gap: 10px;
 				flex-wrap: wrap;
-				margin: 0px 0;
 			}
 
 			.die {
@@ -659,6 +658,7 @@
 				}
 
 				pendingScore = null;
+				_rolling = false;
 				gameState = {
 					players: [
 						{ name: playerNames[0], scores: {} },
@@ -695,17 +695,16 @@
 
 				const table = document.createElement("table");
 
-				// Header
 				const head = document.createElement("tr");
 				head.innerHTML = `
 			    <th></th>
 			    <th class="player ${gameState.currentPlayer === 0 ? "active" : ""}">
 			      <input class="player-name" value="${escHtml(gameState.players[0].name)}"
-			        onchange="gameState.players[0].name=this.value">
+			        oninput="gameState.players[0].name=this.value;saveCurrentGame()">
 			    </th>
 			    <th class="player ${gameState.currentPlayer === 1 ? "active" : ""}">
 			      <input class="player-name" value="${escHtml(gameState.players[1].name)}"
-			        onchange="gameState.players[1].name=this.value">
+			        oninput="gameState.players[1].name=this.value;saveCurrentGame()">
 			    </th>`;
 				table.appendChild(head);
 
@@ -767,7 +766,6 @@
 							flashCell = null;
 						}
 
-						// Apply color coding based on par (only for upper section)
 						if (cat.par !== undefined) {
 							td.classList.add(val >= cat.par ? "at-par" : "below-par");
 						} else {
@@ -849,6 +847,7 @@
 					gameState.dice.forEach((d) => (d.rolling = false));
 					renderDice();
 					renderControls();
+					saveCurrentGame();
 				}, 220);
 			}
 
@@ -983,9 +982,10 @@
 			   SAVE / LOAD
 			============================================================================ */
 			async function saveGame() {
+				const savedAt = localISOString(new Date());
 				const saveData = {
 					version: "1.5",
-					savedAt: localISOString(new Date()),
+					savedAt,
 					gameState: gameState,
 					pastGames: getPastGames() || [],
 				};
@@ -993,7 +993,7 @@
 				const blob = new Blob([JSON.stringify(saveData, null, 2)], {
 					type: "application/json",
 				});
-				const ts = localISOString(new Date()).slice(0, 19).replace(/[-T:]/g, "");
+				const ts = savedAt.slice(0, 19).replace(/[-T:]/g, "");
 				const fname = `yahtzee-${ts}.json`;
 
 				try {
@@ -1045,6 +1045,7 @@
 								}
 								gameState = data.gameState;
 								gameState.locations = gameState.locations || [];
+								pendingScore = null;
 								// v1.3+: pastGames array; v1.2: statistics key — discard silently
 								if (data.pastGames && data.pastGames.length > 0) {
 									showPastGamesLoadModal(data.pastGames);
@@ -1057,6 +1058,7 @@
 								}
 								gameState = data;
 								gameState.locations = gameState.locations || [];
+								pendingScore = null;
 							}
 
 							captureLocation();
@@ -1101,6 +1103,7 @@
 				if (!navigator.geolocation) return;
 				navigator.geolocation.getCurrentPosition(
 					(pos) => {
+						if (!gameState || gameState.gameEnded) return;
 						if (pos.coords.accuracy > 150) return;
 						const point = {
 							latitude: pos.coords.latitude,
@@ -1257,8 +1260,8 @@
 				const locationEntries = Object.entries(locationCounts);
 				if (locationEntries.length > 0) {
 					html += `<h4>Locations</h4>`;
-					locationEntries.forEach(([coords, count]) => {
-						html += `<p>${coords} — ${count} game${count !== 1 ? "s" : ""}</p>`;
+					locationEntries.forEach(([coords, n]) => {
+						html += `<p>${coords} — ${n} game${n !== 1 ? "s" : ""}</p>`;
 					});
 					if (trailGames > 0) {
 						html += `<p style="color:var(--muted);font-size:0.9em">${trailGames} game${trailGames !== 1 ? "s" : ""} played on the move — ${totalDistanceKm.toFixed(1)} km total</p>`;
