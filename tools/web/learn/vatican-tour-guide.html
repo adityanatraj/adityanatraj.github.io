@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vatican — Deep Dive Tour Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --cream: #F5F0E8;
+    --dark: #1A1410;
+    --burgundy: #6B1F2A;
+    --stone: #8B7355;
+    --ink: #2C2416;
+    --mist: #EDE8DE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 30%, #2e1f0a 0%, #0e0a06 60%, #000 100%);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .hero-ornament {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 50%;
+    animation: spin 60s linear infinite;
+  }
+  .hero-ornament:nth-child(2) {
+    width: 600px;
+    height: 600px;
+    border-color: rgba(201,168,76,0.08);
+    animation-duration: 90s;
+    animation-direction: reverse;
+  }
+  .hero-ornament:nth-child(3) {
+    width: 800px;
+    height: 800px;
+    border-color: rgba(201,168,76,0.04);
+    animation-duration: 120s;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 1.2s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 0.3rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    font-style: italic;
+    color: var(--stone);
+    margin-top: 1.2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 2rem auto;
+  }
+
+  .hero-date {
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+
+  .scroll-indicator span {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+
+  /* ── NAV TABS ── */
+  .nav-strip {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15,10,5,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 1rem 1.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--stone);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+    white-space: nowrap;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 400;
+  }
+
+  .nav-tab:hover, .nav-tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    display: none;
+  }
+
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 3rem;
+    border-left: 3px solid var(--gold);
+    padding-left: 1.5rem;
+  }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--cream);
+  }
+
+  .section-title em { color: var(--gold-light); font-style: italic; }
+
+  /* ── ROUTE TIMELINE ── */
+  .route-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .route-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .route-stat-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+
+  .route-stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+
+  .stop {
+    position: relative;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+    opacity: 0;
+  }
+
+  .stop::before {
+    content: '';
+    position: absolute;
+    left: -2.35rem;
+    top: 0.4rem;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--gold);
+    background: var(--dark);
+    border-radius: 50%;
+  }
+
+  .stop.highlight::before {
+    background: var(--gold);
+    box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  }
+
+  .stop-time {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    opacity: 0.7;
+  }
+
+  .stop-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+
+  .stop-tip {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--stone);
+    letter-spacing: 0.03em;
+  }
+
+  .stop-badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+    margin-right: 0.4rem;
+  }
+
+  /* ── CARDS GRID ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .card {
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(201,168,76,0.02));
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover { border-color: rgba(201,168,76,0.4); transform: translateY(-2px); }
+  .card:hover::after { opacity: 1; }
+
+  .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+    opacity: 0.8;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-body {
+    font-size: 0.75rem;
+    line-height: 1.75;
+    color: var(--stone);
+  }
+
+  .card-tag {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  /* ── HIDDEN GEMS ── */
+  .gem-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .gem {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1.2rem;
+    align-items: start;
+    padding: 1.2rem;
+    background: rgba(201,168,76,0.03);
+    border: 1px solid rgba(201,168,76,0.1);
+    transition: border-color 0.3s;
+  }
+
+  .gem:hover { border-color: rgba(201,168,76,0.3); }
+
+  .gem-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .gem-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+
+  .gem-body {
+    font-size: 0.75rem;
+    line-height: 1.75;
+    color: var(--stone);
+  }
+
+  .gem-where {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    opacity: 0.7;
+  }
+
+  /* ── TIPS ── */
+  .tip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .tip-card {
+    padding: 1.2rem;
+    border-left: 2px solid var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .tip-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+
+  .tip-card p {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--stone);
+  }
+
+  /* ── DIVIDER ── */
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0;
+  }
+
+  .ornament-divider span {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,168,76,0.3));
+  }
+
+  .ornament-divider span:last-child {
+    background: linear-gradient(to left, transparent, rgba(201,168,76,0.3));
+  }
+
+  .ornament-divider em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.2rem;
+    opacity: 0.6;
+  }
+
+  /* ── ALERT BOX ── */
+  .alert {
+    padding: 1.2rem 1.5rem;
+    background: rgba(107,31,42,0.2);
+    border: 1px solid rgba(107,31,42,0.5);
+    border-left: 3px solid var(--burgundy);
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: #d4a0a7;
+    margin-bottom: 2rem;
+  }
+
+  .alert strong { color: #e8b8be; }
+
+  .info-box {
+    padding: 1.2rem 1.5rem;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-left: 3px solid var(--gold);
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--stone);
+    margin-bottom: 2rem;
+  }
+
+  .info-box strong { color: var(--gold-light); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+
+  footer p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--stone);
+    font-size: 1rem;
+    opacity: 0.6;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .nav-tab { padding: 0.8rem 0.9rem; font-size: 0.5rem; }
+    .section { padding: 3rem 1.2rem; }
+    .cards { grid-template-columns: 1fr; }
+    .tip-grid { grid-template-columns: 1fr; }
+    .hero-ornament { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-ornament"></div>
+  <div class="hero-ornament"></div>
+  <div class="hero-ornament"></div>
+  <div class="hero-content">
+    <p class="hero-label">Your Complete Day Guide</p>
+    <h1>The <em>Vatican</em></h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">Museums · Basilica · Hidden Gems · Area Deep Dive</p>
+    <p class="hero-date" style="margin-top:1.5rem">May 20, 2026 &nbsp;·&nbsp; Rome, Italy</p>
+  </div>
+  <div class="scroll-indicator">
+    <span>Explore</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-strip">
+  <button class="nav-tab active" onclick="showSection('route-a')">Route A — Deep Dive</button>
+  <button class="nav-tab" onclick="showSection('route-b')">Route B — Essential</button>
+  <button class="nav-tab" onclick="showSection('museums')">Museums</button>
+  <button class="nav-tab" onclick="showSection('basilica')">Basilica</button>
+  <button class="nav-tab" onclick="showSection('hidden')">Hidden Gems</button>
+  <button class="nav-tab" onclick="showSection('area')">The Area</button>
+  <button class="nav-tab" onclick="showSection('tips')">Tips</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     ROUTE A — DEEP DIVE
+══════════════════════════════════════ -->
+<section id="route-a" class="section active">
+  <div class="section-header">
+    <p class="section-label">Full Day · 8–9 Hours</p>
+    <h2 class="section-title">Route A — <em>The Deep Dive</em></h2>
+  </div>
+
+  <div class="info-box">
+    <strong>Strategy:</strong> Attack the Sistine Chapel first (before 9:30am crowds), then loop back through the galleries in order. This is the insider move — most tourists start at the beginning and arrive exhausted at the Chapel.
+  </div>
+
+  <div class="route-meta">
+    <div class="route-stat">
+      <span class="route-stat-label">Duration</span>
+      <span class="route-stat-value">Full Day</span>
+    </div>
+    <div class="route-stat">
+      <span class="route-stat-label">Distance walked</span>
+      <span class="route-stat-value">~7 km</span>
+    </div>
+    <div class="route-stat">
+      <span class="route-stat-label">Best for</span>
+      <span class="route-stat-value">Art & History lovers</span>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="stop highlight" style="--i:0">
+      <p class="stop-time">7:00 AM — Before you enter</p>
+      <span class="stop-badge">Must Do</span>
+      <h3 class="stop-name">Arrive at St. Peter's Square — First Light</h3>
+      <p class="stop-tip">The square is utterly empty at dawn. Stand in the ellipse of Bernini's colonnade and look back at the façade. The light is golden, there are almost no people, and you'll understand why this is one of the greatest architectural sequences ever designed. The 284 columns and 140 saints watching over you — unobstructed.</p>
+    </div>
+
+    <div class="stop" style="--i:1">
+      <p class="stop-time">7:00 – 8:30 AM</p>
+      <span class="stop-badge">Free · No Line at Dawn</span>
+      <h3 class="stop-name">St. Peter's Basilica — Early Morning</h3>
+      <p class="stop-tip">The Basilica opens at 7am and is virtually empty. Head straight for Michelangelo's Pietà (right aisle, behind glass). Then walk the full nave to grasp the scale — the floor markers show just how large other famous churches would fit inside. Descend to the Vatican Grottoes (free, beneath the Basilica) to see papal tombs including John Paul II. Then exit before the museum rush begins.</p>
+    </div>
+
+    <div class="stop" style="--i:2">
+      <p class="stop-time">8:45 AM</p>
+      <span class="stop-badge">Timed Entry</span>
+      <h3 class="stop-name">Vatican Museums — Enter & Go Straight to Sistine</h3>
+      <p class="stop-tip">Follow signs to the Sistine Chapel immediately. By 9am the Chapel is manageable; by 10:30am it's a sardine tin. From the entrance, turn right past the Pinacoteca and take the shortcut corridor. Once you've had quality time in the Chapel, loop back and do everything properly.</p>
+    </div>
+
+    <div class="stop" style="--i:3">
+      <p class="stop-time">9:00 – 10:30 AM</p>
+      <span class="stop-badge">Unmissable</span>
+      <h3 class="stop-name">Sistine Chapel — Full Ceiling Study</h3>
+      <p class="stop-tip">Bring a small mirror — looking straight up for an hour destroys your neck. Study the ceiling in quadrants: start with the Creation of Adam (centre-right), then work your way to the Flood and Noah. The Last Judgement fills the entire altar wall — look for the self-portrait of Michelangelo on the flayed skin held by St. Bartholomew. Take the exit on the far side into St. Peter's Basilica if you want to skip back.</p>
+    </div>
+
+    <div class="stop" style="--i:4">
+      <p class="stop-time">10:30 – 11:30 AM</p>
+      <span class="stop-badge">Most Underrated</span>
+      <h3 class="stop-name">Raphael Rooms (Stanze di Raffaello)</h3>
+      <p class="stop-tip">Four rooms painted entirely by Raphael and his workshop for Pope Julius II. Most people rush through — don't. The School of Athens (Room II) is the masterwork: find Michelangelo as Heraclitus, and Raphael's own self-portrait at the far right edge. Room I (The Fire in the Borgo) shows shocking proto-mannerist drama. Room IV has the first official depiction of the Vatican itself.</p>
+    </div>
+
+    <div class="stop highlight" style="--i:5">
+      <p class="stop-time">11:30 AM – 12:00 PM</p>
+      <span class="stop-badge">Hidden · Most Skip</span>
+      <h3 class="stop-name">Gallery of Maps — Walk Slowly</h3>
+      <p class="stop-tip">120 metres of 16th-century maps of Italy painted directly onto the walls — one of the most extraordinary corridors on earth. Stand in the centre and look at the ceiling above the maps: it's a barrel vault covered in gilded stucco and grotesques that rivals anything in the Sistine. Almost everyone power-walks through staring at the maps, missing the ceiling entirely.</p>
+    </div>
+
+    <div class="stop" style="--i:6">
+      <p class="stop-time">12:00 – 12:45 PM</p>
+      <span class="stop-badge">Lunch</span>
+      <h3 class="stop-name">Vatican Cafeteria — Rooftop Terrace</h3>
+      <p class="stop-tip">The self-service cafeteria inside the museums has a rooftop terrace with a view over Vatican City's gardens that almost no one sees. The food is decent by museum standards, the coffee is reportedly excellent, and you'll be surrounded by garden greenery and dome views rather than hordes. Recharge here.</p>
+    </div>
+
+    <div class="stop" style="--i:7">
+      <p class="stop-time">12:45 – 2:30 PM</p>
+      <span class="stop-badge">Deep Cut</span>
+      <h3 class="stop-name">Pio-Clementino Museum & the Belvedere Courtyard</h3>
+      <p class="stop-tip">The greatest collection of classical sculpture on earth. Don't miss the Laocoön Group (found in 1506 — Michelangelo himself ran to see it the day it was unearthed), the Apollo Belvedere, and the Belvedere Torso which Michelangelo so admired he refused to restore it. The Octagonal Courtyard where these live is the oldest part of the museum complex, designed in 1506.</p>
+    </div>
+
+    <div class="stop" style="--i:8">
+      <p class="stop-time">2:30 – 3:15 PM</p>
+      <span class="stop-badge">Skip by Most</span>
+      <h3 class="stop-name">Egyptian Museum & Etruscan Museum</h3>
+      <p class="stop-tip">Two world-class collections that get ignored because people are exhausted by this point. The Egyptian collection has genuine mummies, sarcophagi, and the canopic jars of a priest from 600 BCE. The Etruscan rooms contain the Mars of Todi — a life-size bronze warrior from 400 BCE that predates Rome's dominance. Take 45 minutes here; you'll likely have the rooms to yourself.</p>
+    </div>
+
+    <div class="stop highlight" style="--i:9">
+      <p class="stop-time">3:30 PM</p>
+      <span class="stop-badge">Must Do · Paid Extra</span>
+      <h3 class="stop-name">Climb the Dome of St. Peter's</h3>
+      <p class="stop-tip">Re-enter the Basilica and climb the dome. Take the stairs the whole way up (no lift) for 551 steps to the lantern — this is non-negotiable for any serious visitor. The intermediate platform inside the dome gives you a vertiginous view down into the Basilica's interior. The very top gives you Rome in every direction, the Vatican Gardens below, and a view of Bernini's colonnade that shows its true elliptical genius.</p>
+    </div>
+
+    <div class="stop" style="--i:10">
+      <p class="stop-time">4:30 – 5:30 PM</p>
+      <span class="stop-badge">Underrated</span>
+      <h3 class="stop-name">Castel Sant'Angelo — Evening Light</h3>
+      <p class="stop-tip">A 15-minute walk along the river. Built as Emperor Hadrian's mausoleum in 135 AD, converted to a papal fortress, prison, and escape route connected to the Vatican by a secret corridor (the Passetto di Borgo) still visible from outside. Climb to the top for sunset views across Rome. The rooftop café at dusk with the dome of St. Peter's glowing behind you is as good as Rome gets.</p>
+    </div>
+
+    <div class="stop" style="--i:11">
+      <p class="stop-time">6:00 PM onwards</p>
+      <span class="stop-badge">Evening</span>
+      <h3 class="stop-name">Prati Neighbourhood — Dinner & Wind Down</h3>
+      <p class="stop-tip">The district just north-east of the Vatican (Borgo Prati) is locals' territory — elegant boulevards, great enotecas, and none of the tourist-trap pricing that plagues Vatican-adjacent restaurants. Via Cola di Rienzo is the main artery. Try La Matricianella for Roman classics, or Pizzarium (Bonci) for the world's best pizza al taglio — just a short walk away on Via della Meloria.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ROUTE B — ESSENTIAL
+══════════════════════════════════════ -->
+<section id="route-b" class="section">
+  <div class="section-header">
+    <p class="section-label">Half Day · 4–5 Hours</p>
+    <h2 class="section-title">Route B — <em>The Essential</em></h2>
+  </div>
+
+  <div class="info-box">
+    <strong>Strategy:</strong> Tight and focused. Hit the absolute peaks only, spend real time in each rather than skimming everything. Quality over quantity.
+  </div>
+
+  <div class="route-meta">
+    <div class="route-stat">
+      <span class="route-stat-label">Duration</span>
+      <span class="route-stat-value">4–5 Hours</span>
+    </div>
+    <div class="route-stat">
+      <span class="route-stat-label">Best for</span>
+      <span class="route-stat-value">Focused visitors</span>
+    </div>
+    <div class="route-stat">
+      <span class="route-stat-label">Starts</span>
+      <span class="route-stat-value">8:30 AM</span>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="stop highlight" style="--i:0">
+      <p class="stop-time">8:00 AM · Free</p>
+      <span class="stop-badge">Start Here</span>
+      <h3 class="stop-name">St. Peter's Basilica — First Stop, No Queue</h3>
+      <p class="stop-tip">Arrive at opening. See the Pietà, walk the full nave, understand the scale. Descend to the Vatican Grottoes if time allows. Exit by 8:45 to make your museum time slot.</p>
+    </div>
+
+    <div class="stop" style="--i:1">
+      <p class="stop-time">9:00 – 10:00 AM</p>
+      <span class="stop-badge">Move Fast to Here</span>
+      <h3 class="stop-name">Sistine Chapel — Direct Route</h3>
+      <p class="stop-tip">Enter the museums and walk directly to the Chapel. Don't stop. You'll see everything else on the way back. Spend a full hour here — it deserves it. Bring a folding mirror or use your phone to save your neck.</p>
+    </div>
+
+    <div class="stop" style="--i:2">
+      <p class="stop-time">10:00 – 11:00 AM</p>
+      <h3 class="stop-name">Raphael Rooms → Gallery of Maps</h3>
+      <p class="stop-tip">Walk back through the Raphael Rooms (spend 20 minutes in the School of Athens room) and the Gallery of Maps (look at the ceiling, not just the walls). These are the two corridors connecting Sistine to the Belvedere.</p>
+    </div>
+
+    <div class="stop highlight" style="--i:3">
+      <p class="stop-time">11:00 – 11:45 AM</p>
+      <span class="stop-badge">Do Not Skip</span>
+      <h3 class="stop-name">Laocoön & Apollo Belvedere — Pio-Clementino Museum</h3>
+      <p class="stop-tip">These two sculptures alone justify the visit. Stand in front of the Laocoön for ten full minutes. It changed the history of Western art the day it was found. The Apollo next door is considered the most perfect representation of the male ideal in antiquity.</p>
+    </div>
+
+    <div class="stop" style="--i:4">
+      <p class="stop-time">12:00 PM</p>
+      <span class="stop-badge">Exit Via</span>
+      <h3 class="stop-name">Rooftop Terrace Cafeteria — Brief Lunch</h3>
+      <p class="stop-tip">Quick coffee and panino on the rooftop terrace with garden views. 30 minutes, then move on.</p>
+    </div>
+
+    <div class="stop highlight" style="--i:5">
+      <p class="stop-time">12:30 – 1:30 PM</p>
+      <span class="stop-badge">Unmissable Finale</span>
+      <h3 class="stop-name">Climb the Dome — Michelangelo's Masterpiece</h3>
+      <p class="stop-tip">Go all the way up on foot. The inside drum walkway with the mosaic saints up close, then the lantern at the top. This is the payoff. Rome spreads before you in every direction. End here.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     MUSEUMS
+══════════════════════════════════════ -->
+<section id="museums" class="section">
+  <div class="section-header">
+    <p class="section-label">Vatican Museums Deep Dive</p>
+    <h2 class="section-title">Room by Room — <em>What Matters</em></h2>
+  </div>
+
+  <div class="alert">
+    <strong>Opening Hours:</strong> Mon–Sat 8am–8pm (last entry 6pm). Closed Sundays except the last Sunday of the month (free entry — expect enormous crowds). Book online. Always.
+  </div>
+
+  <div class="ornament-divider"><span></span><em>★ Must-See Galleries ★</em><span></span></div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <h3 class="card-title">Pio-Clementino Museum</h3>
+      <p class="card-body">The greatest classical sculpture collection in existence. The Octagonal Courtyard (1506) houses Laocoön, Apollo Belvedere, and the Hermes. The circular Sala Rotonda has a floor mosaic from Otricoli and a porphyry basin 13m across. Don't miss the Hall of the Muses — 9 marble muses plus the Belvedere Torso.</p>
+      <span class="card-tag">Floor 1 · Belvedere Wing</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3 class="card-title">Raphael Rooms (Stanze)</h3>
+      <p class="card-body">Four papal apartments painted 1509–1524. Room II has the School of Athens — find Michelangelo (Heraclitus), Raphael himself, and Leonardo as Plato. Room I's Disputation of the Holy Sacrament introduced the idea of painting heaven and earth in the same frame. Room III has the Liberation of St. Peter — Raphael's first nocturnal scene.</p>
+      <span class="card-tag">Floor 2 · Apostolic Palace</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">✨</div>
+      <h3 class="card-title">Sistine Chapel</h3>
+      <p class="card-body">Painted 1508–1512 (ceiling) and 1536–1541 (Last Judgement). Nine scenes from Genesis across the vault, surrounded by 20 male nudes (ignudi), 7 prophets, 5 sibyls. The Last Judgement has 391 figures. Photography is banned but silently universal. Bring a mirror. Look for Michelangelo's self-portrait on Bartholomew's flayed skin.</p>
+      <span class="card-tag">Floor 2 · Direct access</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <h3 class="card-title">Gallery of Maps</h3>
+      <p class="card-body">120m corridor with 40 large maps of Italian regions, commissioned 1580–83 by Gregory XIII. Painted by Ignazio Danti from actual cartographic surveys — revolutionary accuracy for the era. But look up: the vaulted ceiling above is covered in gilded stucco scenes of the history of each mapped region. Most visitors never look up.</p>
+      <span class="card-tag">Floor 2 · Connecting corridor</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🏺</div>
+      <h3 class="card-title">Egyptian Museum</h3>
+      <p class="card-body">18 rooms of Egyptian antiquities collected from the 1st century BC onward when Rome was obsessed with Egypt. Genuine mummies, an intact sarcophagus of Princess Istemkhebe, and the remarkable Canopic jars from 600 BCE. Room 9 has a stunning black basalt statue of Antinous (Hadrian's beloved) depicted as an Egyptian god.</p>
+      <span class="card-tag">Floor 0 · Undervisited</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⚗️</div>
+      <h3 class="card-title">Etruscan Museum</h3>
+      <p class="card-body">One of the world's great collections of Etruscan art — the civilisation that preceded Rome. The Mars of Todi (400 BCE) is a life-size bronze warrior of staggering quality. The Regolini-Galassi Tomb contents include a golden pectoral from 650 BCE. Two floors that almost no one visits. Usually quiet even on packed days.</p>
+      <span class="card-tag">Floor 1 · Often Empty</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🖼️</div>
+      <h3 class="card-title">Vatican Pinacoteca</h3>
+      <p class="card-body">The painting gallery is oddly skipped by most visitors. It has Raphael's Transfiguration (his last and greatest painting, finished by his assistants after his death), Leonardo da Vinci's unfinished St. Jerome, Caravaggio's Deposition, and a room of Byzantine altarpieces spanning 700 years of Italian painting. Entry from the main courtyard.</p>
+      <span class="card-tag">Separate building · Highly recommended</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🦁</div>
+      <h3 class="card-title">Gallery of the Candelabra</h3>
+      <p class="card-body">The grand entrance gallery of marble candelabras, ancient Roman statues, and sarcophagus reliefs that most people speed through. Slow down — every plinth has extraordinary detail. The Dionysus and Ariadne sarcophagus near the centre has the finest relief carving in the entire museum complex (many art historians argue).</p>
+      <span class="card-tag">Floor 2 · Usually rushed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     BASILICA
+══════════════════════════════════════ -->
+<section id="basilica" class="section">
+  <div class="section-header">
+    <p class="section-label">St. Peter's Basilica — Complete Guide</p>
+    <h2 class="section-title">Inside <em>the Greatest Church</em></h2>
+  </div>
+
+  <div class="info-box">
+    <strong>Free Entry · Opens 7:00 AM · Dress Code Strictly Enforced</strong> — No bare shoulders, no shorts above the knee. This applies to everyone without exception. Arrive before 9am to walk freely.
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🕊️</div>
+      <h3 class="card-title">Michelangelo's Pietà</h3>
+      <p class="card-body">Right aisle, immediately on entering. Carved when Michelangelo was 24 years old — 1498–99. The only work he ever signed (on Mary's sash, after overhearing someone attribute it to another sculptor). The scale is deliberately distorted: Mary's body is larger than Christ's to support him physically and symbolically. Look at the extraordinary handling of cloth in marble.</p>
+      <span class="card-tag">Right Nave · Behind Glass Since 1972</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⛪</div>
+      <h3 class="card-title">Bernini's Baldachin</h3>
+      <p class="card-body">The 29-metre bronze canopy over the Papal Altar is the largest bronze artwork in the world. Made from bronze stripped from the Pantheon's portico. The twisted columns echo the columns of Solomon's Temple in Jerusalem. Below it is the tomb of St. Peter, confirmed by archaeological excavations in 1950. Stand underneath it and look straight up — breathtaking.</p>
+      <span class="card-tag">Crossing · Centre</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <h3 class="card-title">The Dome — Michelangelo's Design</h3>
+      <p class="card-body">Commissioned by Pope Paul III in 1547, begun by Michelangelo, completed 1590. The inner diameter is 41.47m — intentionally just smaller than the Pantheon's 43.3m. From inside, look up at the mosaic inscription: "Tu es Petrus et super hanc petram aedificabo ecclesiam meam." Walk up all 551 steps. No lift to the very top.</p>
+      <span class="card-tag">Paid Climb · €8 stairs / €6 lift partway</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⬇️</div>
+      <h3 class="card-title">Vatican Grottoes</h3>
+      <p class="card-body">Beneath the main floor lie the papal tombs and the foundations of the original 4th-century Constantinian basilica. John Paul II's simple white tomb is here — often with flowers from pilgrims. So is John XXIII. The semi-circular ambulatory routes past columns from the original basilica. Free, often uncrowded, profoundly atmospheric.</p>
+      <span class="card-tag">Below Main Floor · Free</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⛏️</div>
+      <h3 class="card-title">The Necropolis — Vatican Scavi</h3>
+      <p class="card-body">The excavations beneath the Grottoes (must book months in advance). A Roman street of mausoleums from the 1st–3rd century AD, ending at the tomb believed to be Peter's. UNESCO-listed. The excavations confirmed in 1950 that bones found here match a first-century male. This is as close as archaeology gets to Peter himself. Book via scavi@fsp.va — often full months out.</p>
+      <span class="card-tag">Book Months Ahead · Limited Groups</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🌅</div>
+      <h3 class="card-title">Bernini's Piazza — The Embrace</h3>
+      <p class="card-body">Step back to the obelisk in the centre of the square. Turn around. Bernini described the colonnade as "the church opening its arms to receive Catholics, confirm heretics, and enlighten unbelievers." The elliptical shape, 196m wide, appears circular when you stand on the porphyry discs between the fountains and the obelisk — the columns align perfectly. Find the discs.</p>
+      <span class="card-tag">Free · Best at Dawn or Dusk</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     HIDDEN GEMS
+══════════════════════════════════════ -->
+<section id="hidden" class="section">
+  <div class="section-header">
+    <p class="section-label">What 95% of Visitors Miss</p>
+    <h2 class="section-title">The <em>Hidden Gems</em></h2>
+  </div>
+
+  <div class="gem-list">
+    <div class="gem">
+      <div class="gem-num">01</div>
+      <div>
+        <h3 class="gem-title">The Ceiling of the Gallery of Maps</h3>
+        <p class="gem-body">Everyone looks at the famous maps on the walls. Almost no one looks up. The barrel-vaulted ceiling above is covered in gilded stucco reliefs and frescoes of the miracles and histories of each Italian region — a second great artwork hiding in plain sight above a more famous one.</p>
+        <p class="gem-where">Vatican Museums · Gallery of Maps</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">02</div>
+      <div>
+        <h3 class="gem-title">Michelangelo's Self-Portrait in the Sistine Chapel</h3>
+        <p class="gem-body">In the Last Judgement, St. Bartholomew holds his own flayed skin. The face on that skin is Michelangelo's — painted during what was reportedly a dark period in his life. An act of sardonic humour or profound despair painted 4 metres off the ground. Most visitors never find it.</p>
+        <p class="gem-where">Sistine Chapel · Altar Wall · St. Bartholomew figure</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">03</div>
+      <div>
+        <h3 class="gem-title">The Porphyry Basins in Sala Rotonda</h3>
+        <p class="gem-body">In the round room of the Pio-Clementino Museum sits a single ancient Roman porphyry basin 13 metres in circumference, carved from a single piece of stone. Porphyry could only be quarried from one place on earth (a site in Egypt that was lost for 1,500 years) — this is one of the largest objects ever made from it.</p>
+        <p class="gem-where">Pio-Clementino Museum · Sala Rotonda</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">04</div>
+      <div>
+        <h3 class="gem-title">Raphael's Self-Portrait in the School of Athens</h3>
+        <p class="gem-body">Raphael placed himself in his greatest fresco — second from the right, the young man in the black hat looking directly at you. Standing next to him is Sodoma, his friend. Michelangelo (as Heraclitus) sits alone in the centre foreground. Leonardo da Vinci is portrayed as Plato on the left. The whole fresco is a gathering of Renaissance artists in ancient costume.</p>
+        <p class="gem-where">Raphael Rooms · Stanza della Segnatura · Far right figure</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">05</div>
+      <div>
+        <h3 class="gem-title">The Belvedere Torso — Refused Restoration</h3>
+        <p class="gem-body">A fragmentary seated male torso from 1st century BCE, signed by Apollonius of Athens. When Pope Julius II wanted it restored, Michelangelo refused, saying it was perfect as it was. He returned to study it throughout his career. The muscle groups in this broken fragment influenced nearly every nude Michelangelo subsequently painted.</p>
+        <p class="gem-where">Pio-Clementino Museum · Hall of the Muses</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">06</div>
+      <div>
+        <h3 class="gem-title">The Alignment Disc in Bernini's Colonnade</h3>
+        <p class="gem-body">Between the central obelisk and each fountain, there is a small porphyry disc set into the cobblestones. Stand on it and look at either wing of the colonnade — the four rows of columns collapse into a single perfectly aligned row. A geometric illusion Bernini built into the entire piazza, invisible unless you know exactly where to stand.</p>
+        <p class="gem-where">St. Peter's Square · Two discs between obelisk and fountains</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">07</div>
+      <div>
+        <h3 class="gem-title">The Passetto di Borgo — The Pope's Escape Tunnel</h3>
+        <p class="gem-body">An elevated covered corridor running 800 metres from the Vatican to Castel Sant'Angelo, built in 1277. Pope Clement VII used it to escape during the Sack of Rome in 1527 (watched from the ramparts of Castel Sant'Angelo as his Swiss Guards were massacred). You can see the corridor from street level on Via della Conciliazione.</p>
+        <p class="gem-where">Visible from street · Borgo Corridor</p>
+      </div>
+    </div>
+
+    <div class="gem">
+      <div class="gem-num">08</div>
+      <div>
+        <h3 class="gem-title">Leonardo's Unfinished St. Jerome — Vatican Pinacoteca</h3>
+        <p class="gem-body">In the painting gallery: an unfinished panel painting by Leonardo da Vinci (c.1480). The saint and his lion are sketched in with extraordinary anatomical precision — the neck musculature was ahead of its time by a century. It was cut in half at some point and used as a tabletop before being identified as a Leonardo in the 19th century. Eerily powerful in its incompleteness.</p>
+        <p class="gem-where">Vatican Pinacoteca · Room IX</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     THE AREA
+══════════════════════════════════════ -->
+<section id="area" class="section">
+  <div class="section-header">
+    <p class="section-label">Beyond the Museums</p>
+    <h2 class="section-title">The <em>Vatican Area</em> — Know Your Neighbourhood</h2>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏰</div>
+      <h3 class="card-title">Castel Sant'Angelo</h3>
+      <p class="card-body">Built 135 AD as Emperor Hadrian's mausoleum. Converted to a papal fortress in the 6th century — popes added rooms, cellars, latrines, and the famous rooftop terrace. Seven floors of history from Roman tomb to Renaissance palace. The Papal Apartments on the upper floors have extraordinary frescoed ceilings. The rooftop view at sunset is the best in Rome.</p>
+      <span class="card-tag">Tue–Sun 9am–7:30pm · ~€15 · 15min walk</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🌿</div>
+      <h3 class="card-title">Vatican Gardens</h3>
+      <p class="card-body">23 hectares of private gardens covering half of Vatican City, established 1279 by Nicholas III. Italian formal gardens, English woodland, French parterres, Lourdes Grotto, radio antenna (Vatican Radio), and a perfect view back at the rear of St. Peter's dome almost no one ever sees. Book the open-bus garden tour through the Vatican Museums website — limited daily capacity.</p>
+      <span class="card-tag">Book Via Vatican Museums · €35 approx · 90 min tour</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🍕</div>
+      <h3 class="card-title">Pizzarium Bonci</h3>
+      <p class="card-body">Gabriele Bonci is to pizza what Michelangelo is to marble — a genius working in a humble medium. His pizza al taglio (by the slice, by weight) uses naturally leavened dough aged 72 hours, seasonal ingredients, and cooking techniques borrowed from French haute cuisine. Via della Meloria 43, a 10-minute walk from the museums. Be there at noon when fresh trays emerge.</p>
+      <span class="card-tag">Via della Meloria 43 · Noon–10pm · Cash only</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🌉</div>
+      <h3 class="card-title">Ponte Sant'Angelo</h3>
+      <p class="card-body">The pedestrian bridge over the Tiber leading to Castel Sant'Angelo. Lined with 10 marble angels designed by Bernini (1669) — each holding an instrument of Christ's Passion. The bridge itself is ancient Roman (135 AD), making it one of the oldest continuously used bridges in the world. Walk it slowly at dusk when the castle and St. Peter's are both lit.</p>
+      <span class="card-tag">Free · Best at Dusk</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🏘️</div>
+      <h3 class="card-title">Borgo Pio — Old Pilgrims' Quarter</h3>
+      <p class="card-body">The medieval borgo (hamlet) directly adjacent to the Vatican walls. The narrow streets were built to house pilgrims coming to Rome from the whole of Christendom. Via di Porta Angelica and the side alleys still have the scale of a medieval city. Away from Via della Conciliazione's tourist strip: quieter, cheaper, more atmospheric.</p>
+      <span class="card-tag">Free to explore · Walk along Vatican walls</span>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <h3 class="card-title">Prati — The Local District</h3>
+      <p class="card-body">Built in the late 19th century as a residential district, Prati (meaning "meadows") is where Romans who work at the Vatican actually live. Wide boulevards, elegant Liberty-style (Art Nouveau) apartment buildings, the best independent bookshops in Rome, and restaurants without tourist menus. Via Cola di Rienzo for shopping; Via Candia for food.</p>
+      <span class="card-tag">North of Vatican · 10 min walk</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TIPS
+══════════════════════════════════════ -->
+<section id="tips" class="section">
+  <div class="section-header">
+    <p class="section-label">Insider Knowledge</p>
+    <h2 class="section-title">Tips, Logistics <em>& Survival</em></h2>
+  </div>
+
+  <div class="alert">
+    <strong>Today is Wednesday.</strong> The Pope gives his public General Audience on Wednesdays at 9:30am in St. Peter's Square (when in residence). If the Pope is in Rome, the square will be busy from 8am — factor this into your timing. The Audience ends by 11am.
+  </div>
+
+  <div class="tip-grid">
+    <div class="tip-card">
+      <h4>Book in Advance</h4>
+      <p>Vatican Museums tickets sell out weeks ahead in high season. If you haven't booked: go in person at opening, or try the same-day kiosks inside the Vatican Tourist Office on Via della Conciliazione. Authorised tour operators also have allocations.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Dress Code — Strict</h4>
+      <p>Both the museums and Basilica require covered shoulders and knees. No exceptions. Guards will turn you away. Keep a scarf or light layer in your bag. This applies to all genders.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Shoes Matter</h4>
+      <p>You will walk 6–8km on marble, cobblestones, and stairs if doing Route A. Wear serious walking shoes. The dome stairs alone are 551 steps on a narrow, increasingly tight spiral.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Water & Food</h4>
+      <p>There are water fountains (nasoni) throughout Rome — fill a bottle before entering. Museum food is pricey. Bring snacks. The rooftop cafeteria is your best bet inside. Avoid every restaurant on Via della Conciliazione.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Audio Guide vs Guide</h4>
+      <p>The museum audio guide is worth it (€7). For the Basilica, the Rick Steves free audio tour (his website/app) is better than anything you can rent on-site. Download it before you arrive.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Photography</h4>
+      <p>Photography is banned in the Sistine Chapel (strictly enforced — guards shout). Allowed almost everywhere else in the museums without flash. The Basilica allows photography in the main nave.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Neck Mirror Trick</h4>
+      <p>Bring a small compact mirror or use your phone screen as a reflection surface to view the Sistine ceiling without craning your neck for an hour. Travel-size compact mirrors work perfectly.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Best Time in the Chapel</h4>
+      <p>8:30–9:30am (first hour) and 5:30–6pm (final half-hour). Midday is unbearable. If you're there at midday, the Chapel will have 2,000 people in it simultaneously — it's designed to hold around 200.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Vatican Necropolis</h4>
+      <p>If you haven't already: email scavi@fsp.va NOW to request a spot on the archaeological tour beneath the Basilica. It books months out but cancellations happen. The most extraordinary experience in all of Rome.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Castel Sant'Angelo</h4>
+      <p>Closed Mondays. Open until 7:30pm other days — great for the afternoon when museum energy drops. The rooftop bar has expensive drinks but unbeatable views. Go for aperitivo hour around 6pm.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>The Passetto Visible Walk</h4>
+      <p>Walk from the Vatican to Castel Sant'Angelo along the Lungotevere (river road) and look up to your left — the Passetto di Borgo (papal escape corridor) runs elevated between the buildings, unmistakable once you know what you're looking at.</p>
+    </div>
+
+    <div class="tip-card">
+      <h4>Emergency Lunch</h4>
+      <p>Pizzarium Bonci (Via della Meloria 43, 10 min walk) is genuinely world-class and costs about €5–10 for a filling lunch. Or Il Sorpasso in Prati for a sit-down meal that locals actually use.</p>
+    </div>
+  </div>
+
+  <div class="ornament-divider" style="margin-top:3rem"><span></span><em>✦</em><span></span></div>
+
+  <div class="info-box" style="text-align:center">
+    <strong>One last thing:</strong> The Vatican rewards slowness. The tourists who get least from it are those who rush. Pick fewer things and look at them longer — a single hour in front of the Laocoön will stay with you for life. A sprint through all 54 galleries will leave you with nothing but sore feet.
+  </div>
+</section>
+
+<footer>
+  <p>"Rome was not built in a day, but you can begin to understand it in one."</p>
+</footer>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+
+    // Re-trigger animations
+    document.querySelectorAll('.stop').forEach((s, i) => {
+      s.style.animation = 'none';
+      s.offsetHeight;
+      s.style.animation = '';
+      s.style.setProperty('--i', i);
+    });
+
+    window.scrollTo({ top: document.querySelector('.nav-strip').offsetTop, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
