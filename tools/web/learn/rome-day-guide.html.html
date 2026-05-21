@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rome — One Perfect Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ochre: #C8863A;
+    --rust: #A0412A;
+    --travertine: #F2EDE4;
+    --stone: #D6CABC;
+    --ink: #1C1410;
+    --smoke: #6B5F55;
+    --cream: #FAF7F2;
+    --gold: #D4A843;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 3rem 2rem 3rem;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 30% 60%, rgba(160,65,42,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(200,134,58,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(28,20,16,0.9) 0%, transparent 60%);
+  }
+
+  .hero-arch {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 400px;
+    border: 1px solid rgba(200,134,58,0.25);
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    animation: fadeIn 2s ease forwards;
+    opacity: 0;
+  }
+
+  .hero-arch::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 0;
+    border: 1px solid rgba(200,134,58,0.12);
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--ochre);
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+    animation: slideUp 1s ease 0.3s both;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 12vw, 7rem);
+    font-weight: 300;
+    color: var(--travertine);
+    line-height: 0.9;
+    position: relative;
+    z-index: 2;
+    animation: slideUp 1s ease 0.5s both;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--ochre);
+  }
+
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--stone);
+    margin-top: 1rem;
+    position: relative;
+    z-index: 2;
+    animation: slideUp 1s ease 0.7s both;
+  }
+
+  .hero-line {
+    width: 60px;
+    height: 1px;
+    background: var(--ochre);
+    margin: 1.5rem 0;
+    position: relative;
+    z-index: 2;
+    animation: slideUp 1s ease 0.9s both;
+  }
+
+  /* TIMELINE */
+  .section {
+    padding: 3rem 1.5rem;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    color: var(--ochre);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--stone);
+  }
+
+  /* TIME BLOCK */
+  .time-block {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 3rem;
+    border-left: 1px solid var(--stone);
+  }
+
+  .time-block::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    background: var(--ochre);
+    border-radius: 50%;
+  }
+
+  .time-stamp {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--rust);
+    margin-bottom: 0.4rem;
+  }
+
+  .time-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+    line-height: 1.1;
+  }
+
+  .time-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--smoke);
+    margin-bottom: 0.9rem;
+  }
+
+  .time-desc {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: #3a3028;
+    margin-bottom: 1rem;
+  }
+
+  /* CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--stone);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--ochre);
+  }
+
+  .card-icon {
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--rust);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+  }
+
+  .card-text {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--smoke);
+  }
+
+  .card.gem::before { background: #5B8C5A; }
+  .card.food::before { background: var(--gold); }
+
+  /* PILL TAGS */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.65rem;
+    background: var(--travertine);
+    border: 1px solid var(--stone);
+    color: var(--smoke);
+    text-transform: uppercase;
+  }
+
+  .tag.must {
+    background: var(--rust);
+    border-color: var(--rust);
+    color: white;
+  }
+
+  /* DIVIDER */
+  .ornament {
+    text-align: center;
+    color: var(--stone);
+    font-size: 1.2rem;
+    letter-spacing: 0.5em;
+    padding: 1.5rem 0;
+  }
+
+  /* FOOD SECTION */
+  .food-block {
+    background: var(--travertine);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-top: 2px solid var(--gold);
+  }
+
+  .food-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.15rem;
+  }
+
+  .food-zone {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    color: var(--ochre);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .food-desc {
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--smoke);
+  }
+
+  .food-order {
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--rust);
+    font-style: italic;
+  }
+
+  /* INSIDER */
+  .insider {
+    background: var(--ink);
+    color: var(--travertine);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .insider::before {
+    content: '"';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 8rem;
+    color: rgba(200,134,58,0.15);
+    position: absolute;
+    top: -1rem;
+    left: 0.5rem;
+    line-height: 1;
+  }
+
+  .insider-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  .insider-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--ochre);
+    text-transform: uppercase;
+    margin-top: 0.75rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: var(--stone);
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+
+  footer .footer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--travertine);
+    margin-bottom: 0.5rem;
+  }
+
+  footer p {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* GEM HIGHLIGHT */
+  .gem-highlight {
+    border-left: 3px solid #5B8C5A;
+    padding-left: 1rem;
+    margin: 1rem 0;
+  }
+
+  .gem-highlight .gem-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: #5B8C5A;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .gem-highlight p {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--smoke);
+  }
+
+  hr.fancy {
+    border: none;
+    border-top: 1px solid var(--stone);
+    margin: 2rem 0;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--rust);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    padding: 0.2rem 0.5rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+
+  .badge.green {
+    background: #5B8C5A;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-arch"></div>
+  <div class="hero-tag">A Complete Guide</div>
+  <div class="hero-title">One Day<br>in <em>Rome</em></div>
+  <div class="hero-line"></div>
+  <div class="hero-sub">The Colosseum at dawn · The Forum · Hidden layers · St. Peter's at 4pm</div>
+</div>
+
+<!-- MORNING -->
+<div class="section">
+  <div class="section-label">Morning</div>
+
+  <div class="time-block">
+    <div class="time-stamp">8:30 AM</div>
+    <div class="time-title">The Colosseum</div>
+    <div class="time-subtitle">Piazza del Colosseo · Allow 1.5–2 hrs</div>
+    <div class="time-desc">
+      Go early — by 10am the crowds thicken considerably. You have a combined ticket that covers all three sites (Colosseum + Forum + Palatine Hill). <strong>Book the Arena Floor access</strong> if you can — it's an upgraded ticket but worth every euro. Standing on the actual floor where gladiators fought, looking up at the tiered walls, is one of those rare moments that delivers exactly what you hoped for.
+    </div>
+
+    <div class="tags">
+      <span class="tag must">Book in advance</span>
+      <span class="tag must">Arena Floor add-on</span>
+      <span class="tag">Audio guide app</span>
+    </div>
+
+    <div class="insider" style="margin-top:1rem;">
+      <div class="insider-text">The hypogeum — the underground network of tunnels beneath the arena floor — is where the real drama lived. Gladiators, animals, and stage machinery were all staged here before being hoisted through trap doors into the light above. It costs extra to see it but nothing else in Rome compares.</div>
+      <div class="insider-label">⬡ Insider Move</div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🏛</div>
+        <div class="card-name">What Most Miss</div>
+        <div class="card-text">The upper tier (Tier 4 & 5) views are only accessible with special tickets, but the top of Tier 3 is free — the full bowl opens before you.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🐦</div>
+        <div class="card-name">Fun Detail</div>
+        <div class="card-text">A flock of ring-necked parakeets has made the Colosseum their home. Bright green against ancient travertine — you'll spot them flying through the arches.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament">· · ·</div>
+
+  <!-- FIRST FOOD STOP -->
+  <div class="section-label">First Coffee Stop</div>
+
+  <div class="food-block">
+    <div class="food-title">Bar San Calisto or any standing bar nearby</div>
+    <div class="food-zone">Near the Forum entrance</div>
+    <div class="food-desc">Rome runs on espresso. Stand at the counter like a local — sitting costs 3x as much. Order a <em>cornetto con crema</em> (cream-filled croissant) and a <em>caffè macchiato</em>. €2 total. You're doing it right.</div>
+    <div class="food-order">Order: Caffè macchiato + cornetto alla crema. Eat standing. Never apologize.</div>
+  </div>
+
+  <div class="ornament">· · ·</div>
+
+  <!-- FORUM -->
+  <div class="time-block">
+    <div class="time-stamp">10:30 AM</div>
+    <div class="time-title">Palatine Hill First</div>
+    <div class="time-subtitle">Enter from Via Sacra · Allow 1–1.5 hrs</div>
+    <div class="time-desc">
+      Counter-intuitive move: <strong>do Palatine Hill before the Roman Forum</strong>. Most people go Forum then Hill — so go the other way. The Hill is quieter, the views of the Forum below are spectacular, and you'll understand the geography of ancient Rome from the top down. This is the literal birthplace of Rome — Romulus drew the first sacred boundary up here in 753 BC.
+    </div>
+
+    <div class="tags">
+      <span class="tag must">Start Here</span>
+      <span class="tag">Farnese Gardens</span>
+      <span class="tag">View of Circus Maximus</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card gem">
+        <div class="card-icon">🌿</div>
+        <div class="card-name">Hidden Garden</div>
+        <div class="card-text">The Farnese Gardens on top are Europe's oldest botanical garden. Nobody lingers here. Sit on a bench above the Forum in the shade — it's extraordinary.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👑</div>
+        <div class="card-name">Emperor's Palace</div>
+        <div class="card-text">The Domus Augustana ruins still read as palatial. Augustus chose this hill because Romulus chose it — every emperor after made it their own.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORUM -->
+  <div class="time-block">
+    <div class="time-stamp">Noon</div>
+    <div class="time-title">The Roman Forum</div>
+    <div class="time-subtitle">Heart of the Ancient World · Allow 1.5 hrs</div>
+    <div class="time-desc">
+      Descend from the Hill into the Forum. Walk the Via Sacra — the same road where triumphant generals paraded — from the Arch of Titus to the Arch of Septimius Severus. Let the scale hit you: every election, religious ceremony, public execution, and market day of the republic happened in this valley.
+    </div>
+
+    <div class="gem-highlight">
+      <div class="gem-name">◆ Don't Miss — Temple of Vesta</div>
+      <p>The round temple of Vesta and the nearby House of the Vestal Virgins is an underrated pocket. The Vestals maintained the sacred flame for 1,000 years. Their residence — columns, rose gardens, reflecting pools — feels serene and completely un-touristy even when the Forum is packed.</p>
+    </div>
+
+    <div class="gem-highlight">
+      <div class="gem-name">◆ Don't Miss — Arch of Titus</div>
+      <p>Walk through it. The relief carvings inside show the sack of Jerusalem in 70 AD — Roman soldiers carrying the golden Menorah from the Temple. One of the most historically charged carvings in the world, and most people walk past it.</p>
+    </div>
+
+    <div class="insider">
+      <div class="insider-text">Download the free "Roma" app before you go. At the Forum it overlays a full color reconstruction of ancient Rome onto your camera view — you see the gleaming white marble temples as they actually were. It's genuinely stunning and completely changes the experience.</div>
+      <div class="insider-label">⬡ App Tip</div>
+    </div>
+  </div>
+</div>
+
+<!-- MIDDAY FOOD -->
+<div style="background: var(--travertine); padding: 2rem 1.5rem;">
+  <div style="max-width: 680px; margin: 0 auto;">
+    <div class="section-label">Lunch</div>
+    <p style="font-size:0.85rem; color:var(--smoke); margin-bottom:1.5rem;">Eat before 1pm or after 2pm — Rome's lunch rush is real. Walk 5 min from the Forum into the side streets. Avoid anywhere with a photo menu or a tout outside the door.</p>
+
+    <div class="food-block" style="border-top-color: var(--rust);">
+      <div class="food-title">La Nuova Piazzetta <span class="badge">Local Favorite</span></div>
+      <div class="food-zone">Vicolo del Buon Consiglio, 23 · 3 min from Forum</div>
+      <div class="food-desc">Down a side alley, perpetually busy, perpetually worth it. Classic Roman trattoria energy — paper tablecloths, generous portions, zero pretense. 50,000+ reviews at 4.8 stars is not an accident.</div>
+      <div class="food-order">Order: Cacio e pepe · Grilled prawns · House wine by the carafe · Tiramisù to finish</div>
+    </div>
+
+    <div class="food-block">
+      <div class="food-title">Pasqualino Al Colosseo <span class="badge green">Since 1956</span></div>
+      <div class="food-zone">Via dei SS. Quattro · Colosseum zone</div>
+      <div class="food-desc">A genuine Roman institution since 1956. The fettuccine al ragù is the real Roman version — nothing like what you've had anywhere else. Outdoor seating with the Colosseum in view. Don't order the pizza here; do order the pasta.</div>
+      <div class="food-order">Order: Fettuccine al ragù · Saltimbocca alla romana · Complimentary limoncello at the end (always)</div>
+    </div>
+
+    <hr class="fancy">
+
+    <div class="section-label" style="margin-top:1rem;">The Undervalued Detour</div>
+
+    <div class="card-grid">
+      <div class="card gem" style="grid-column: 1 / -1;">
+        <div class="card-icon">⛪</div>
+        <div class="card-name">Basilica di San Clemente — THE Hidden Gem of Rome</div>
+        <div class="card-text" style="font-size:0.85rem; line-height:1.7;">
+          5-minute walk from the Colosseum. Three churches stacked on top of each other: a 12th-century basilica above ground, a 4th-century early Christian church one level below (still with original frescoes), and at the bottom — a 1st-century Roman apartment building and a <em>Mithraic temple</em> from 200 AD, with an underground stream you can hear rushing. <strong>This is Rome in microcosm.</strong> Three civilizations literally layered beneath your feet. Barely anyone goes. €10. Do not skip this.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AFTERNOON TRANSITION -->
+<div class="section">
+  <div class="section-label">Afternoon Bridge</div>
+
+  <div class="time-block">
+    <div class="time-stamp">2:30 PM</div>
+    <div class="time-title">Cross the City</div>
+    <div class="time-subtitle">Colosseum → Vatican · ~30 min by taxi or bus</div>
+    <div class="time-desc">
+      Take a taxi directly — €12-15 and worth every cent on a full-day walk. Or take bus 40/64 from Largo Argentina (a 15-min walk west) — these go directly to St. Peter's Square. If energy allows, the walk via Campo de' Fiori is itself worth doing: 45 minutes through the living city.
+    </div>
+
+    <div class="gem-highlight">
+      <div class="gem-name">◆ Optional Detour — Largo Argentina</div>
+      <p>An open-air Roman archaeological site in the middle of a modern piazza. Four Republican-era temples dating to 300 BC, right there on street level among the taxis and cafés. Also the exact location where Julius Caesar was assassinated on March 15, 44 BC. Free to view from the perimeter. A cat sanctuary lives inside the ruins now — genuinely surreal and wonderful.</p>
+    </div>
+  </div>
+
+  <div class="ornament">· · ·</div>
+
+  <!-- ST PETER'S -->
+  <div class="time-block">
+    <div class="time-stamp">4:00 PM</div>
+    <div class="time-title">St. Peter's Basilica</div>
+    <div class="time-subtitle">Vatican City · Allow 1.5–2 hrs</div>
+    <div class="time-desc">
+      Entry to the Basilica itself is free. 4pm is actually a good time — the massive morning rush of tour groups has thinned. The square (Bernini's masterpiece of colonnade arms) will be glowing in afternoon light. Give yourself a full minute in the center of the square before you enter — look up at the 284 columns, and the 140 saints looking down. It's theater on a divine scale.
+    </div>
+
+    <div class="tags">
+      <span class="tag must">Free Entry</span>
+      <span class="tag must">Michelangelo's Pietà</span>
+      <span class="tag">Climb the Dome</span>
+      <span class="tag">Swiss Guard</span>
+    </div>
+
+    <div class="insider">
+      <div class="insider-text">The Pietà is behind bulletproof glass now (since a man attacked it with a hammer in 1972), but it's lit beautifully. Stand as close as you can and look at Mary's face — Michelangelo carved this at age 24. The scale of Christ's body in her lap is purposefully unrealistic; it reads emotionally, not physically. It's the most moving object in the building.</div>
+      <div class="insider-label">⬡ What to Look For</div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card gem">
+        <div class="card-icon">🔶</div>
+        <div class="card-name">Underrated Inside</div>
+        <div class="card-text">The bronze papal tombs along the nave walls. Most visitors beeline for Pietà and dome. The tombs — some by Bernini — are extraordinary and completely uncrowded.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🕍</div>
+        <div class="card-name">The Dome</div>
+        <div class="card-text">Climb the dome (551 steps, or elevator partway). The view of Rome at dusk from 120 meters — €8. Go for sunset if timing allows. One of the best views on earth.</div>
+      </div>
+      <div class="card gem">
+        <div class="card-icon">🌅</div>
+        <div class="card-name">After Basilica</div>
+        <div class="card-text">Walk 10 min to Castel Sant'Angelo. The golden hour light on the fortress and the Tiber is sublime. Walk the bridge lined with Bernini angels.</div>
+      </div>
+      <div class="card food">
+        <div class="card-icon">🧆</div>
+        <div class="card-name">Aperitivo Hour</div>
+        <div class="card-text">Prati neighborhood (5 min walk from Vatican) is where Romans actually eat near the Vatican. None of the tourist-trap prices of the square area.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENING FOOD -->
+<div style="background: var(--ink); padding: 2.5rem 1.5rem;">
+  <div style="max-width: 680px; margin: 0 auto;">
+    <div class="section-label" style="color: var(--ochre);">Evening</div>
+
+    <div style="color: var(--travertine);">
+      <div style="font-family: 'Cormorant Garamond', serif; font-size:1.5rem; margin-bottom:1rem;">Where to Eat Tonight</div>
+
+      <div style="background: rgba(255,255,255,0.05); border-left: 3px solid var(--gold); padding: 1.2rem; margin-bottom:1rem;">
+        <div style="font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--gold); margin-bottom:0.4rem; text-transform:uppercase;">Near the Vatican · Scialla Street Food</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--travertine); margin-bottom:0.3rem;">Scialla The Original Street Food</div>
+        <div style="font-size:0.82rem; color:var(--stone); line-height:1.7;">Vicolo del Farinone, 27 — 5 min from St. Peter's Square. A tiny, famous, cash-only hole-in-the-wall. Some of the best pizza and pasta in Rome at prices that seem impossible for the neighborhood. Four tables. You will wait. Worth it every time.</div>
+        <div style="font-size:0.78rem; color:var(--gold); font-style:italic; margin-top:0.5rem;">Bring cash · Close at 3:30pm — best for late lunch, not dinner</div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.05); border-left: 3px solid var(--rust); padding: 1.2rem; margin-bottom:1rem;">
+        <div style="font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--ochre); margin-bottom:0.4rem; text-transform:uppercase;">Prati Neighborhood · Local Roman</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--travertine); margin-bottom:0.3rem;">Caffe delle Commari</div>
+        <div style="font-size:0.82rem; color:var(--stone); line-height:1.7;">Via Santamaura, 22. Warm, neighborhood, non-touristy energy. Pistachio cappuccino. Best pizza in the Vatican zone by a mile. Go here for the sit-down evening meal — the staff are legendarily kind.</div>
+        <div style="font-size:0.78rem; color:var(--gold); font-style:italic; margin-top:0.5rem;">Order: Pizza bianca · Carbonara · Pistachio cappuccino</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN GEMS RECAP -->
+<div class="section">
+  <div class="section-label">The Undervalued List</div>
+  <p style="font-size:0.85rem; color:var(--smoke); margin-bottom:1.5rem; line-height:1.7;">Things most people skip that will genuinely stay with you.</p>
+
+  <div class="card-grid">
+    <div class="card gem" style="grid-column: 1 / -1;">
+      <div class="card-name">🔑 #1 — San Clemente Basilica</div>
+      <div class="card-text" style="font-size:0.85rem;">Three churches, 1,000 years of history, an underground river. Five minutes from the Colosseum. Nothing else in Rome is this layered or this good for the price.</div>
+    </div>
+    <div class="card gem">
+      <div class="card-name">🔑 Farnese Gardens</div>
+      <div class="card-text">Atop Palatine Hill. Shaded, peaceful, with a staggering view of the Forum below.</div>
+    </div>
+    <div class="card gem">
+      <div class="card-name">🔑 Arch of Titus Interior</div>
+      <div class="card-text">The Jerusalem relief carvings inside. Most people walk through without looking up.</div>
+    </div>
+    <div class="card gem">
+      <div class="card-name">🔑 Largo Argentina</div>
+      <div class="card-text">Caesar's assassination site. Republican temples. Feral cats. In the middle of a traffic roundabout.</div>
+    </div>
+    <div class="card gem">
+      <div class="card-name">🔑 Janiculum Hill</div>
+      <div class="card-text">If you end near Trastevere: the best panorama of Rome, almost no tourists, noon cannon fires daily.</div>
+    </div>
+    <div class="card gem">
+      <div class="card-name">🔑 Ponte Sant'Angelo Dusk</div>
+      <div class="card-text">Bernini's ten angels at golden hour with Castel Sant'Angelo lit behind. Walk slowly.</div>
+    </div>
+  </div>
+
+  <hr class="fancy">
+
+  <div class="section-label" style="margin-top:2rem;">Roman Food Musts</div>
+  <p style="font-size:0.85rem; color:var(--smoke); margin-bottom:1.5rem; line-height:1.7;">These are the dishes you can only get right in Rome.</p>
+
+  <div style="display:grid; gap:0.75rem;">
+    <div class="food-block" style="border-top-color: var(--smoke); padding: 1rem 1.25rem;">
+      <div class="food-title" style="font-size:1.1rem;">Cacio e Pepe</div>
+      <div class="food-desc">Pecorino romano, black pepper, pasta water. Three ingredients, infinite skill. This is the one Roman pasta that's almost impossible to get right outside of Rome. Order it everywhere.</div>
+    </div>
+    <div class="food-block" style="border-top-color: var(--smoke); padding: 1rem 1.25rem;">
+      <div class="food-title" style="font-size:1.1rem;">Supplì al Telefono</div>
+      <div class="food-desc">Rome's answer to arancini — fried rice balls with tomato and mozzarella. The cheese stretches like a telephone wire when you pull it apart (hence the name). Grab one from any alimentari or street food spot.</div>
+    </div>
+    <div class="food-block" style="border-top-color: var(--smoke); padding: 1rem 1.25rem;">
+      <div class="food-title" style="font-size:1.1rem;">Gelato — but correctly</div>
+      <div class="food-desc">Artisanal gelato (gelato artigianale) sits in covered metal containers, not piled high in neon mounds. If it looks like a foam sculpture, walk past it. The pistachio should be grey-green, not neon. Taste before you commit.</div>
+    </div>
+    <div class="food-block" style="border-top-color: var(--smoke); padding: 1rem 1.25rem;">
+      <div class="food-title" style="font-size:1.1rem;">Aperol Spritz · Campari · Negroni</div>
+      <div class="food-desc">Aperitivo hour is 6–8pm. Order a drink, the bar puts out free snacks (olive, bruschetta, chips). This is how Romans segue between afternoon and dinner. Join in.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-title">Tu felix Roma</div>
+  <p>You lucky Rome. The city rewards those who look down alleys, enter side doors, and order what the table next to them is having. Everything above is a suggestion — the best thing you'll see today might be a courtyard you wander into by accident.</p>
+  <div style="margin-top:1.5rem; font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.3em; color:var(--smoke);">COLOSSEUM → FORUM → PALATINE → SAN CLEMENTE → TRANSIT → ST. PETER'S → PRATI</div>
+</footer>
+
+</body>
+</html>
