@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naples — A Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --cream: #ede7d6;
+    --rust: #c0392b;
+    --gold: #b8860b;
+    --faded: #8a7d6a;
+    --olive: #5a6e3d;
+    --border: #c8bda8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,57,43,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 16vw, 110px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+  .hero-title span { color: var(--rust); }
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(245,240,232,0.65);
+    margin-top: 16px;
+    max-width: 500px;
+  }
+  .hero-meta {
+    margin-top: 28px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    padding: 5px 12px;
+    border: 1px solid rgba(245,240,232,0.2);
+    border-radius: 2px;
+  }
+
+  /* NAV */
+  .section-nav {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .section-nav a {
+    display: inline-block;
+    padding: 14px 16px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .section-nav a:hover { color: var(--rust); border-bottom-color: var(--rust); }
+
+  /* LAYOUT */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  /* SECTION HEADERS */
+  .section-header {
+    padding: 48px 0 8px;
+    border-top: 2px solid var(--ink);
+    margin-top: 48px;
+  }
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 1;
+    color: var(--border);
+    float: right;
+    margin-top: -10px;
+  }
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.1;
+  }
+  .section-intro {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--faded);
+    margin: 16px 0 32px;
+    padding-left: 16px;
+    border-left: 3px solid var(--rust);
+  }
+
+  /* CARDS */
+  .cards { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+  .cards-2 { grid-template-columns: 1fr 1fr; }
+  .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  @media (max-width: 600px) {
+    .cards-2, .cards-3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper);
+    padding: 20px;
+  }
+  .card-priority {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .must { color: var(--rust); }
+  .should { color: var(--gold); }
+  .could { color: var(--olive); }
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .card-body { font-size: 13px; color: #3d3428; line-height: 1.6; }
+  .card-note {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--faded);
+    font-style: italic;
+  }
+
+  /* FOOD ITEMS */
+  .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+  @media (max-width: 560px) { .food-grid { grid-template-columns: 1fr; } }
+
+  .food-item { background: var(--paper); padding: 18px 20px; }
+  .food-category {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-bottom: 4px;
+  }
+  .food-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .food-desc { font-size: 12.5px; color: #3d3428; line-height: 1.55; }
+  .food-where {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--rust);
+  }
+  .food-where span { font-weight: 500; }
+
+  /* RESTAURANT TABLE */
+  .resto-list { margin: 24px 0; }
+  .resto-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .resto-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--border);
+    line-height: 1;
+    width: 28px;
+  }
+  .resto-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .resto-desc { font-size: 12.5px; color: #3d3428; }
+  .resto-tag {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    background: var(--cream);
+    color: var(--faded);
+    white-space: nowrap;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+
+  /* NEIGHBORHOODS */
+  .nbhd-block {
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  .nbhd-header {
+    background: var(--cream);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .nbhd-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .nbhd-vibe {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+  .nbhd-body { padding: 16px 20px; font-size: 13px; color: #3d3428; line-height: 1.65; }
+  .nbhd-hits { margin-top: 10px; }
+  .nbhd-hits span {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--ink);
+    color: var(--paper);
+    margin: 2px 3px 2px 0;
+    border-radius: 2px;
+  }
+
+  /* PULLQUOTES */
+  .pullquote {
+    margin: 36px 0;
+    padding: 28px 32px;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+  }
+  .pullquote::before {
+    content: '\201C';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px;
+    color: var(--rust);
+    position: absolute;
+    top: 0; left: 16px;
+    line-height: 1;
+    opacity: 0.7;
+  }
+  .pullquote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.45;
+    padding-left: 20px;
+  }
+  .pullquote cite {
+    display: block;
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    padding-left: 20px;
+  }
+
+  /* ITINERARY */
+  .day-block {
+    margin: 20px 0;
+    border-left: 3px solid var(--rust);
+    padding-left: 20px;
+  }
+  .day-label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 4px;
+  }
+  .day-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .day-item {
+    font-size: 13px;
+    padding: 4px 0;
+    display: flex;
+    gap: 12px;
+    color: #3d3428;
+  }
+  .day-time {
+    font-size: 10px;
+    color: var(--faded);
+    min-width: 50px;
+    padding-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .day-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--cream);
+    font-size: 11.5px;
+    color: var(--faded);
+    font-style: italic;
+    border-left: 2px solid var(--gold);
+  }
+
+  /* TIPS */
+  .tip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 24px 0; }
+  @media (max-width: 560px) { .tip-grid { grid-template-columns: 1fr; } }
+  .tip {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    color: #3d3428;
+    line-height: 1.6;
+  }
+  .tip-head {
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    text-align: center;
+    margin: 40px 0 0;
+    color: var(--border);
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-book { background: #ffeaea; color: var(--rust); border: 1px solid #f5c6c6; }
+  .badge-free { background: #eaf3ea; color: var(--olive); border: 1px solid #c0d4b8; }
+  .badge-hidden { background: #f5f0e0; color: var(--gold); border: 1px solid #dfd0a0; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 60px;
+    background: var(--ink);
+    color: rgba(245,240,232,0.4);
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Field Guide · May 23–25, 2026</div>
+  <div class="hero-title">NA<span>P</span>OLI</div>
+  <div class="hero-subtitle">Where every meal is an argument, every street is a museum, and the coffee is always perfect.</div>
+  <div class="hero-meta">
+    <div class="hero-tag">3 Nights</div>
+    <div class="hero-tag">Food First</div>
+    <div class="hero-tag">Centro Storico Base</div>
+    <div class="hero-tag">Sansevero 9:30am Tomorrow</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="section-nav">
+  <a href="#orientation">The City</a>
+  <a href="#musts">Must · Should · Could</a>
+  <a href="#food">The Food Bible</a>
+  <a href="#restaurants">Where to Eat</a>
+  <a href="#neighborhoods">Neighborhoods</a>
+  <a href="#tours">Tours</a>
+  <a href="#routing">Day Plans</a>
+  <a href="#tips">Survival Tips</a>
+</nav>
+
+<div class="container">
+
+<!-- ORIENTATION -->
+<section id="orientation">
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <div class="section-label">Orientation</div>
+    <div class="section-title">Understanding Naples</div>
+  </div>
+  <div class="section-intro">
+    Naples is not a city you visit — it's a city that happens to you. It is loud, crumbling, glorious, overwhelming, and utterly alive in a way that makes other Italian cities feel like theme parks by comparison.
+  </div>
+
+  <div class="pullquote">
+    <p>Naples is a city that has never been cleaned up for tourists. It's raw, unfiltered, maddeningly beautiful — the kind of place where the greatest sculpture in the world shares a block with laundry lines, and that's exactly the point.</p>
+    <cite>— Spirit of Bourdain</cite>
+  </div>
+
+  <p style="font-size:14px; margin-bottom:16px;">Naples was a Greek colony (Neapolis — "New City") founded around 470 BC. The Romans loved it for leisure. The Spanish ruled it for two centuries, stamping their grid onto the hillside. Then the Bourbons came, built palaces, and gave Naples an opera house. Every layer is still visible. The centro storico is a UNESCO World Heritage Site — not because it's been preserved, but because it's still basically the same city the Greeks laid out 2,500 years ago. The streets you'll walk were Roman roads.</p>
+
+  <div class="cards cards-3">
+    <div class="card">
+      <div class="card-priority must">Core Area</div>
+      <div class="card-name">Centro Storico</div>
+      <div class="card-body">Your home base. The ancient Greek grid — three long east-west decumani (including Spaccanapoli) crossed by north-south streets. Everything you need is walkable from here.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">Orientation</div>
+      <div class="card-name">The Three Axes</div>
+      <div class="card-body">Spaccanapoli (the arrow-straight split), Via dei Tribunali (upper decumanus, pizza row), and Via Toledo (the grand boulevard down to the waterfront). Learn these and you'll never be lost.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority could">Logistics</div>
+      <div class="card-name">Getting Around</div>
+      <div class="card-body">Walk the centro. For Vomero: funicular. For Pozzuoli/Campi Flegrei: Metro Line 2. For the waterfront: it's flat, keep walking. Avoid taxis where possible — negotiate first.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MUSTS -->
+<section id="musts">
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <div class="section-label">Sights & Experiences</div>
+    <div class="section-title">Must · Should · Could</div>
+  </div>
+  <div class="section-intro">
+    Ranked by irreplaceability. The MUSTs are things you cannot get elsewhere, or only get here in their purest form. SHOULDs enrich the picture. COULDs reward the curious.
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin-bottom:12px;">MUST DO — Non-negotiable</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-priority must">★ MUST · Pre-Booked</div>
+      <div class="card-name">Cappella Sansevero — The Veiled Christ <span class="badge badge-book">Booked: 9:30am Tomorrow</span></div>
+      <div class="card-body">The single most important reason to come to Naples beyond the food. Giuseppe Sanmartino's Veiled Christ (1753) — carved from a single block of marble — renders a transparent veil over the face of Christ so convincingly that Canova, arguably the greatest sculptor of his era, said he would trade ten years of his life to have made it. But the chapel is more than the Christ. Prince Raimondo di Sangro — Freemason, alchemist, inventor, and possible madman — conceived the entire space as a unified iconographic journey through human spiritual development. Each sculpture represents a Virtue; the whole room is a philosophical argument in marble. In the basement: two Anatomical Machines, human skeletons with their complete circulatory systems preserved in wire and wax. Their origin is the subject of the darkest legend in Naples.</div>
+      <div class="card-note">→ Arrive a few minutes early. Late arrivals forfeit their slot. Via Francesco De Sanctis 19.</div>
+    </div>
+  </div>
+
+  <div class="cards cards-2" style="margin-top:1px;">
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">MANN — National Archaeological Museum</div>
+      <div class="card-body">The world's finest collection of Greco-Roman antiquities, full stop. Farnese Hercules (largest surviving ancient sculpture), the Alexander Mosaic from Pompeii, the Farnese Bull, and rooms upon rooms of material from Pompeii and Herculaneum that would have been lost forever. The Gabinetto Segreto (Secret Cabinet) — erotic art from Roman homes, locked away for 200 years, opened in 2000 — is a genuine window into Roman private life without Victorian embarrassment. Budget a half-day minimum.</div>
+      <div class="card-note">→ Piazza Museo Nazionale 19. Closed Tuesdays.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">Spaccanapoli — End to End</div>
+      <div class="card-body">Walk the entire length at least once. This is the lower decumanus of the ancient Greek city, unchanged in its path for 2,500 years. It is one of the great streets of the world — chaotic, beautiful, alive, absolutely filthy in the best way. Start at Piazza del Gesù Nuovo, walk east past Santa Chiara, San Domenico Maggiore, Sansevero Chapel, and out toward the Duomo. Allow yourself to get lost in the alleys branching off it.</div>
+      <div class="card-note">→ Best in the morning and again after 7pm when the light changes.</div>
+    </div>
+  </div>
+
+  <div class="cards cards-2" style="margin-top:1px;">
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">Napoli Sotterranea — The Underground</div>
+      <div class="card-body">Naples is built on 2,500 years of its own infrastructure. The underground tours descend into the Greek-Roman cistern system that supplied the city's water until the 1885 cholera epidemic. During WWII, the tunnels became air-raid shelters for thousands — they left behind extraordinary artifacts, still visible. Narrow passages through volcanic tuff, cathedral-sized cisterns, and a rooftop view of the centro from below. Multiple tour operators; the original Napoli Sotterranea on Piazza San Gaetano is excellent.</div>
+      <div class="card-note">→ Tours run frequently. About 80 minutes. Bring a jacket — cold below.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">Via dei Tribunali — Pizza Row</div>
+      <div class="card-body">The upper decumanus is Naples' great pizza street. Sorbillo, Di Matteo, and others are concentrated here, but more importantly the entire street is a theater of Neapolitan life. Walk it before you eat on it. Watch the pizza men work through the glass at Sorbillo — the wood fire, the stretch, the char happening in 90 seconds. Then sit and eat a Margherita. It will rearrange your understanding of pizza permanently.</div>
+      <div class="card-note">→ Go at 7pm when it's most alive. Avoid peak lunch crush if lines feel discouraging.</div>
+    </div>
+  </div>
+
+  <div class="cards cards-2" style="margin-top:1px;">
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">The Lungomare at Sunset</div>
+      <div class="card-body">Walk the waterfront from Castel dell'Ovo west toward Mergellina. This is Naples as it wants to be seen: Vesuvius across the bay, fishermen on the sea wall, the city's chaos temporarily silenced by the water. The free-standing Castel dell'Ovo, Naples' oldest castle, sits on a tiny island connected by a causeway. The name means "egg castle" — legend holds it was built on a magic egg hidden by Virgil, and if the egg cracks, Naples falls.</div>
+      <div class="card-note">→ Golden hour is magnificent. Best combined with dinner in the Chiaia district afterward.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority must">★ MUST</div>
+      <div class="card-name">Piazza del Plebiscito</div>
+      <div class="card-body">Naples' vast civic square — surrounded by the Royal Palace, the Church of San Francesco di Paola (a deliberate echo of the Pantheon), and the grandeur of Bourbon-era ambition. In the morning before the crowds it is breathtaking. The Royal Palace (Palazzo Reale) is worth going inside for its throne room and royal apartments — less crowded than you'd expect for a building this extraordinary.</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 28px 0 12px;">SHOULD DO — Strongly Recommended</p>
+
+  <div class="cards cards-3">
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Fontanelle Cemetery <span class="badge badge-hidden">Hidden</span></div>
+      <div class="card-body">A vast ossuary carved into tuff rock, holding the bones of tens of thousands — plague, cholera, famine victims. Neapolitans developed a cult of "anime pezzentelle" — adopting a skull, keeping it clean, praying for the soul. Eerie, powerful, unlike anything else in Italy. Sanità district.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Catacombs of San Gennaro <span class="badge badge-hidden">Hidden</span></div>
+      <div class="card-body">Below the Basilica di Santa Maria della Sanità: the second most important early Christian cemetery in the city. The Sanità neighborhood itself — working-class, real, un-touristified — is a major draw. Come here to understand a Naples that tourism hasn't reached.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Certosa di San Martino + Vomero</div>
+      <div class="card-body">Take the funicular up to Vomero for the hilltop views, the Charterhouse monastery museum (extraordinary Christmas nativity collection, vast nave), and Castel Sant'Elmo. The view from the terrace is the best panorama of Naples and the bay. Catch your breath, literally and figuratively.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Via San Gregorio Armeno</div>
+      <div class="card-body">The presepi alley — family workshops producing nativity scene figures since the 17th century. Now includes contemporary figures alongside the holy family: politicians, footballers, celebrities in terracotta. Wonderfully surreal. Even if you buy nothing, the workshops are alive with craft.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Palazzo Reale di Capodimonte</div>
+      <div class="card-body">Naples' great art museum — Titian, Caravaggio, Raphael, plus Neapolitan Baroque that gets overlooked because everyone's in Florence. Set in a huge hilltop park. The Caravaggio Flagellation alone makes the trip. Less crowded than it deserves. Take bus 168 from the centro.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">SHOULD</div>
+      <div class="card-name">Quartieri Spagnoli Deep Walk</div>
+      <div class="card-body">The Spanish Quarter — narrow, grid-like streets climbing the hillside west of Via Toledo. Laundry everywhere. Shrines on every corner. The Maradona murals. Real Neapolitan life at street level. It can feel rough but is generally safe in daylight. Best morning or early evening.</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 28px 0 12px;">COULD DO — For the Curious &amp; Well-Rested</p>
+
+  <div class="cards cards-3">
+    <div class="card">
+      <div class="card-priority could">COULD</div>
+      <div class="card-name">Campi Flegrei / Pozzuoli <span class="badge badge-hidden">Day Trip</span></div>
+      <div class="card-body">West of Naples by Metro Line 2. A supervolcano caldera with 24 craters, ancient Roman harbor ruins, the Solfatara crater (steam, sulfur, Martian landscape), and the Flavian Amphitheater (Italy's third largest). Add the underwater ruins of ancient Baia. A full day trip for history and geology addicts.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority could">COULD</div>
+      <div class="card-name">Pausilypon Imperial Villa</div>
+      <div class="card-body">Augustus' imperial seaside estate — accessible only by boat from Mergellina. Roman theater, cliff-cut rooms above the sea. Nearly no visitors. Requires advance booking for the guided boat tour. For ancient Rome obsessives who've already done everything else.</div>
+      <div class="card-note">→ Book via Borbonico Sotterraneo or similar tour operator.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority could">COULD</div>
+      <div class="card-name">Bourbon Tunnel <span class="badge badge-hidden">Hidden</span></div>
+      <div class="card-body">Originally built as a royal escape route connecting the Palazzo Reale to military barracks. Used as WWII air-raid shelter. Filled with vintage vehicles, motorcycles, and wartime artifacts. Different vibe from Napoli Sotterranea — more industrial, weirder, less touristy.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOD -->
+<section id="food">
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <div class="section-label">The Only Thing That Matters</div>
+    <div class="section-title">The Naples Food Bible</div>
+  </div>
+  <div class="section-intro">
+    Naples is not a city with good food. Naples IS food. Every dish here carries centuries of poverty and ingenuity — the Neapolitans learned to make extraordinary things from almost nothing, and that discipline produced some of the world's great culinary traditions.
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin-bottom:12px;">STREET FOOD — Eat Standing, Eat Often</p>
+
+  <div class="food-grid">
+    <div class="food-item">
+      <div class="food-category">★ Essential · Breakfast</div>
+      <div class="food-name">Sfogliatella</div>
+      <div class="food-desc">Shell-shaped pastry of impossibly thin layered dough, filled with ricotta, candied citrus, and semolina. The <em>riccia</em> (ridged, crunchy shell) is the classic; the <em>frolla</em> (shortcrust) is softer. Hot from the oven, these are what morning in Naples tastes like. One of the great pastries in human history.</div>
+      <div class="food-where"><span>→ Sfogliatelle Attanasio</span> near Stazione Centrale · Also Pintauro on Via Toledo</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">★ Essential · Anytime</div>
+      <div class="food-name">Pizza Fritta</div>
+      <div class="food-desc">Fried pizza — folded dough fried in lard or oil, filled with ricotta, cicoli (rendered pork fat), and provola. Born in postwar Naples when wood wasn't available for ovens. Anthony Bourdain called it one of the best things he ever ate. Eat standing at a friggitoria. Don't wear a white shirt.</div>
+      <div class="food-where"><span>→ Di Matteo</span> on Via dei Tribunali · Any friggitoria on Spaccanapoli</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">★ Essential · On the Go</div>
+      <div class="food-name">Pizza a Portafoglio</div>
+      <div class="food-desc">A pizza Margherita or Marinara folded twice into a wallet shape — 4 layers — and eaten standing on the street. This is how Neapolitans have eaten pizza for 200 years. €1.50. The crust blisters and chars from the wood fire (leopard spotting is correct). The tomato is San Marzano only.</div>
+      <div class="food-where"><span>→ Any good pizzeria near Via dei Tribunali</span> · Ask for pizza a portafoglio</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Street · Fried</div>
+      <div class="food-name">Cuoppo</div>
+      <div class="food-desc">A paper cone of mixed fried things — calamari, shrimp, vegetables, mozzarella balls, zucchini blossoms. The Neapolitan version of fish and chips. Everything fried in Naples is done with a lightness that defies physics. Order at a friggitoria, walk to the sea.</div>
+      <div class="food-where"><span>→ Friggitoria Vomero</span> or any port-area friggitoria</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Street · Savory Snack</div>
+      <div class="food-name">Tarallo Sugna e Pepe</div>
+      <div class="food-desc">Ring-shaped baked snack made with lard (sugna) and black pepper. Crunchy, slightly bitter from the almonds inside, deeply savory. The Neapolitan pretzel. Sold at street stalls and bakeries everywhere. Excellent with a cold Peroni or a spritz.</div>
+      <div class="food-where"><span>→ Antiche Delizie</span> or any bakery on Spaccanapoli</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Street · Snack</div>
+      <div class="food-name">Frittatina di Pasta</div>
+      <div class="food-desc">A fried pasta cake — leftover pasta bound with béchamel and fried into a round puck. The genius of cucina povera: turning yesterday's pasta into today's snack. Deeply comforting, golden outside, soft inside.</div>
+      <div class="food-where"><span>→ Friggitorie</span> throughout the centro · Pignasecca market area</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 28px 0 12px;">PIZZA — The Reason for Everything</p>
+
+  <div class="food-grid">
+    <div class="food-item">
+      <div class="food-category">★ Essential · Sit-Down</div>
+      <div class="food-name">Pizza Margherita</div>
+      <div class="food-desc">San Marzano tomatoes, fior di latte mozzarella (or buffalo), fresh basil, olive oil. Baked 60-90 seconds in a 485°C wood-fired oven. The crust: soft and chewy at center (cornicione bubbled and blistered), light char on the leopard spots. This is the pizza all other pizza aspires to be. Order it here and nowhere else on this trip.</div>
+      <div class="food-where"><span>→ Da Michele, Sorbillo, Di Matteo, or Starita</span> — all are correct answers</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">★ Essential · Sit-Down</div>
+      <div class="food-name">Pizza Marinara</div>
+      <div class="food-desc">No cheese. San Marzano tomato, garlic, oregano, olive oil. Older than Margherita by at least a century. Da Michele serves only these two and nothing else — and it is a pilgrimage site for good reason. The marinara tests the tomato and the crust; both must be perfect, and at the best places, they are.</div>
+      <div class="food-where"><span>→ L'Antica Pizzeria da Michele</span> — Via Cesare Sersale 1</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 28px 0 12px;">PASTA — The Serious Business</p>
+
+  <div class="food-grid">
+    <div class="food-item">
+      <div class="food-category">★ Essential · Trattoria</div>
+      <div class="food-name">Ragù alla Napoletana</div>
+      <div class="food-desc">Not the Bolognese of the north. This is a slow-cooked Sunday sauce — whole cuts of beef, pork, and sometimes lamb braised for 8+ hours until the meat surrenders into a deep, dark, wine-scented sauce. The pasta is typically rigatoni or ziti spezzati. This is why Sunday lunch exists.</div>
+      <div class="food-where"><span>→ Trattoria e Cucina</span> or any family-run osteria · Order ahead if possible</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">★ Essential · Trattoria</div>
+      <div class="food-name">Pasta e Patate con Provola</div>
+      <div class="food-desc">Pasta and potatoes — a peasant dish that somehow tastes of luxury. A thick, starchy, almost risotto-like broth of pasta cooked with potatoes until they surrender, finished with smoked provola cheese that melts into smoky strings. One of the great comfort foods of the Italian south.</div>
+      <div class="food-where"><span>→ Any serious trattoria in the centro</span> · Ask if it's on the menu that day</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Essential · Trattoria</div>
+      <div class="food-name">La Genovese</div>
+      <div class="food-desc">The paradox: Naples' great slow-cooked onion sauce that has nothing to do with Genoa. A mountain of white onions cooked with beef for hours until they collapse into a sweet, jammy, silky condiment for pasta. One of the most distinctive sauces in Italian cooking. Ask for it by name.</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Essential · Seafood</div>
+      <div class="food-name">Spaghetti alle Vongole</div>
+      <div class="food-desc">Clams, garlic, white wine, olive oil, chili, parsley. The in bianco version (no tomato) is the correct version in Naples. The pasta should be coated in the briny, garlicky bivalve liquor — nothing shy, nothing over-sauced. Order at any seafood trattoria near the port or in Chiaia.</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 28px 0 12px;">SWEETS & COFFEE — The Ceremonies</p>
+
+  <div class="food-grid">
+    <div class="food-item">
+      <div class="food-category">★ Essential · Coffee</div>
+      <div class="food-name">Caffè Napoletano</div>
+      <div class="food-desc">Neapolitan espresso is darker roasted and slightly more bitter than elsewhere in Italy. Drink it standing at the bar. Pay before you drink (at the cassa, then give receipt to barista). The ritual is as important as the coffee. One euro. Order "un caffè" — nothing more needed.</div>
+      <div class="food-where"><span>→ Gran Caffè Gambrinus</span> (historic, Piazza del Plebiscito) · Caffè Mexico · Any neighborhood bar</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">★ Essential · Pastry</div>
+      <div class="food-name">Babà al Rhum</div>
+      <div class="food-desc">Yeast cake soaked in rum syrup — the Neapolitan babà is a sponge of extraordinary lightness that absorbs rum without becoming heavy. Naples' most beloved dessert. The best are served with whipped cream alongside. Variations exist with limoncello or pastry cream. Order one always.</div>
+      <div class="food-where"><span>→ Pasticceria Pintauro · Pasticceria Poppella</span> (also try their "fiocco di neve")</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Essential · Gelato</div>
+      <div class="food-name">Fiocco di Neve</div>
+      <div class="food-desc">A Poppella specialty — small round buns filled with a snow-white cream made from ricotta and custard, powdered sugar dusted. Not technically gelato but a must-eat confection. The queue outside Poppella is always long and always worth it.</div>
+      <div class="food-where"><span>→ Pasticceria Poppella</span> · Via dei Tribunali 275</div>
+    </div>
+    <div class="food-item">
+      <div class="food-category">Essential · Cheese</div>
+      <div class="food-name">Buffalo Mozzarella</div>
+      <div class="food-desc">Campania is the home of buffalo mozzarella DOP. The best is from Caserta or Paestum — you can taste the difference from supermarket versions. Order it as an antipasto with just olive oil and black pepper. Nothing else. The dairy sweetness, the slight acidity, the milk pooling when you cut it. Pure.</div>
+      <div class="food-where"><span>→ Any good latteria or the market at Pignasecca</span></div>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    <p>The pizza here doesn't taste better because they're better at making it. It tastes better because the tomatoes are different, the water is different, the flour is different, the oven is hotter, and the person making it was raised on it. You can't replicate it elsewhere. You can only come here.</p>
+    <cite>— The Honest Truth About Neapolitan Pizza</cite>
+  </div>
+</section>
+
+<!-- RESTAURANTS -->
+<section id="restaurants">
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <div class="section-label">Where to Eat</div>
+    <div class="section-title">The Shortlist</div>
+  </div>
+  <div class="section-intro">
+    Naples rewards wandering into places that look right. But for the truly irreplaceable, here's where to go with intent.
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin-bottom:4px;">PIZZA</p>
+
+  <div class="resto-list">
+    <div class="resto-item">
+      <div class="resto-rank">1</div>
+      <div>
+        <div class="resto-name">L'Antica Pizzeria da Michele</div>
+        <div class="resto-desc">Two items only: Margherita and Marinara. Founded 1870. The most famous pizzeria in the world and arguably still the best. The absence of choice is the point. Queue forms early; worth it entirely. Via Cesare Sersale 1, off Spaccanapoli.</div>
+      </div>
+      <div class="resto-tag">Iconic · Queue</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">2</div>
+      <div>
+        <div class="resto-name">Gino e Toto Sorbillo</div>
+        <div class="resto-desc">The most celebrated living pizzaiolo in Naples. Constantly busy, occasionally chaotic, always worth it. The crust is exemplary — airy cornicione, perfect leopard char. Via dei Tribunali 32.</div>
+      </div>
+      <div class="resto-tag">Essential · Via Tribunali</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">3</div>
+      <div>
+        <div class="resto-name">Pizzeria Di Matteo</div>
+        <div class="resto-desc">Famous for both its sit-down pizza and its street-window pizza fritta. Bill Clinton ate here in 1994 (the photo is still on the wall). Via dei Tribunali 94. Go early.</div>
+      </div>
+      <div class="resto-tag">Pizza + Street Food</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">4</div>
+      <div>
+        <div class="resto-name">Starita a Materdei</div>
+        <div class="resto-desc">Slightly off the tourist axis in the Materdei neighborhood — which is exactly why it's worth the 15-minute walk. Deeper menu, extraordinary fried antipasti, and one of the best cornicioni in the city. Via Materdei 27.</div>
+      </div>
+      <div class="resto-tag">Neighborhood Gem</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 24px 0 4px;">TRATTORIE & SERIOUS EATING</p>
+
+  <div class="resto-list">
+    <div class="resto-item">
+      <div class="resto-rank">1</div>
+      <div>
+        <div class="resto-name">Trattoria da Nennella</div>
+        <div class="resto-desc">The Quartieri Spagnoli experience. Tables packed together, the owner might serenade you, the menu is whatever they felt like making. Cash only. The pasta e fagioli, the ragù, the whatever-is-on — all correct. Via Lungo Teatro Nuovo 103.</div>
+      </div>
+      <div class="resto-tag">Local · Cash Only</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">2</div>
+      <div>
+        <div class="resto-name">Osteria della Mattonella</div>
+        <div class="resto-desc">Traditional Neapolitan home cooking in a tiled room near San Domenico Maggiore. Order the Genovese, the pasta e patate, the baccalà. Small, reservations recommended for dinner. Via Giovanni Nicotera 13.</div>
+      </div>
+      <div class="resto-tag">Book Ahead</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">3</div>
+      <div>
+        <div class="resto-name">Palazzo Petrucci</div>
+        <div class="resto-desc">If you want a serious dinner with a view — seafood risotto, beautiful crudo, reimagined sfogliatella for dessert, all above the sea in Posillipo. Not cheap but genuinely extraordinary. The sea urchin risotto served in its spiny shell is the dish people travel for.</div>
+      </div>
+      <div class="resto-tag">Fine Dining · Posillipo</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 24px 0 4px;">PASTRY & SWEETS</p>
+
+  <div class="resto-list">
+    <div class="resto-item">
+      <div class="resto-rank">1</div>
+      <div>
+        <div class="resto-name">Pasticceria Poppella</div>
+        <div class="resto-desc">The fiocco di neve. Queue for it. Also excellent babà and pastiera (ricotta tart for Easter season). Via dei Tribunali 275.</div>
+      </div>
+      <div class="resto-tag">Queue Expected</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">2</div>
+      <div>
+        <div class="resto-name">Sfogliatelle Attanasio</div>
+        <div class="resto-desc">Near Stazione Centrale — easily dismissed as a transit pastry shop, actually one of the best sfogliatelle in the city. Hot, flaky, ricotta-filled. Start here on arrival. Vico Ferrovia 2.</div>
+      </div>
+      <div class="resto-tag">Arrival Ritual</div>
+    </div>
+    <div class="resto-item">
+      <div class="resto-rank">3</div>
+      <div>
+        <div class="resto-name">Gran Caffè Gambrinus</div>
+        <div class="resto-desc">The grand café on Piazza del Plebiscito — historic, beautiful, more expensive than a neighborhood bar but worth the splurge once. Nietzsche, Oscar Wilde, and every Bourbon king drank here. The pastries are impeccable.</div>
+      </div>
+      <div class="resto-tag">Historic · Splurge</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faded); margin: 24px 0 4px;">THE MARKET</p>
+  <div class="nbhd-block" style="margin-top:0;">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Mercato di Pignasecca</div>
+      <div class="nbhd-vibe">Best Market in Naples · Morning</div>
+    </div>
+    <div class="nbhd-body">
+      The oldest market in Naples, west of Via Toledo. This is where Neapolitans actually shop — fish still twitching, tomatoes piled in crates, fresh buffalo mozzarella in its liquid, dried pasta in every width. Come in the morning, eat your way through it, watch how food moves in this city. The contrast with the tourist zones is immediate and clarifying. A street food tour that starts here (see Tours section) will show you what's in season and why it matters.
+    </div>
+  </div>
+</section>
+
+<!-- NEIGHBORHOODS -->
+<section id="neighborhoods">
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <div class="section-label">The Lay of the Land</div>
+    <div class="section-title">Neighborhoods</div>
+  </div>
+  <div class="section-intro">
+    Naples is a vertical city — the hillside neighborhoods above feel like different worlds from the ancient centro below. Learn the geography and the city becomes navigable.
+  </div>
+
+  <div class="nbhd-block">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Centro Storico</div>
+      <div class="nbhd-vibe">Base Camp · The Ancient City · Most Important</div>
+    </div>
+    <div class="nbhd-body">
+      The Greek-Roman street grid, unchanged for 2,500 years. Three parallel east-west decumani (Via dei Tribunali, Spaccanapoli/Via San Biagio, Via Anticaglia) crossed by north-south roads — this is the original urban plan of Neapolis. Everything here is layered: Gothic churches with Roman columns inside, Baroque facades hiding medieval crypts, Greek walls visible in café cellars. This is where you eat, sleep, and return to. Everything else radiates from here.
+      <div class="nbhd-hits">
+        <span>Spaccanapoli</span><span>Via dei Tribunali</span><span>Sansevero Chapel</span><span>MANN Museum</span><span>San Gregorio Armeno</span><span>Napoli Sotterranea</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nbhd-block">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Quartieri Spagnoli</div>
+      <div class="nbhd-vibe">Most Authentic · West of Via Toledo</div>
+    </div>
+    <div class="nbhd-body">
+      Built in the 16th century to house the Spanish garrison — a tight grid of narrow streets climbing the hill, deliberately kept separate from the city below. Today it's the neighborhood most resistant to gentrification: laundry overhead, shrines at every intersection, scooters threading impossible gaps, street art everywhere. The Maradona murals are here — Diego Armando Maradona is not merely celebrated in Naples, he is worshipped, literally canonized in street art as a saint who once saved the city's soul. This is where Naples' working-class identity is most visible and most alive.
+      <div class="nbhd-hits">
+        <span>Maradona Murals</span><span>Da Nennella Trattoria</span><span>Street Shrines</span><span>Via Toledo edge</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nbhd-block">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Sanità</div>
+      <div class="nbhd-vibe">Hidden Gem · Catacombs · Real Naples</div>
+    </div>
+    <div class="nbhd-body">
+      North of the centro, in a valley below Capodimonte — this is the neighborhood the tourist map often leaves blank. It is also one of the most fascinating places in the city. The catacombs of San Gennaro are below the Basilica of Santa Maria della Sanità. The Fontanelle Cemetery is a 10-minute walk. The streets are animated by a daily life that hasn't been packaged for visitors. The church's social cooperative that runs the catacomb tours is genuinely working to revitalize the neighborhood through tourism done right — worth supporting.
+      <div class="nbhd-hits">
+        <span>Fontanelle Cemetery</span><span>Catacombs of San Gennaro</span><span>Rione Sanità street life</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nbhd-block">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Vomero</div>
+      <div class="nbhd-vibe">Hilltop Escape · Views · Funicular</div>
+    </div>
+    <div class="nbhd-body">
+      The residential hilltop neighborhood reached by funicular — a completely different Naples from the centro below. Middle-class, quiet, with beautiful Liberty-era apartment buildings and the Certosa di San Martino monastery-museum at its crown. The terrace views of the Bay of Naples are the best in the city. Come up for the Certosa, have a coffee on the hill, take the funicular back down. A good half-morning.
+      <div class="nbhd-hits">
+        <span>Certosa di San Martino</span><span>Castel Sant'Elmo</span><span>Bay panorama</span><span>Funicular ride</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nbhd-block">
+    <div class="nbhd-header">
+      <div class="nbhd-name">Chiaia & the Lungomare</div>
+      <div class="nbhd-vibe">Elegant · Waterfront · Evening</div>
+    </div>
+    <div class="nbhd-body">
+      The elegant seaside district — upscale boutiques, the Riviera di Chiaia seafront, Villa Pignatelli's garden, and Castel dell'Ovo at the water's edge. This is where Naples dresses up. Aperitivo hour here is civilized and beautiful. The walk along the waterfront toward Mergellina at golden hour — Vesuvius across the bay turning pink — is the essential Naples moment that every photograph fails to capture.
+      <div class="nbhd-hits">
+        <span>Castel dell'Ovo</span><span>Lungomare walk</span><span>Aperitivo bars</span><span>Piazza del Plebiscito approach</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOURS -->
+<section id="tours">
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <div class="section-label">Guided Experiences</div>
+    <div class="section-title">Should You Take a Tour?</div>
+  </div>
+  <div class="section-intro">
+    Naples is a city where a good local guide genuinely unlocks layers you'd miss alone — not because sights are hard to find, but because context is everything here. A short answer: yes, one food tour on your first full day is worth it.
+  </div>
+
+  <div class="cards cards-2">
+    <div class="card">
+      <div class="card-priority must">★ STRONGLY RECOMMENDED</div>
+      <div class="card-name">Street Food Walking Tour (First Day)</div>
+      <div class="card-body">The best single investment of your first full day in Naples. A 3-hour walk through the centro storico with an English-speaking local guide who stops at the best street food spots — pizza fritta, tarallo, sfogliatella, cuoppo, mozzarella, babà, spritz. You'll learn the food geography (who's been there 4 generations vs. who's new), the neighborhood's history, and get honest restaurant recommendations for your remaining nights. TripAdvisor and GetYourGuide reviews for the best operators (guides named Mario, Sara, Carmen, Daniella) are consistently extraordinary — this is not a tourist trap.</div>
+      <div class="card-note">→ Book via GetYourGuide or Viator. Look for "Authentic Naples Street Food Tour" ~€35-50/person. Starting point: Piazza Bellini near the Greek ruins.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">RECOMMENDED</div>
+      <div class="card-name">Napoli Sotterranea Guided Tour</div>
+      <div class="card-body">The underground cistern system really does need a guide — the history of the Greek aqueducts, their Roman transformation, the wartime sheltering, and the current archaeological excavations ongoing are all things that context makes extraordinary. Walk-in tours available frequently. The original site on Piazza San Gaetano is the best operator.</div>
+      <div class="card-note">→ Walk-in available. Book same day or online. About €13/person, 80 minutes.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority should">GOOD OPTION</div>
+      <div class="card-name">Sanità Catacombs + Neighborhood Tour</div>
+      <div class="card-body">The cooperative that runs tours of the Catacombs of San Gennaro offers a combined neighborhood walk. Young local guides from the Sanità district itself — genuinely invested in the neighborhood's story. This is tourism done right: money goes back into the community, guides know the streets as their home.</div>
+      <div class="card-note">→ Cooperativa Sociale "La Paranza" — book via their website or at the basilica.</div>
+    </div>
+    <div class="card">
+      <div class="card-priority could">OPTIONAL</div>
+      <div class="card-name">Private Food/History Half-Day</div>
+      <div class="card-body">If you want a deeper dive combining history and food — markets, specific trattorie, lesser-known sites — a private guide for a half-day runs ~€150-200 total and gives you a completely tailored experience. Worth it if you want to go beyond the standard street food route into pasta-making windows, cheese shops, and harder-to-find spots. Search "Naples private food tour" on Airbnb Experiences for vetted options.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROUTING -->
+<section id="routing">
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <div class="section-label">The Plan</div>
+    <div class="section-title">Day-by-Day Routing</div>
+  </div>
+  <div class="section-intro">
+    You arrive today (May 23) around 1pm. You leave May 26 for Castellammare. You have Sansevero at 9:30am tomorrow (May 24). Here's a logical co-located routing that minimizes backtracking and maximizes experience.
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Day 1 — May 23 · Arrival Day</div>
+    <div class="day-title">First Contact</div>
+    <div class="day-item"><div class="day-time">1:00 PM</div><div>Arrive Napoli Centrale. Check in. Drop bags.</div></div>
+    <div class="day-item"><div class="day-time">1:30 PM</div><div><strong>Sfogliatelle Attanasio</strong> — immediately, while still hot. You've been on a train. You need this.</div></div>
+    <div class="day-item"><div class="day-time">2:00 PM</div><div>Walk down to <strong>Spaccanapoli</strong> — full east-to-west orientation walk. Piazza del Gesù, Santa Chiara exterior, San Domenico Maggiore, Sansevero exterior (preview for tomorrow), the alley grid.</div></div>
+    <div class="day-item"><div class="day-time">3:30 PM</div><div><strong>Via San Gregorio Armeno</strong> — the presepi workshops. Take your time. Buy something absurd.</div></div>
+    <div class="day-item"><div class="day-time">4:30 PM</div><div>Walk to <strong>Piazza del Plebiscito</strong> and the waterfront. Castel dell'Ovo. The sea.</div></div>
+    <div class="day-item"><div class="day-time">6:00 PM</div><div>Aperitivo in <strong>Chiaia</strong> — a campari soda or spritz at a bar on Via Chiaia or Riviera di Chiaia.</div></div>
+    <div class="day-item"><div class="day-time">7:30 PM</div><div><strong>Pizza dinner</strong> — Di Matteo or Sorbillo on Via dei Tribunali. Margherita. Marinara. Nothing else needed.</div></div>
+    <div class="day-note">Light day by design. You're arriving into chaos — let the city wash over you first, navigate by instinct, let the smells guide you. The serious stuff starts tomorrow.</div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Day 2 — May 24 · The Core Day</div>
+    <div class="day-title">Sansevero + Underground + History</div>
+    <div class="day-item"><div class="day-time">8:30 AM</div><div>Coffee and sfogliatella at a neighborhood bar near Sansevero.</div></div>
+    <div class="day-item"><div class="day-time">9:30 AM</div><div><strong>★ Cappella Sansevero</strong> — your booking. Give it the full time. Stand in front of the Veiled Christ for ten minutes without moving.</div></div>
+    <div class="day-item"><div class="day-time">11:00 AM</div><div><strong>MANN — National Archaeological Museum</strong>. A 10-minute walk from Sansevero. Farnese Hercules, Alexander Mosaic, Gabinetto Segreto. Half day minimum — don't rush this.</div></div>
+    <div class="day-item"><div class="day-time">1:30 PM</div><div>Lunch near the museum — there are good trattorias in the Piazza Cavour area. Or walk back toward Via dei Tribunali for a midday pizza.</div></div>
+    <div class="day-item"><div class="day-time">3:00 PM</div><div><strong>Napoli Sotterranea</strong> — Piazza San Gaetano 68. Join a tour. 80 minutes underground.</div></div>
+    <div class="day-item"><div class="day-time">5:00 PM</div><div>Walk back through Spaccanapoli at the afternoon light. <strong>Pasticceria Poppella</strong> for the fiocco di neve.</div></div>
+    <div class="day-item"><div class="day-time">6:30 PM</div><div><strong>Sunset Lungomare walk</strong> — Castel dell'Ovo toward Mergellina. This is the golden hour moment.</div></div>
+    <div class="day-item"><div class="day-time">8:30 PM</div><div>Dinner — <strong>Osteria della Mattonella</strong> (book ahead) for Genovese and pasta e patate. Or <strong>Da Nennella</strong> in the Quartieri for the full Neapolitan chaos experience.</div></div>
+    <div class="day-note">This is the densest day — Sansevero and MANN alone are 5 hours of serious stuff. Pace yourself at the museum. The underground tour is a gear shift — physically different, historically rich.</div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Day 3 — May 25 · Flex + Depth</div>
+    <div class="day-title">Go Where the Morning Takes You</div>
+    <div class="day-item"><div class="day-time">9:00 AM</div><div><strong>Street Food Walking Tour</strong> (if not done Day 1) — 3 hours, starts Piazza Bellini. The best use of a morning here.</div></div>
+    <div class="day-item"><div class="day-time">9:00 AM</div><div><em>OR:</em> <strong>Pignasecca Market</strong> — walk through the oldest market, buy things, eat things. Then walk the Quartieri Spagnoli grid. Find the Maradona murals.</div></div>
+    <div class="day-item"><div class="day-time">1:00 PM</div><div>Lunch at <strong>Da Michele</strong> (Margherita or Marinara, nothing else, no exceptions). Queue if necessary. It's necessary.</div></div>
+    <div class="day-item"><div class="day-time">2:30 PM</div><div>Funicular up to <strong>Vomero</strong> — Certosa di San Martino + the terrace view. 2 hours up here.</div></div>
+    <div class="day-item"><div class="day-time">5:00 PM</div><div>Back down. Explore <strong>Chiaia</strong> in the late afternoon — Via Filangieri, Villa Pignatelli garden (free, beautiful).</div></div>
+    <div class="day-item"><div class="day-time">7:00 PM</div><div><strong>Gran Caffè Gambrinus</strong> — splurge aperitivo at the grand café, Piazza del Plebiscito. Once is right.</div></div>
+    <div class="day-item"><div class="day-time">8:30 PM</div><div>Final Naples dinner — make it count. Seafood in Chiaia, or a long trattoria dinner somewhere you found yourself, or go back to what you loved most.</div></div>
+    <div class="day-note">If energy allows: Fontanelle Cemetery and Sanità in the afternoon instead of/before Vomero. The cemetery pairs with the catacombs for a full Sanità half-day — genuinely extraordinary, requires a morning.</div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section id="tips">
+  <div class="section-header">
+    <div class="section-number">08</div>
+    <div class="section-label">Hard-Won Knowledge</div>
+    <div class="section-title">Survival & Pleasure Tips</div>
+  </div>
+
+  <div class="tip-grid">
+    <div class="tip">
+      <div class="tip-head">Coffee Rules</div>
+      Pay at the cassa first (get a receipt), then hand it to the barista and order. Stand at the bar — sitting costs extra. "Un caffè" is sufficient. Never order a cappuccino after 11am if you want respect.
+    </div>
+    <div class="tip">
+      <div class="tip-head">The Queue is the Review</div>
+      In Naples, a line outside a place is the only review that matters. Locals queue for Da Michele, Poppella, and Attanasio for a reason. Join them.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Cash is Still King</div>
+      Many of the best places are cash-only or prefer it. Keep €50-100 in small bills. ATMs (Bancomat) are common but use bank-affiliated ones to avoid fees.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Noise & Chaos</div>
+      Naples is loud. Permanently. Scooters thread through pedestrian alleys. Horns are communicative, not hostile. If you find it overwhelming, walk one block off the main streets — the alleys are immediately calmer.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Lunch Hours</div>
+      Restaurants open for lunch 12:30-3pm, dinner 7:30-11pm. Don't try to eat at 6pm (except street food). The best trattorias often run out of their specials by 2pm.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Watch for Pickpockets</div>
+      Standard European city rules: bag in front, nothing in back pockets, phones not dangling. The centro storico and the Circumvesuviana are the main risk zones. Naples is not dangerous — it's simply urban.
+    </div>
+    <div class="tip">
+      <div class="tip-head">The Margherita Test</div>
+      Order only a Margherita at any new pizzeria. It has nowhere to hide. If the tomato is sharp and bright, the fior di latte melted into pools not a solid layer, and the crust has char and chew — you're in the right place.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Follow the Locals</div>
+      If a restaurant has tourists only, leave. If the menu is in four languages, leave faster. The ratio of Neapolitans to tourists is the most reliable quality indicator in the city.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Sansevero Protocol</div>
+      Tomorrow at 9:30am: arrive a few minutes early. Latecomers forfeit slots — timed entry is strict. No photography inside the chapel. The Veiled Christ is at the center. Start with it, come back to it at the end.
+    </div>
+    <div class="tip">
+      <div class="tip-head">Ask Anyone</div>
+      Neapolitans are famously generous with directions, restaurant opinions, and strong feelings about where you should eat. If you ask "dove si mangia bene?" ("where do you eat well?") to any local, you will receive an impassioned answer.
+    </div>
+  </div>
+
+  <div class="pullquote" style="margin-top:40px;">
+    <p>Naples is the most honest city in Italy. It doesn't perform for you. It doesn't care if you come back. And that indifference is exactly what makes it magnificent.</p>
+    <cite>— The Spirit of Rick Steves, Having His Best Day</cite>
+  </div>
+
+</section>
+
+<div class="divider">· · ·</div>
+
+<footer>
+  Naples Field Guide · Compiled May 23, 2026 · For Personal Use · Sansevero 9:30am Tomorrow — Don't Be Late
+</footer>
+
+</div><!-- /container -->
+</body>
+</html>
