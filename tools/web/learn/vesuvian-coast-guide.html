@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vesuvian Coast — A Deep Drive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ash: #f0ece4;
+    --pumice: #d8d0c4;
+    --fresco-red: #8b2e1a;
+    --fresco-gold: #b8922e;
+    --fresco-blue: #1a4a5e;
+    --fresco-green: #2a4a2e;
+    --obsidian: #1a1612;
+    --lava: #3d1f0e;
+    --vesuvius: #6b4e2a;
+    --sea: #2a5a6e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ash);
+    color: var(--obsidian);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background: var(--lava);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4rem 3rem 5rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 120% 60% at 50% 120%, #8b2e1a44 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at 70% -20%, #b8922e22 0%, transparent 50%),
+      linear-gradient(160deg, #1a1612 0%, #3d1f0e 40%, #2a1a08 70%, #1a1a2e 100%);
+  }
+
+  .volcano-silhouette {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200%;
+    height: 50%;
+    background: linear-gradient(to top, #0d0a07 0%, #1a1208 40%, transparent 100%);
+    clip-path: polygon(0% 100%, 15% 100%, 20% 60%, 30% 55%, 38% 20%, 45% 10%, 50% 5%, 55% 10%, 62% 20%, 70% 55%, 80% 60%, 85% 100%);
+    opacity: 0.8;
+  }
+
+  .smoke-1, .smoke-2, .smoke-3 {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    animation: smoke 8s infinite;
+  }
+  .smoke-1 { width: 60px; height: 60px; background: radial-gradient(circle, #ffffff18, transparent); top: 8%; left: 48%; animation-delay: 0s; }
+  .smoke-2 { width: 80px; height: 80px; background: radial-gradient(circle, #ffffff12, transparent); top: 4%; left: 46%; animation-delay: 2s; }
+  .smoke-3 { width: 50px; height: 50px; background: radial-gradient(circle, #ffffff0e, transparent); top: 2%; left: 50%; animation-delay: 4s; }
+
+  @keyframes smoke {
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    30% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-80px) scale(2); }
+  }
+
+  .hero-eyebrow {
+    position: relative;
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--fresco-gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+
+  .hero-title {
+    position: relative;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ash);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--fresco-gold);
+  }
+
+  .hero-subtitle {
+    position: relative;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #c4b8a8;
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+
+  .hero-meta {
+    position: relative;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 1s 0.9s forwards;
+  }
+
+  .meta-tag {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pumice);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meta-tag::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--fresco-gold);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* THEME PREAMBLE */
+  .preamble {
+    background: var(--obsidian);
+    padding: 5rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preamble::before {
+    content: 'LXXIX';
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16rem;
+    font-weight: 300;
+    color: #ffffff06;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .preamble-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--fresco-gold);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--fresco-gold);
+    opacity: 0.5;
+  }
+
+  .preamble h2 {
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--ash);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  .preamble p {
+    color: #b8b0a4;
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .pull-quote {
+    border-left: 2px solid var(--fresco-gold);
+    padding: 1rem 0 1rem 2rem;
+    margin: 2.5rem 0;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--ash);
+    line-height: 1.5;
+  }
+
+  /* STOPS */
+  .stops-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .stop {
+    margin-bottom: 0;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+
+  .stop.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Timeline line */
+  .stop::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 70px;
+    bottom: -2rem;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--fresco-gold), transparent);
+    opacity: 0.3;
+  }
+
+  .stop:last-child::before { display: none; }
+
+  .stop-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 0;
+  }
+
+  .stop-number {
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    border: 1px solid var(--fresco-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--fresco-gold);
+    background: var(--ash);
+    position: relative;
+    z-index: 1;
+  }
+
+  .stop-title-group {
+    padding-top: 0.5rem;
+  }
+
+  .stop-kicker {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--vesuvius);
+    margin-bottom: 0.25rem;
+  }
+
+  .stop-title {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--lava);
+    line-height: 1.1;
+  }
+
+  .stop-body {
+    margin-left: 74px;
+    padding: 1.5rem 0 3rem;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tag {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+  }
+
+  .tag-open { background: #d4edda; color: #155724; }
+  .tag-warning { background: #fff3cd; color: #856404; }
+  .tag-free { background: #d1ecf1; color: #0c5460; }
+  .tag-tip { background: var(--lava); color: var(--ash); }
+  .tag-new { background: var(--fresco-red); color: white; }
+
+  /* Content sections */
+  .narrative {
+    font-size: 1.05rem;
+    color: #2a2018;
+    margin-bottom: 1.5rem;
+    line-height: 1.75;
+  }
+
+  .history-block {
+    background: var(--obsidian);
+    color: var(--ash);
+    padding: 2rem 2.5rem;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .history-block::before {
+    content: attr(data-era);
+    position: absolute;
+    right: -1rem;
+    top: -0.5rem;
+    font-size: 5rem;
+    font-weight: 300;
+    color: #ffffff07;
+    font-family: 'Cormorant Garamond', serif;
+    line-height: 1;
+  }
+
+  .history-block h4 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--fresco-gold);
+    margin-bottom: 1rem;
+  }
+
+  .history-block p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #c4b8a8;
+  }
+
+  /* What to see list */
+  .see-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 600px) {
+    .see-grid { grid-template-columns: 1fr; }
+  }
+
+  .see-item {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--pumice);
+    background: white;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .see-item:hover {
+    border-color: var(--fresco-gold);
+    background: #fffdf8;
+  }
+
+  .see-item h5 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fresco-red);
+    margin-bottom: 0.4rem;
+  }
+
+  .see-item p {
+    font-size: 0.88rem;
+    color: #4a3a28;
+    line-height: 1.5;
+  }
+
+  /* Food block */
+  .food-block {
+    background: #f8f4ec;
+    border-left: 3px solid var(--fresco-gold);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .food-block h4 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--vesuvius);
+    margin-bottom: 0.75rem;
+  }
+
+  .food-block ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .food-block li {
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--lava);
+    background: white;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #e0d8cc;
+  }
+
+  /* Route connector */
+  .route-connector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0 1.5rem 74px;
+    color: var(--vesuvius);
+    font-size: 0.82rem;
+    font-family: 'Tenor Sans', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .route-connector::before {
+    content: '→';
+    font-size: 1rem;
+  }
+
+  /* Theme panels */
+  .thematic-panel {
+    background: var(--fresco-red);
+    color: white;
+    padding: 4rem 3rem;
+    margin: 4rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .thematic-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 80% 50%, #ffffff08, transparent 60%),
+      repeating-linear-gradient(45deg, transparent, transparent 40px, #00000008 40px, #00000008 41px);
+  }
+
+  .thematic-panel .section-label { color: #ffcc88; }
+  .thematic-panel .section-label::after { background: #ffcc88; }
+
+  .thematic-panel h3 {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .thematic-panel p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #ffeedd;
+    max-width: 680px;
+    position: relative;
+  }
+
+  /* Decision guide */
+  .decision-guide {
+    background: var(--fresco-blue);
+    color: white;
+    padding: 4rem 3rem;
+    margin: 4rem 0;
+  }
+
+  .decision-guide h3 {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    color: #c8e4f0;
+  }
+
+  .decision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .decision-grid { grid-template-columns: 1fr; }
+  }
+
+  .decision-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 1.5rem;
+  }
+
+  .decision-card h5 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #88c8e0;
+    margin-bottom: 0.75rem;
+  }
+
+  .decision-card p {
+    font-size: 0.9rem;
+    color: #d8eaf4;
+    line-height: 1.65;
+  }
+
+  /* Practical footer */
+  .practical {
+    background: var(--obsidian);
+    color: var(--ash);
+    padding: 4rem 3rem;
+  }
+
+  .practical h3 {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    color: var(--ash);
+  }
+
+  .practical-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2rem;
+  }
+
+  .practical-item h5 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--fresco-gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .practical-item p, .practical-item li {
+    font-size: 0.88rem;
+    color: #9a9088;
+    line-height: 1.7;
+  }
+
+  .practical-item ul { list-style: none; }
+  .practical-item li::before { content: '— '; color: var(--fresco-gold); }
+
+  /* Divider */
+  .ornamental-divider {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--pumice);
+    font-size: 1.2rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Scrollable container for stops */
+  #stops-section {
+    background: var(--ash);
+    padding: 5rem 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="volcano-silhouette"></div>
+  <div class="smoke-1"></div>
+  <div class="smoke-2"></div>
+  <div class="smoke-3"></div>
+
+  <div class="hero-eyebrow">The Vesuvian Coast · Bay of Naples · AD 79 — Present Day</div>
+  <h1 class="hero-title">The Coast<br>That <em>Time</em><br>Buried</h1>
+  <p class="hero-subtitle">A deep traveller's guide to Herculaneum, Oplontis, Pompeii & the Stabiae Villas — four buried cities, one drive, 2,000 years of Roman life.</p>
+  <div class="hero-meta">
+    <span class="meta-tag">Herculaneum → Castellammare di Stabia</span>
+    <span class="meta-tag">~30km coastal route</span>
+    <span class="meta-tag">Full day with car</span>
+    <span class="meta-tag">May 26 · ~78°F · Clear</span>
+  </div>
+</section>
+
+<!-- PREAMBLE -->
+<section class="preamble">
+  <div class="preamble-inner">
+    <div class="section-label">The Thematic Frame</div>
+    <h2>One mountain. Four cities. One afternoon in AD 79.</h2>
+    <p>This coastline you're driving today is unlike anywhere else on earth. Within 20 kilometres, Vesuvius destroyed — and thereby perfectly preserved — four distinct Roman settlements in a single catastrophic afternoon in August of AD 79. Each site captured a different slice of Roman society: the resort town of the wealthy elite (Herculaneum), the coastal villa of an empress (Oplontis), the bustling commercial city (Pompeii), and the aristocratic hilltop retreat (Stabiae). Together they form the most complete picture of Roman life ever recovered.</p>
+    <div class="pull-quote">"This stretch of coastline has so many mansions that it looks like a single village of villas extending for kilometres." — Pliny the Elder, writing about the Bay of Naples, just years before his death here.</div>
+    <p>What makes your drive today so remarkable is the <em>thematic progression</em>: you move from the most intimate (Herculaneum — you can walk into houses, touch doorposts) to the most imperial (Oplontis — Nero's empress) to the most monumental (Pompeii) to the most contemplative (Stabiae, where the world's greatest encyclopedist breathed his last). The mountain looms over all of it, still smoking.</p>
+  </div>
+</section>
+
+<!-- STOPS -->
+<section id="stops-section">
+  <div class="stops-container">
+
+    <!-- STOP 1: HERCULANEUM -->
+    <div class="stop">
+      <div class="stop-header">
+        <div class="stop-number">I</div>
+        <div class="stop-title-group">
+          <div class="stop-kicker">You Are Here · Morning</div>
+          <h2 class="stop-title">Herculaneum<br><em style="font-size:1.2rem; color: var(--vesuvius)">The City That Survived Better by Being Forgotten</em></h2>
+        </div>
+      </div>
+      <div class="stop-body">
+        <div class="status-bar">
+          <span class="tag tag-open">Open 8:30am–7:30pm</span>
+          <span class="tag tag-tip">€16 · Children free</span>
+          <span class="tag tag-new">Ancient Beach now open 2025</span>
+        </div>
+
+        <p class="narrative">Herculaneum is the great secret of the Vesuvian Coast — better preserved than Pompeii, less visited, and in many ways more emotionally overwhelming. Where Pompeii was a commercial city of 20,000, Herculaneum was a small, wealthy resort of perhaps 4,000–5,000 souls: the Hamptons of the Roman world, perched on a bluff above the sea, filled with aristocratic villas, heated baths, and elegant mosaic floors. The town's very name preserves the legend of its founding — by Hercules himself, returning from his labors.</p>
+
+        <div class="history-block" data-era="79">
+          <h4>What Happened Here — August 24, AD 79</h4>
+          <p>Pompeii was killed by ash and pumice raining from the sky over 18 hours — a slow, suffocating death. Herculaneum experienced something far more violent and paradoxically more preserving. A pyroclastic surge — a superheated avalanche of gas and volcanic matter moving at 100mph and 500°C — hit the city in the early hours of August 25th. Everything was vaporised or carbonised in seconds. Then volcanic mud, 15–18 metres deep, entombed the entire town in an airtight seal that would last 1,700 years. Wood didn't rot. Organic matter survived. Furniture stayed in place. Food remained on shelves. The result is the only Roman city where you walk into houses that still have their second floors, wooden doors, staircases, roof beams, and even the remains of food on the kitchen counter.</p>
+        </div>
+
+        <p class="narrative">The site opened its first-ever beach excavation to visitors in 2025. Stand at the ancient shoreline — now inland, because Vesuvius pushed the coast forward — and look at the vaulted boat sheds. In the 1980s, archaeologists found the skeletons of at least 300 people huddled in these chambers, waiting for rescue boats that never came. Most of the town had evacuated. These were the ones who couldn't: the elderly, enslaved people, the ill. Their carbonised remains still rest there. It is a profoundly human moment in a day of stone and fresco.</p>
+
+        <div class="see-grid">
+          <div class="see-item">
+            <h5>House of Neptune & Amphitrite</h5>
+            <p>The finest wall mosaic in the Roman world still in its original location. The sea-god couple still blazes with lapis blue and gold glass tessera. Next door, the wine shop still has its amphorae on the shelves.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Ancient Beach & Boat Sheds</h5>
+            <p>Newly opened 2025. The haunting shoreline where 300 people waited. Stand here and look back up at Vesuvius. This is the emotional centrepiece of the site.</p>
+          </div>
+          <div class="see-item">
+            <h5>House of the Wooden Partition</h5>
+            <p>The original carbonised wooden screen — Roman domestic furniture still in place 2,000 years on. Nowhere else on earth will you see this.</p>
+          </div>
+          <div class="see-item">
+            <h5>Villa of the Papyri (nearby)</h5>
+            <p>The only complete ancient library to survive — 1,800 carbonised scrolls, likely belonging to Julius Caesar's father-in-law. The Getty Villa in Malibu is a replica. Scholars are still reading them with X-ray technology.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Forum Baths</h5>
+            <p>Step into the caldarium (hot room) — the marble benches, the terracotta pipes beneath the floor (hypocaust), the domed ceiling still intact. Romans came here daily. The changing room graffiti is still on the walls.</p>
+          </div>
+          <div class="see-item">
+            <h5>House of the Deer (Casa dei Cervi)</h5>
+            <p>The grandest seaside villa — its terrace once hung over the sea. The famous marble statues (deer being attacked by dogs) are copies; originals are in Naples. The garden views toward Vesuvius are unchanged.</p>
+          </div>
+        </div>
+
+        <div class="food-block">
+          <h4>Don't Leave Without Trying</h4>
+          <ul>
+            <li>Espresso at any bar on Corso Resina</li>
+            <li>Cornetto filled with crema pasticcera</li>
+            <li>Granita di limone (if it's getting hot)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div class="route-connector reveal">15 min south on A3 / SS18 · Follow signs for Torre Annunziata · Park near Via Sepolcri</div>
+
+    <!-- STOP 2: OPLONTIS / VILLA POPPAEA -->
+    <div class="stop reveal">
+      <div class="stop-header">
+        <div class="stop-number">II</div>
+        <div class="stop-title-group">
+          <div class="stop-kicker">Torre Annunziata · Late Morning</div>
+          <h2 class="stop-title">Villa Poppaea<br><em style="font-size:1.2rem; color: var(--vesuvius)">The Empress's Playground — Still Being Excavated</em></h2>
+        </div>
+      </div>
+      <div class="stop-body">
+        <div class="status-bar">
+          <span class="tag tag-open">Open 9am–6pm</span>
+          <span class="tag tag-warning">⚠ Closed Tuesdays</span>
+          <span class="tag tag-new">New frescoes uncovered Dec 2025</span>
+        </div>
+
+        <p class="narrative">You are about to walk through a house that almost certainly belonged to Poppaea Sabina — one of the most controversial women in Roman history, empress, schemer, and second wife of Nero. The villa is staggering in scale and refinement: marble columns (rare even by Roman villa standards), private thermal baths, a swimming pool 60 metres long, winter gardens, and a fresco programme so sophisticated that art historians are still unravelling its iconographic schemes. And it is almost entirely empty of tourists.</p>
+
+        <div class="history-block" data-era="NERO">
+          <h4>The Woman Who Owned This House</h4>
+          <p>Poppaea Sabina was born in Pompeii itself — not far from where you'll pass later. She was beautiful, politically brilliant, and according to ancient sources utterly ruthless. She married a friend of Nero's — reportedly just to get close to the emperor — then divorced him, seduced Nero, and convinced him to exile his first wife and murder his own mother Agrippina to clear her path to empress. She became empress in 62 AD, three years before her death. Nero reportedly kicked her to death in a fit of rage while she was pregnant with his child (ancient sources disagree). She had been empress for just three years. Her villa at Oplontis was in the middle of renovation when Vesuvius erupted in 79 AD — it was likely empty. No bodies were ever found here. The house was simply waiting for its owner to return.</p>
+        </div>
+
+        <p class="narrative">In December 2025 — just five months ago — archaeologists working in the western section of the villa uncovered what they're calling "virgin surfaces": fresco pigments untouched since 79 AD. The newly revealed Hall of the Peacock now shows a complete pair of peacocks facing each other in perfect symmetry, alongside theatrical masks (including a comic one called Pappus — a foolish vain old man), gilded tripods, birds, and fruit. The site director described the colors as "so vivid in their authenticity" that they rewrote the team's understanding of how Roman elites decorated their interiors. You may well be walking past active conservation work today.</p>
+
+        <div class="see-grid">
+          <div class="see-item">
+            <h5>The Hall of the Peacock</h5>
+            <p>Newly revealed December 2025. The freshest Roman frescoes you will ever see — pigments essentially untouched since antiquity. The peacock pair and theatrical masks are extraordinary.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Swimming Pool</h5>
+            <p>60m long, surrounded by colonnades and gardens. One of the largest private pools in the Roman world. The original floor surfaces and drainage channels are intact.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Main Atrium Frescoes</h5>
+            <p>The "second style" trompe l'oeil architectural paintings create an illusion of receding colonnades and gardens. Painted around 50 BC — some of the oldest and finest Roman wall painting surviving.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Depth of Burial</h5>
+            <p>Stand at the edge of the excavation walls and look at the strata. You can see the successive layers of pyroclastic material that flowed in and how deep they went. The scale of Vesuvius's power made visible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div class="route-connector reveal">10 min south on SS18 · Pompeii is visible on your right · Optional stop or drive through</div>
+
+    <!-- STOP 3: POMPEII -->
+    <div class="stop reveal">
+      <div class="stop-header">
+        <div class="stop-number">III</div>
+        <div class="stop-title-group">
+          <div class="stop-kicker">Pompeii · Optional Midday</div>
+          <h2 class="stop-title">Pompeii<br><em style="font-size:1.2rem; color: var(--vesuvius)">The City You Know — But Perhaps Haven't Seen</em></h2>
+        </div>
+      </div>
+      <div class="stop-body">
+        <div class="status-bar">
+          <span class="tag tag-open">Open 9am–7pm</span>
+          <span class="tag tag-tip">€18 · Book ahead in peak season</span>
+          <span class="tag tag-warning">Very crowded midday — go early or late</span>
+        </div>
+
+        <p class="narrative">Pompeii is the famous one, and for good reason — it's vast, it's complete, it shows an entire city. But it is also more blocked off than Herculaneum, more sun-bleached, and at peak midday genuinely overwhelming. If you've already had a deep morning at Herculaneum, consider treating Pompeii as a <em>selective</em> stop rather than a full visit. The main Via dell'Abbondanza, the Forum, the Amphitheatre, and the newly reopened Antiquarium (with the famous body casts) give you the core in 90 minutes. Or simply drive along its perimeter and let the sheer scale of the walls communicate what Herculaneum's intimacy could not.</p>
+
+        <div class="history-block" data-era="POMPEII">
+          <h4>What Pompeii Gives You That Herculaneum Doesn't</h4>
+          <p>Pompeii was a commercial, middle-class city — noisy, bustling, covered in electoral graffiti, full of taverns (thermopolia), brothels, bakeries, and fast food counters. It shows Roman life at volume. The body casts — made by pouring plaster into the voids left by decomposed bodies in the ash — are among the most emotionally shattering objects in archaeology. A dog, still on its chain. A man covering his face. A family huddled together. Herculaneum shows you the elegance of Roman life; Pompeii shows you its humanity.</p>
+        </div>
+
+        <div class="food-block">
+          <h4>Lunch Options Near Pompeii</h4>
+          <ul>
+            <li>Ristorante il Principe (upscale, near the excavations)</li>
+            <li>Thermopolium (casual, atmospheric, near Porta Marina)</li>
+            <li>Or hold out — Castellammare's seafront is only 15min away</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div class="route-connector reveal">15 min south-west on A3 then SS145 · Castellammare exit · Follow signs to Passeggiata Archeologica for the villas, or head to the seafront first</div>
+
+    <!-- STOP 4: STABIAE VILLAS -->
+    <div class="stop reveal">
+      <div class="stop-header">
+        <div class="stop-number">IV</div>
+        <div class="stop-title-group">
+          <div class="stop-kicker">Castellammare di Stabia · Afternoon</div>
+          <h2 class="stop-title">The Stabiae Villas<br><em style="font-size:1.2rem; color: var(--vesuvius)">Where Pliny Died & The Aristocracy Dreamed</em></h2>
+        </div>
+      </div>
+      <div class="stop-body">
+        <div class="status-bar">
+          <span class="tag tag-free">Free Entry</span>
+          <span class="tag tag-open">Open 9am–6pm</span>
+          <span class="tag tag-warning">⚠ Closed Tuesdays</span>
+          <span class="tag tag-tip">Almost no crowds</span>
+        </div>
+
+        <p class="narrative">Stabiae — the ancient name for Castellammare di Stabia — was the most exclusive address on the Vesuvian coast: not a town, but a scattered hilltop resort of aristocratic pleasure villas, each commanding panoramic views over the entire Bay of Naples. These were not working estates or commercial properties. They were pure <em>otium</em> — the Latin concept of leisure, contemplation, and gracious living that the Roman elite cultivated as a counterpoint to the negotium (business) of Rome. Cicero had a villa here. So did the family of Pompey. And possibly Pliny the Elder, who sailed here to rescue a friend and never left.</p>
+
+        <div class="history-block" data-era="PLINY">
+          <h4>The Death of Pliny the Elder — The Most Famous Moment in This Town's History</h4>
+          <p>Gaius Plinius Secundus — Pliny the Elder — was the commander of the Roman fleet at Misenum, across the bay. When Vesuvius erupted, he launched ships both to observe the phenomenon (scientifically) and to rescue people. His helmsman warned him to turn back. Pliny reportedly said "Fortes fortuna iuvat" — Fortune favours the bold — and sailed on. He reached his friend Pomponianus at Stabiae, found escape impossible (the wind was blowing toward shore), and settled in to wait out the eruption, bathing, dining, and sleeping to calm his companions. At dawn on August 25th, the surges reached Stabiae. Pliny, possibly asthmatic, was overcome on the beach. "His body was found whole and uninjured," his nephew wrote, "its appearance was of one resting rather than dead." He was 55. He had just finished writing the world's first encyclopaedia. The beach where he fell is somewhere beneath the town you're now standing in.</p>
+        </div>
+
+        <p class="narrative">Six villas were identified in the 18th-century Bourbon excavations; three are open today. They are built along the edge of the Varano hill with terraced gardens descending toward the sea — an architectural concept that influenced Italian garden design for centuries afterward.</p>
+
+        <div class="see-grid">
+          <div class="see-item">
+            <h5>Villa San Marco — The Showpiece</h5>
+            <p>11,000 sq metres, one of the largest Roman residential villas ever found. A gigantic swimming pool, colonnaded garden, floor-to-ceiling red frescoes in corridors, original mosaic floors, thermal bath suite. The layout is slightly irregular — built in stages as the family grew richer. Free. Almost no crowds. Reviewers call it one of the most moving archaeological experiences in Italy.</p>
+          </div>
+          <div class="see-item">
+            <h5>Villa Arianna — The Ancient One</h5>
+            <p>Built in the 2nd century BC — 200 years older than most Pompeii buildings. Named for its triclinium fresco of Ariadne abandoned by Theseus. The Bourbon kings stripped many frescoes (they're in Naples Archaeological Museum), but what remains shows the original mythological fresco programme in ghostly outline. The terrace view is unchanged since Pliny looked out from here.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Libero D'Orsi Archaeological Museum</h5>
+            <p>A newer museum in town displaying finds from the Stabiae excavations — paintings, objects, reconstructed rooms. Named after the archaeologist who re-excavated the villas in the 1950s. Worth 30 minutes before or after the sites.</p>
+          </div>
+          <div class="see-item">
+            <h5>The View from the Varano Hill</h5>
+            <p>The same view Pliny, Cicero, and Pompey had. The entire Bay of Naples from Naples to Sorrento, Vesuvius, Capri in the distance. The Romans built here for this view. Nothing has changed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div class="route-connector reveal">Head down to the seafront — Lungomare Garibaldi — for lunch or late afternoon</div>
+
+    <!-- STOP 5: CASTELLAMMARE TOWN -->
+    <div class="stop reveal">
+      <div class="stop-header">
+        <div class="stop-number">V</div>
+        <div class="stop-title-group">
+          <div class="stop-kicker">Town & Waterfront · Afternoon–Evening</div>
+          <h2 class="stop-title">Castellammare<br><em style="font-size:1.2rem; color: var(--vesuvius)">The Living City at the Foot of the Dead Ones</em></h2>
+        </div>
+      </div>
+      <div class="stop-body">
+        <div class="status-bar">
+          <span class="tag tag-open">All hours</span>
+          <span class="tag tag-tip">Cable car to Monte Faito closes ~6pm — check seasonally</span>
+        </div>
+
+        <p class="narrative">Castellammare is a working Neapolitan port city — not prettified for tourists, not self-conscious. The Lungomare is where local families do the passeggiata, where fishermen bring in their catch, where retired men argue over football. This is what the buried cities around it used to sound like. The contrast is the point.</p>
+
+        <div class="see-grid">
+          <div class="see-item">
+            <h5>Monte Faito by Cable Car</h5>
+            <p>The cable car from Castellammare station ascends to 1,100m in minutes. From the summit: all of Naples, Vesuvius, Capri, Ischia, the Sorrento Peninsula, and (on clear days) the beginning of the Amalfi Coast. There are hiking trails, a belvedere, and restaurants. Perfect for sunset. Don't miss it.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Thermal Springs</h5>
+            <p>Castellammare has 28 mineral springs — each with different mineral compositions for different ailments. The Romans built baths here; the Bourbons turned it into a spa town. The Terme di Castellammare (though sometimes closed for renovation) represents 2,000 years of unbroken bathing culture on this spot.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Lungomare Promenade</h5>
+            <p>Walk the waterfront from the port toward the old Bourbon thermal building. The views back to Vesuvius and across to Naples are spectacular at any hour. The best local bar for spritz and watching the evening unfold is here.</p>
+          </div>
+          <div class="see-item">
+            <h5>The Medieval Castle</h5>
+            <p>The Castello Medievale dominates the headland. It gave the city its name — "Castellum Maris," castle by the sea. Norman in origin, Aragonese in reconstruction. The views from its walls are excellent.</p>
+          </div>
+        </div>
+
+        <div class="food-block">
+          <h4>Where & What to Eat in Castellammare</h4>
+          <ul>
+            <li>Spaghetti alle vongole (clams, white wine, parsley)</li>
+            <li>Crudi di mare — raw seafood platter, order "una barca" (a boat)</li>
+            <li>Frittura di paranza — mixed fried fish, order by weight</li>
+            <li>Polpo alla luciana — braised octopus with olives & capers</li>
+            <li>Local Falanghina or Greco di Tufo white wine</li>
+            <li>Sfogliatella — the flaky Neapolitan pastry — from any bar</li>
+          </ul>
+        </div>
+
+        <p class="narrative" style="margin-top:1rem;"><strong>Recommended restaurants:</strong> <em>Quartuccio Bistrot</em> and <em>Fronte Mare C.M</em> are the most consistently praised for seafood. <em>La Bettola del Pescatore</em> on Corso Garibaldi is beloved for its raw bar — reviewers who ate there on the first night came back on the last. For pizza alongside locals, <em>Addò Trammiere Il Maradona della Pizza</em> is the name to know.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- THEMATIC PANEL: WHAT VESUVIUS PRESERVED -->
+<section class="thematic-panel reveal">
+  <div class="section-label">The Deep Narrative</div>
+  <h3>What Vesuvius Actually Preserved — and Why These Sites Are Irreplaceable</h3>
+  <p>We tend to talk about Vesuvius as a destroyer. But what it actually did was the most extraordinary act of preservation in human history. When the eruption sealed these four sites, it locked away something that nowhere else in the ancient world survived: the texture of Roman daily life. The scroll half-read on the desk. The bread still in the oven. The electoral graffiti on the wall. The skeleton of a dog still chained. Every other Roman city — Rome itself included — was continuously inhabited, rebuilt, stripped for material, and palimpsested over 2,000 years. These four cities were simply... stopped. Sealed. And slowly returned to us. Every year, new excavations reveal new rooms, new frescoes, new objects. The Pompeii Archaeological Park alone announced over 200 new finds in 2024. In December 2025, Villa Poppaea revealed frescoes unseen for two millennia. This coast is still giving up its secrets.</p>
+</section>
+
+<!-- DECISION GUIDE -->
+<section class="decision-guide reveal">
+  <div class="section-label" style="color: #88c8e0;"><span>Your Day</span></div>
+  <h3>How to Tune the Day — Scenarios for Different Travellers</h3>
+  <div class="decision-grid">
+    <div class="decision-card">
+      <h5>If You're Archaeology-Deep</h5>
+      <p>Spend a full 3+ hours at Herculaneum, especially the boat sheds and the newly opened beach. Skip Pompeii or do only the Antiquarium and Forum (45 min). Make the Stabiae villas your second major stop — Villa San Marco alone is worth an hour. Skip Monte Faito, save it for another day.</p>
+    </div>
+    <div class="decision-card">
+      <h5>If You Want the Full Day Arc</h5>
+      <p>2hrs Herculaneum → 1hr Oplontis → 45min Pompeii walk-through → lunch on Lungomare → 1.5hr Stabiae villas → cable car to Monte Faito for sunset → dinner in Castellammare. This is a near-perfect Roman day, sea to mountain.</p>
+    </div>
+    <div class="decision-card">
+      <h5>If Energy Is Flagging by Afternoon</h5>
+      <p>Skip the Stabiae villas (save for tomorrow morning — they're free, they open at 9am, and you'll have them nearly to yourself). Do Monte Faito cable car instead — it's effortless and spectacular — then dinner on the Lungomare. The villas will still be there.</p>
+    </div>
+    <div class="decision-card">
+      <h5>If You Want the Hidden Gem Route</h5>
+      <p>Skip Pompeii entirely. Spend extra time at Oplontis — it genuinely deserves 90 minutes — then head directly to Stabiae. These three sites (Herculaneum, Oplontis, Stabiae) represent the least-crowded, most intellectually rich version of this coast. Roman life without the tour-group noise.</p>
+    </div>
+    <div class="decision-card">
+      <h5>If You Have Children</h5>
+      <p>Herculaneum is more child-friendly than Pompeii — smaller, cooler (more shade), and the boat sheds with skeletons are genuinely gripping for older kids. Villa San Marco's giant pool is easy to explain and visualise. Monte Faito cable car is thrilling for all ages. End with gelato on the Lungomare.</p>
+    </div>
+    <div class="decision-card">
+      <h5>If You're Here Again Tomorrow</h5>
+      <p>Today: Herculaneum + Oplontis + Castellammare evening. Tomorrow: Stabiae villas at 9am when they open (no crowds, morning light is beautiful on the frescoes), then down the Sorrentine Peninsula via SS145 toward Vico Equense and Sorrento — one of Italy's great coastal drives.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRACTICAL -->
+<section class="practical reveal">
+  <h3>Practical Notes for Today</h3>
+  <div class="practical-grid">
+    <div class="practical-item">
+      <h5>Closure Days</h5>
+      <ul>
+        <li>Oplontis: closed Tuesdays</li>
+        <li>Stabiae villas: closed Tuesdays</li>
+        <li>Herculaneum: open daily</li>
+        <li>Pompeii: open daily</li>
+      </ul>
+    </div>
+    <div class="practical-item">
+      <h5>Parking</h5>
+      <ul>
+        <li>Herculaneum: free parking on Corso Resina</li>
+        <li>Oplontis: street parking near Via Sepolcri</li>
+        <li>Pompeii: paid lots near Porta Marina (~€5)</li>
+        <li>Stabiae: parking near Passeggiata Archeologica</li>
+      </ul>
+    </div>
+    <div class="practical-item">
+      <h5>Weather Today</h5>
+      <ul>
+        <li>High ~78°F (26°C)</li>
+        <li>UV Very High — seek shade 11am–3pm</li>
+        <li>Bring water, hat, sunscreen</li>
+        <li>All sites mostly unshaded</li>
+      </ul>
+    </div>
+    <div class="practical-item">
+      <h5>Combined Tickets</h5>
+      <ul>
+        <li>3-day ticket covers Pompeii, Herculaneum, Oplontis, Stabiae, Boscoreale</li>
+        <li>Available at any site entrance</li>
+        <li>Best value if visiting 3+ sites</li>
+      </ul>
+    </div>
+    <div class="practical-item">
+      <h5>Monte Faito Cable Car</h5>
+      <ul>
+        <li>Departs from Castellammare station</li>
+        <li>Runs approx. 9am–6pm (check seasonally)</li>
+        <li>~€8 return</li>
+        <li>Last car down typically 1hr before close</li>
+      </ul>
+    </div>
+    <div class="practical-item">
+      <h5>Key Phrases</h5>
+      <ul>
+        <li>"Un tavolo per due" — table for two</li>
+        <li>"Il menù degustazione" — tasting menu</li>
+        <li>"Cosa raccomanda?" — what do you recommend?</li>
+        <li>"Il conto, per favore" — the check please</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="ornamental-divider">· · ·</div>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // For stops, add 'visible' class
+        if (entry.target.classList.contains('stop')) {
+          entry.target.classList.add('visible');
+        }
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal, .stop').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
