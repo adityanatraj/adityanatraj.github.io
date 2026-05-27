@@ -418,6 +418,28 @@
 			.category-section.hidden {
 				display: none;
 			}
+
+			.country-group {
+				margin-bottom: 2rem;
+			}
+
+			.country-group:last-child {
+				margin-bottom: 0;
+			}
+
+			.country-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--text-tertiary);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				margin-bottom: 0.75rem;
+				padding-left: 0.25rem;
+			}
+
+			.country-group.hidden {
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -555,6 +577,7 @@
 					title: "Vietnamese Conversations",
 					tag: "Language",
 					category: "learn",
+					group: "Vietnam",
 					description:
 						"Learn Vietnamese through common conversations. Practice everyday phrases and dialogues.",
 					tags: "language learning vietnamese education",
@@ -565,6 +588,7 @@
 					title: "Vietnamese Hotel Conversations",
 					tag: "Language",
 					category: "learn",
+					group: "Vietnam",
 					description:
 						"Learn hotel-specific Vietnamese phrases. Essential conversations for travelers.",
 					tags: "language learning vietnamese hotel travel education",
@@ -575,6 +599,7 @@
 					title: "Italian for Travelers",
 					tag: "Language",
 					category: "learn",
+					group: "Italy",
 					description:
 						"Essential Italian phrases for travelers. Common expressions to help you get around Italy.",
 					tags: "language learning italian travel education",
@@ -585,6 +610,7 @@
 					title: "Rome — One Perfect Day",
 					tag: "Travel",
 					category: "learn",
+					group: "Italy",
 					description:
 						"A curated one-day itinerary for Rome. Walk the city's highlights in a single perfect day.",
 					tags: "travel rome italy guide itinerary education",
@@ -595,6 +621,7 @@
 					title: "Vatican Deep Dive Tour Guide",
 					tag: "Travel",
 					category: "learn",
+					group: "Italy",
 					description:
 						"An in-depth tour guide for the Vatican. Explore the history, art, and architecture of the world's smallest country.",
 					tags: "travel vatican rome italy guide tour education",
@@ -605,6 +632,7 @@
 					title: "Naples — A Field Guide",
 					tag: "Travel",
 					category: "learn",
+					group: "Italy",
 					description:
 						"A practical field guide to Naples. Food, neighborhoods, culture, and everything you need to explore the city.",
 					tags: "travel naples italy guide food culture education",
@@ -615,34 +643,57 @@
 					title: "The Vesuvian Coast — A Deep Dive",
 					tag: "Travel",
 					category: "learn",
+					group: "Italy",
 					description:
 						"Explore the towns and ruins buried by Vesuvius. A deep dive into the history and landscapes of the Vesuvian coast.",
 					tags: "travel vesuvius pompeii herculaneum italy coast guide history education",
 				},
+				{
+					href: "tools/web/learn/pompeii-day-guide.html",
+					icon: "🏺",
+					title: "Pompeii — Field Guide",
+					tag: "Travel",
+					category: "learn",
+					group: "Italy",
+					description:
+						"A field guide to Pompeii. Navigate the ancient city's ruins with context on what you're seeing and how to make the most of a visit.",
+					tags: "travel pompeii vesuvius italy ruins history guide education",
+				},
 			];
 
-			const categories = ["tools", "games", "learn"];
+			const groupFlags = { Vietnam: "🇻🇳", Italy: "🇮🇹" };
 
-			categories.forEach((cat) => {
-				const list = document.getElementById(`list-${cat}`);
-				list.innerHTML = tools
-					.filter((t) => t.category === cat)
-					.map(
-						(t) => `
-					<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
-						<div class="tool-icon-row">${t.icon}</div>
-						<div class="tool-content">
-							<div class="tool-header">
-								<h3 class="tool-title-row">${t.title}</h3>
-								<span class="tag">${t.tag}</span>
-							</div>
-							<p class="tool-description-row">${t.description}</p>
+			function renderTool(t) {
+				return `<a href="${t.href}" class="tool-row" data-title="${t.title}" data-description="${t.description}" data-tags="${t.tags}">
+					<div class="tool-icon-row">${t.icon}</div>
+					<div class="tool-content">
+						<div class="tool-header">
+							<h3 class="tool-title-row">${t.title}</h3>
+							<span class="tag">${t.tag}</span>
 						</div>
-						<div class="tool-arrow">→</div>
-					</a>`,
-					)
-					.join("");
+						<p class="tool-description-row">${t.description}</p>
+					</div>
+					<div class="tool-arrow">→</div>
+				</a>`;
+			}
+
+			["tools", "games"].forEach((cat) => {
+				const list = document.getElementById(`list-${cat}`);
+				list.innerHTML = tools.filter((t) => t.category === cat).map(renderTool).join("");
 			});
+
+			// Render learn section grouped by country
+			const learnList = document.getElementById("list-learn");
+			const learnTools = tools.filter((t) => t.category === "learn");
+			const learnGroups = [...new Set(learnTools.map((t) => t.group))];
+			learnList.innerHTML = learnGroups.map((group) => `
+				<div class="country-group" data-group="${group}">
+					<div class="country-label">${groupFlags[group] ?? ""} ${group}</div>
+					<div class="tools-list">
+						${learnTools.filter((t) => t.group === group).map(renderTool).join("")}
+					</div>
+				</div>
+			`).join("");
 
 			const noResults = document.getElementById("noResults");
 			const searchInput = document.getElementById("searchInput");
@@ -672,6 +723,13 @@
 							);
 						row.classList.toggle("hidden", !matches);
 						if (matches) count++;
+					});
+
+					// Hide country groups with no visible tools
+					section.querySelectorAll(".country-group").forEach((grp) => {
+						const anyGroupVisible = Array.from(grp.querySelectorAll(".tool-row"))
+							.some((r) => !r.classList.contains("hidden"));
+						grp.classList.toggle("hidden", !anyGroupVisible);
 					});
 
 					if (count === 0 && term !== "") {
