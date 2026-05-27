@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pompeii — Field Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ash:        #171411;
+  --ash2:       #201d19;
+  --ash3:       #2a2520;
+  --ember:      #c4531a;
+  --ember-dim:  rgba(196,83,26,0.18);
+  --gold:       #c9a03e;
+  --gold-dim:   rgba(201,160,62,0.15);
+  --cream:      #f2ebe0;
+  --cream-dim:  rgba(242,235,224,0.6);
+  --cream-faint:rgba(242,235,224,0.35);
+  --teal:       #3d7a6e;
+  --teal-dim:   rgba(61,122,110,0.12);
+  --red:        #9b2335;
+  --line:       rgba(242,235,224,0.07);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ash);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ─── HERO ─────────────────────────────────── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  background: var(--ash);
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 55% at 50% 105%, rgba(196,83,26,0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 30% at 75% 10%, rgba(201,160,62,0.06) 0%, transparent 60%);
+}
+
+.volcano {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 150%; height: 52%;
+  background: linear-gradient(to top, #0c0a08 0%, #171411 35%, transparent 100%);
+  clip-path: polygon(0% 100%, 5% 65%, 15% 55%, 25% 42%, 33% 28%, 40% 15%, 46% 7%, 50% 3%, 54% 7%, 60% 15%, 67% 28%, 75% 42%, 85% 55%, 95% 65%, 100% 100%);
+}
+
+.particles { position: absolute; inset: 0; pointer-events: none; }
+.p {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: rgba(201,160,62,0.45);
+  border-radius: 50%;
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(-15vh) translateX(var(--dx)); opacity: 0; }
+}
+
+.hero-body {
+  position: relative; z-index: 5;
+  padding: 0 1.6rem 3.5rem;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5.5rem, 24vw, 12rem);
+  line-height: 0.85;
+  letter-spacing: 0.03em;
+  color: var(--cream);
+}
+
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: var(--ember);
+  margin-top: 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+.hero-meta {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.hero-pill {
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.35rem 1rem;
+  border: 1px solid rgba(196,83,26,0.4);
+  color: rgba(242,235,224,0.55);
+}
+
+/* ─── TICKER ─────────────────────────────── */
+.ticker {
+  background: var(--ember);
+  padding: 0.48rem 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-inner { display: inline-block; animation: tick 32s linear infinite; }
+.ticker-inner span {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0 2rem;
+  color: rgba(242,235,224,0.85);
+}
+.ticker-inner span::before { content: '✦  '; color: rgba(242,235,224,0.4); }
+@keyframes tick { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ─── NAV ────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(23,20,17,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 1.5rem;
+  display: flex; gap: 1.8rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav a {
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.nav a:hover { color: var(--gold); }
+
+/* ─── LAYOUT ─────────────────────────────── */
+.wrap {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── SECTION HEAD ───────────────────────── */
+.sh {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 4rem 0 1.8rem;
+}
+.sh-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  color: rgba(196,83,26,0.18);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.sh-t {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1.2;
+}
+.sh-t em { color: var(--gold); font-style: italic; }
+
+/* ─── RULE ───────────────────────────────── */
+.rule {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 0.6rem 0 2rem;
+}
+
+/* ─── INTRO BOX ──────────────────────────── */
+.intro-box {
+  background: var(--ash2);
+  border-left: 2px solid var(--ember);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 2rem;
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+  line-height: 1.8;
+}
+.intro-box strong { color: var(--cream); font-weight: 500; }
+
+/* ─── TIMELINE ───────────────────────────── */
+.tl { position: relative; padding-left: 1.4rem; }
+.tl::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--ember) 0%, rgba(196,83,26,0.05) 100%);
+}
+
+.tl-block {
+  position: relative;
+  margin-bottom: 2.8rem;
+  padding-left: 1.4rem;
+}
+.tl-block::before {
+  content: '';
+  position: absolute;
+  left: -1.4rem; top: 5px;
+  width: 7px; height: 7px;
+  background: var(--ember);
+  border-radius: 50%;
+  transform: translateX(-3px);
+  box-shadow: 0 0 8px rgba(196,83,26,0.5);
+}
+
+.tl-time {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 0.25rem;
+}
+
+.tl-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.tl-body {
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+  line-height: 1.82;
+}
+.tl-body strong { color: var(--gold); font-weight: 500; }
+.tl-body em { color: var(--cream); font-style: italic; }
+
+/* ─── CONTEXT DROPS ─ the real intel ────── */
+.context {
+  background: var(--ash2);
+  border: 1px solid var(--line);
+  padding: 1rem 1.2rem;
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+  color: rgba(242,235,224,0.58);
+  line-height: 1.82;
+}
+.context strong { color: var(--gold); font-weight: 500; }
+.context-label {
+  display: block;
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+  opacity: 0.7;
+}
+
+/* ─── SITE ENTRY CARDS ───────────────────── */
+.entry-card {
+  border: 1px solid var(--line);
+  background: var(--ash2);
+  margin-bottom: 1px;
+}
+
+.entry-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.3rem 1.3rem 0;
+}
+
+.entry-tag {
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+.t-art    { background: rgba(155,35,53,0.2);  color: #e08;  border: 1px solid rgba(155,35,53,0.35); }
+.t-hist   { background: var(--gold-dim);       color: var(--gold); border: 1px solid rgba(201,160,62,0.3); }
+.t-gem    { background: var(--teal-dim);       color: #7ecfc5; border: 1px solid rgba(61,122,110,0.35); }
+.t-civic  { background: rgba(70,100,180,0.15); color: #9ab; border: 1px solid rgba(70,100,180,0.3); }
+.t-food   { background: var(--ember-dim);      color: #f0936e; border: 1px solid rgba(196,83,26,0.35); }
+
+.entry-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1.25;
+}
+
+.entry-loc {
+  font-size: 0.62rem;
+  color: var(--cream-faint);
+  margin-top: 0.15rem;
+  letter-spacing: 0.05em;
+}
+
+.entry-body {
+  padding: 0.8rem 1.3rem 1.3rem;
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  line-height: 1.82;
+}
+.entry-body strong { color: var(--gold); font-weight: 500; }
+.entry-body em { color: var(--cream); font-style: normal; font-weight: 400; }
+
+.entry-insight {
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(0,0,0,0.25);
+  border-left: 2px solid var(--teal);
+  font-size: 0.76rem;
+  color: rgba(126,207,197,0.8);
+  line-height: 1.7;
+}
+.entry-insight::before {
+  content: 'WHAT TO NOTICE ';
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  display: block;
+  color: var(--teal);
+  margin-bottom: 0.3rem;
+}
+
+/* ─── FRESCO STRIP ───────────────────────── */
+.fstrip {
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--ember), var(--gold), var(--teal), #4a6090);
+  margin: 3rem 0;
+  opacity: 0.55;
+}
+
+/* ─── GEM CALLOUT ────────────────────────── */
+.gem {
+  border-left: 2px solid var(--teal);
+  padding: 1rem 1.3rem;
+  background: var(--teal-dim);
+  margin: 1.5rem 0;
+}
+.gem-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #7ecfc5;
+  margin-bottom: 0.35rem;
+}
+.gem-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: rgba(242,235,224,0.75);
+  line-height: 1.65;
+}
+
+/* ─── DIVIDER ────────────────────────────── */
+.div {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 3.5rem 0;
+  opacity: 0.22;
+}
+.div::before, .div::after { content:''; flex:1; height:1px; background:var(--cream); }
+.div span { font-size: 0.55rem; letter-spacing: 0.3em; }
+
+/* ─── RESTAURANT ─────────────────────────── */
+.resto {
+  background: var(--ash2);
+  border: 1px solid var(--line);
+  padding: 1.4rem;
+  margin-bottom: 1px;
+}
+.resto-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+.resto-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--cream);
+}
+.resto-stars { color: var(--gold); font-size: 0.72rem; }
+.resto-tag {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 0.6rem;
+}
+.resto-body {
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  line-height: 1.82;
+}
+.resto-body strong { color: var(--gold); font-weight: 500; }
+
+/* ─── BEYOND CARDS ───────────────────────── */
+.beyond {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.beyond-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  color: rgba(196,83,26,0.2);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 2.5rem;
+}
+.beyond-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 0.35rem;
+}
+.beyond-body {
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  line-height: 1.82;
+}
+.beyond-body strong { color: var(--gold); font-weight: 500; }
+
+/* ─── NOTE BOX ───────────────────────────── */
+.note {
+  border: 1px solid rgba(201,160,62,0.25);
+  background: rgba(201,160,62,0.04);
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  line-height: 1.8;
+}
+.note strong { color: var(--gold); font-weight: 500; }
+
+/* ─── TIPS ───────────────────────────────── */
+.tips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin: 1.5rem 0;
+}
+.tip {
+  background: var(--ash2);
+  padding: 1.1rem;
+  font-size: 0.78rem;
+  color: rgba(242,235,224,0.62);
+  line-height: 1.7;
+}
+.tip-icon { font-size: 1rem; display: block; margin-bottom: 0.4rem; }
+.tip strong { color: var(--gold); display: block; font-size: 0.7rem; margin-bottom: 0.3rem; }
+
+/* ─── FOOTER ─────────────────────────────── */
+.footer {
+  margin-top: 5rem;
+  padding: 2.5rem 1.5rem 3rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.footer-q {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(242,235,224,0.35);
+  max-width: 380px;
+  margin: 0 auto 0.8rem;
+  line-height: 1.6;
+}
+.footer-c {
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(242,235,224,0.18);
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="volcano"></div>
+  <div class="particles" id="pt"></div>
+  <div class="hero-body">
+    <div class="hero-eyebrow">Field Guide · May 27, 2026</div>
+    <div class="hero-title">POMPEII</div>
+    <div class="hero-sub">From Castellammare di Stabia — 9 AM entry confirmed</div>
+    <div class="hero-meta">
+      <span class="hero-pill">66 hectares · 11,000 inhabitants · Buried 79 AD</span>
+      <span class="hero-pill">~5 hrs on site · Rental car</span>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Forum</span><span>House of the Faun</span><span>Via dell'Abbondanza</span><span>Lupanar</span><span>Garden of the Fugitives</span><span>Villa dei Misteri</span><span>Amphitheatre</span><span>Regio V</span><span>Thermopolia</span><span>Forum Baths</span>
+    <span>Forum</span><span>House of the Faun</span><span>Via dell'Abbondanza</span><span>Lupanar</span><span>Garden of the Fugitives</span><span>Villa dei Misteri</span><span>Amphitheatre</span><span>Regio V</span><span>Thermopolia</span><span>Forum Baths</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#context">Context</a>
+  <a href="#plan">Day Plan</a>
+  <a href="#site">Site Guide</a>
+  <a href="#hidden">Hidden</a>
+  <a href="#food">Food</a>
+  <a href="#beyond">Beyond</a>
+  <a href="#tips">Tips</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── CONTEXT ── -->
+  <div id="context">
+    <div class="sh"><div class="sh-n">01</div><div class="sh-t">Before You <em>Go In</em></div></div>
+    <hr class="rule">
+
+    <div class="intro-box">
+      <strong>What this place actually is:</strong> Pompeii was a prosperous Roman port city, not particularly famous in its day — one of dozens of Campanian towns. On August 24, 79 AD, Vesuvius erupted and buried it under 4–6 meters of volcanic ash and pumice in about 18 hours. Around 2,000 people died on-site (most fled); the city was then forgotten for 1,700 years. When excavation began in the 1700s, they found it intact — food still on tables, graffiti still on walls, bodies in the positions they fell. The preservation is not just architectural. It's human.
+    </div>
+
+    <div class="intro-box">
+      <strong>How to read the site:</strong> Pompeii is organized in <strong>Regiones</strong> — nine numbered districts. The tourist flow runs along two main arteries: <strong>Via dell'Abbondanza</strong> (east–west, the main commercial street) and the north–south spine from the Forum. Anything one block off these arteries is often deserted. The site closes at 7:30PM; last entry at 6PM. You have your 9AM slot — use it. The first two hours are meaningfully less crowded.
+    </div>
+
+    <div class="intro-box">
+      <strong>What to keep in your head all day:</strong> Look at the ruts in the roads — centuries of cart wheels. Look at the raised sidewalks (Romans didn't want to walk in the street-level sewage). Look at the election notices painted on walls — Pompeii had political campaigns. Look at the bar counters: the holes held clay pots of hot food. This was a full, noisy, smelly, commercial city. The ash froze it mid-sentence. Your job is to hear it talking.
+    </div>
+  </div>
+
+  <!-- ── DAY PLAN ── -->
+  <div id="plan">
+    <div class="sh"><div class="sh-n">02</div><div class="sh-t">The <em>Day</em> Plan</div></div>
+    <hr class="rule">
+
+    <div class="tl">
+
+      <div class="tl-block">
+        <div class="tl-time">8:10 AM · Depart Castellammare</div>
+        <div class="tl-title">Drive to Pompeii — 15 minutes</div>
+        <div class="tl-body">
+          Take the SS145 north toward Torre Annunziata, then follow brown <em>Pompei Scavi</em> signs. <strong>Park on Via Villa dei Misteri</strong> — there are several lots right beside the main entrance (Porta Marina). Cost: roughly €5–7 for the day; have cash. Grab a coffee at the bar outside the gates if you haven't eaten. Do not try to get food inside the site — the one café is expensive and mediocre.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">9:00 AM · Enter</div>
+        <div class="tl-title">Porta Marina → The Forum</div>
+        <div class="tl-body">
+          The Porta Marina (Sea Gate) was one of the main entrances to the city — you'll walk up the original ramp. Turn right at the top and head directly to <strong>the Forum</strong>. This is your orientation moment. Stand in the center. The Forum is 150m × 35m — a rectangle of civic, religious and commercial power. Temple of Jupiter at the north end. The Basilica (law courts) along the left. The Macellum market on the right. And behind the temple, visible over the roofline, <strong>Vesuvius itself framed in the gap.</strong>
+        </div>
+        <div class="context">
+          <span class="context-label">What you're looking at</span>
+          The column stumps around the Forum perimeter supported a two-story portico. The Forum was pedestrianized — those large stones at each entrance were bollards to block carts. The white marble you see is largely reconstruction; the original was stripped for building material in the Middle Ages. The Temple of Jupiter was not just religious — the triangular pediment above the columns held a massive statue of Jupiter, Juno, and Minerva. After the earthquake of 62 AD (17 years before the eruption), the temple was still being repaired when Vesuvius went off. They never finished.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">9:30 AM</div>
+        <div class="tl-title">Forum Baths → House of the Tragic Poet</div>
+        <div class="tl-body">
+          Walk north from the Forum to the <strong>Forum Baths (Terme del Foro)</strong> — best-preserved baths in Pompeii, and the stucco ceiling of the cold room (frigidarium) is extraordinary. Then find the <strong>House of the Tragic Poet</strong> on Via delle Terme: small house, enormous reputation. The famous <em>Cave Canem</em> ("Beware of the Dog") mosaic is in the entrance corridor — a chained dog, beautifully rendered. The name came from a theatrical rehearsal mosaic found inside (now in Naples). This house is the model for the nouveau-riche Pompeian household in Bulwer-Lytton's 1834 novel <em>The Last Days of Pompeii</em>.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">10:00 AM</div>
+        <div class="tl-title">House of the Faun — The Crown Jewel of Private Architecture</div>
+        <div class="tl-body">
+          Walk east on Via della Fortuna. The <strong>House of the Faun</strong> takes up an entire city block — 3,000 square meters. It was the home of a family of extraordinary wealth, probably Sulla's relatives. Two atriums, two gardens, domestic rooms, a formal dining suite. The bronze dancing faun in the first atrium is the original (2nd century BC). In the second garden, you'll see a mosaic threshold bearing the word <em>HAVE</em> — the Latin greeting "Welcome." <strong>The Alexander Mosaic was found in the exedra (the large apse-shaped room) at the back.</strong> The original is in Naples; what you see is a replica. But the room itself — the scale, the light — gives you the context that the museum never can.
+        </div>
+        <div class="context">
+          <span class="context-label">The Alexander Mosaic — what it shows</span>
+          The mosaic depicts the Battle of Issus (333 BC) — Alexander the Great charging on horseback toward a terrified Persian King Darius III, who is already turning his chariot to flee. It's made of roughly 1.5 million tesserae (glass and stone tiles), each about 4mm wide. What makes it technically astonishing: the artist used a technique called <em>vermiculatum</em> — tiny tiles following the contour of each form to suggest musculature and fabric. The original measures 5.8m × 3.1m and is considered the finest ancient mosaic in existence. Alexander is shown with wild hair and no helmet — a deliberate choice to show fearlessness.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">11:00 AM</div>
+        <div class="tl-title">Via dell'Abbondanza — The Commercial Spine</div>
+        <div class="tl-body">
+          Walk east along <strong>Via dell'Abbondanza</strong>, the main commercial street. This is where you'll see Pompeii as a living city. <strong>Election notices painted directly on house facades</strong> — candidates' names still legible in red and black. Bars and restaurants (thermopolia) every few meters, their L-shaped counters intact, with circular holes where clay storage jars (dolia) were set flush. <strong>One thermopolium still has bones and seeds of the food that was in its pots when it was buried.</strong> Stepping stones across the road at intersections, precisely spaced for cart wheels. Graffiti everywhere: love declarations, insults, gladiator results, shop ads.
+        </div>
+        <div class="context">
+          <span class="context-label">Reading the road itself</span>
+          The basalt paving stones are deeply rutted by cart wheels. Archaeologists have used these ruts to map ancient traffic patterns — which streets were one-way, which were high-traffic. The large blocks you keep stepping on at crosswalks were deliberate: the street was used as a drainage channel, and the raised stones let pedestrians cross without wading. Note also that the sidewalks are raised 20–30cm above street level — same reason.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">11:45 AM</div>
+        <div class="tl-title">The Lupanar & The Forum Granary</div>
+        <div class="tl-body">
+          Head to the <strong>Lupanar</strong> — Pompeii's main brothel, the only purpose-built one identified. Two floors; ground floor has five small rooms each with a stone bed and built-in stone pillow. Above each door: a painted panel showing a sexual position — not erotic decoration but a literal menu for illiterate clients. The graffiti on these walls is among the most personal in Pompeii: workers giving themselves nicknames, clients rating the experience. On your way back toward the Forum, stop at the <strong>Granary (Horrea)</strong> — now used to store plaster casts. <strong>This is where you'll see the casts up close</strong>, including the man with his hands over his face, the woman curled on her side, a dog writhing on its chain.
+        </div>
+        <div class="context">
+          <span class="context-label">How the casts were made</span>
+          Giuseppe Fiorelli, the site's director from 1860, noticed that voids in the hardened ash corresponded to the shapes of decomposed organic matter. He developed the technique of pouring liquid plaster into these voids. The resulting casts are not skeletons — they're the outer form of people and animals at the moment they died, with the bones inside. You can see fabric textures on clothing, facial expressions, the way fingers curled. It is one of the most technically and emotionally remarkable things in archaeology.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">12:30 PM · Exit for Lunch</div>
+        <div class="tl-title">Leave the Site — Eat Well</div>
+        <div class="tl-body">
+          This is the right move. Midday heat peaks, crowds swell, and you'll be stronger for the afternoon. <strong>Head to Ristorante Spinelli Bistrot</strong> on Piazza Bartolo Longo — a 10-minute walk from the exit. Full details in the food section. Take an hour. Rest your feet. When you re-enter, you'll have the site nearly to yourselves by 2:30–3PM.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">1:45 PM · Re-enter</div>
+        <div class="tl-title">Garden of the Fugitives → Amphitheatre</div>
+        <div class="tl-body">
+          Re-enter via the Porta di Sarno (east gate) and walk directly to the <strong>Garden of the Fugitives</strong> in Regio I. Thirteen people — a group including children — sheltered in a garden portico as the eruption peaked, covering their faces with cloth. They died together. Their casts remain in the exact positions they were found, in a garden behind a low wall. <strong>This is the most humanly overwhelming moment on the site.</strong> Don't rush it. Then walk to the <strong>Amphitheatre</strong> — largest building in Pompeii, built in 80 BC, capacity 20,000. Older than the Colosseum by 150 years. Walk down into the arena floor.
+        </div>
+        <div class="context">
+          <span class="context-label">The Amphitheatre Riot of 59 AD</span>
+          A fresco found in a Pompeian house depicts a riot that broke out during games between fans from Pompeii and the neighboring town of Nuceria. People died. The Roman Senate investigated; Emperor Nero banned gladiatorial games in Pompeii for ten years as punishment. The fresco — which shows the brawl spilling out of the stands — is now in Naples. But you're standing in the exact arena where it happened.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">2:45 PM</div>
+        <div class="tl-title">The New Excavations — Regio V</div>
+        <div class="tl-body">
+          Head northwest to the <strong>Regio V</strong> excavation area — work ongoing since 2017, some of the most significant recent finds. The <strong>Thermopolium of Regio V</strong> (discovered 2020) has painted animals on the counter still in vivid color: a rooster, a Nereid on a seahorse, a mallard duck. Hot food residue was found in the storage jars. A human skeleton was found still lying on a bed in an adjacent room. <strong>This area has almost no crowds and represents the absolute frontier of what's been uncovered.</strong> Ask staff which parts are currently open; access varies.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">3:30 PM</div>
+        <div class="tl-title">Villa of the Mysteries — Save This for Now</div>
+        <div class="tl-body">
+          Walk to the northwest corner of the site — or exit via Porta Ercolano and walk 5 minutes along the ancient road to the Villa. The crowds will have thinned. The <strong>Villa of the Mysteries</strong> is not inside the city proper; it's a suburban villa that predates much of the urban site. Its main room contains the <strong>Megalography</strong> — a continuous frieze of life-size figures rendered in "Pompeian red," running on three walls. Twenty-nine figures. The subject: a young woman's initiation into the cult of Dionysus. The scene progresses from left to right: preparation, ritual, divine revelation, flagellation, ecstasy. <strong>No one fully agrees on its meaning. It has been studied for over a century and remains genuinely mysterious.</strong>
+        </div>
+        <div class="context">
+          <span class="context-label">Looking at the fresco</span>
+          The red is made from cinnabar (mercury sulfide). Stand back and let the whole wall read as a single composition. The figures are not flat — note the shadows under feet, the dimensionality of drapery, the sense of arrested movement. The woman being flagellated (right wall) is bending forward, her garment slipping; the winged demon figure raising the whip is simultaneously terrifying and ritualistic. The final figure — a seated woman being dressed by attendants, gaze direct and calm — is believed to be the villa's owner, now initiated. Look at her eyes.
+        </div>
+      </div>
+
+      <div class="tl-block">
+        <div class="tl-time">4:30–5:30 PM</div>
+        <div class="tl-title">Drift & Decide</div>
+        <div class="tl-body">
+          Late afternoon is the best time on-site. <strong>House of the Vettii</strong> (Regio VI) — two wealthy freedmen, ostentatiously decorated; the famous Priapus weighing his enormous phallus on a scale against a bag of gold is at the entrance, a symbol of prosperity. <strong>House of the Silver Wedding</strong> for its beautiful atrium. Or simply walk residential streets you haven't been on. By 5PM the tourist groups are gone. You may want to stay until 6 or 7. Or exit and make the decision: drive up Vesuvius (45 min), detour to Oplontis (15 min), or head back to Castellammare for an evening.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="fstrip"></div>
+
+  <!-- ── SITE GUIDE ── -->
+  <div id="site">
+    <div class="sh"><div class="sh-n">03</div><div class="sh-t">Site <em>Deep Dives</em></div></div>
+    <hr class="rule">
+
+    <div class="gem">
+      <div class="gem-label">✦ How to read Pompeian houses</div>
+      <div class="gem-text">Every Roman house follows the same axis: entrance → fauces (narrow corridor) → atrium (open-roofed central hall with a pool called the impluvium) → tablinum (the owner's reception office, always visible from the entrance as a display of status) → garden or second atrium. The richer the owner, the longer the axis and the more symmetrical the decoration. Once you know this sequence, every house reads like a sentence.</div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-hist">Civic</span>
+        <div>
+          <div class="entry-name">The Forum Baths (Terme del Foro)</div>
+          <div class="entry-loc">Regio VII · Via delle Terme — northwest of the Forum</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        The best-preserved bath complex in Pompeii. Separate men's and women's sections. The sequence: apodyterium (changing room) → frigidarium (cold plunge) → tepidarium (warm room) → caldarium (hot steam room). The caldarium is heated by hollow walls and floors — you can see the gaps in the brickwork where hot air circulated. The stucco ceiling of the men's frigidarium is a white barrel vault with painted stucco figures in high relief — athletes, sea creatures, garlands.
+        <div class="entry-insight">Look at the individual niches in the apodyterium — cubby holes for storing clothing and valuables while bathing. Note the small oil lamp niches too: baths stayed open after dark, lit by oil lamps. The hot room's floor is slightly elevated on small brick pillars (the hypocaust system) — run your hand along the base of the wall and you'll feel where the gap begins.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-art">Art</span>
+        <div>
+          <div class="entry-name">House of the Faun (Casa del Fauno)</div>
+          <div class="entry-loc">Regio VI · Via della Fortuna — one full city block</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        The largest and richest private house in Pompeii. Built in the 2nd century BC — earlier than most of what you'll see. Two atriums, two peristyle gardens, a formal dining suite that opens onto the large garden. The <strong>bronze dancing faun</strong> in the first atrium is the original; it's an Italic satyr, not strictly a faun — but the name stuck. The faun stands on a small plinth in the impluvium, where it would have been reflected in the water below. The <em>HAVE</em> mosaic at the entrance to the second atrium is original.
+        <div class="entry-insight">The Alexander Mosaic was found in the large apse (exedra) at the back of the second garden — this room opened onto the garden and was used as a summer triclinium (dining room). Imagine dinner guests reclining on couches, looking at this vast mosaic depicting the greatest military victory in history. The choice of subject was not accidental — the owner was making a statement about the kind of man he considered himself to be.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-hist">History</span>
+        <div>
+          <div class="entry-name">The Lupanar</div>
+          <div class="entry-loc">Regio VII · Vicolo del Lupanare — near the Forum</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        The only purpose-built brothel identified in Pompeii (there were others operating out of private rooms above bars). Two floors. Ground floor: five small cells with stone beds and stone pillow-headrests. The painted panels above each door are not decoration — they're service menus for clients who couldn't read. The graffiti on the walls is the most personal text in Pompeii: <em>"Mula fucked me here," "I came here and made a girl," "Felix licks."</em> Workers gave themselves animal or exotic names: Drauca, Felix, Africana. The smells and sounds of this place are worth sitting with for a moment — it was not glamorous, and the people who worked here were almost certainly enslaved.
+        <div class="entry-insight">Go upstairs if accessible — the upper level was the manager's quarters and is almost always empty. You also get a view down onto the street from a window that would have been used to advertise. The graffiti on the street wall outside the brothel is some of the most explicit in the site.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-hist">Emotion</span>
+        <div>
+          <div class="entry-name">Garden of the Fugitives</div>
+          <div class="entry-loc">Regio I · Via dell'Abbondanza (east end)</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        Thirteen people — two adults believed to be a family with children, plus others — sheltered in a garden portico as the pyroclastic surge hit in the final hours of the eruption. They pulled fabric over their faces. They died together. Their casts remain where they were found, in a low-walled garden enclosure. What hits you is not the dramatic poses — it's the ordinary ones. A child lying straight, apparently asleep. An adult face-down, one arm bent under their body as if they simply fell. <strong>You are looking at the last moment of specific, individual human lives.</strong>
+        <div class="entry-insight">Notice that some figures are still wearing jewelry — rings, bracelets. Some have coins in their hands or bags. They grabbed what they could before they fled. One figure appears to have a small figurine — a household Lar, a protective deity. It didn't protect them.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-art">Masterpiece</span>
+        <div>
+          <div class="entry-name">Villa of the Mysteries (Villa dei Misteri)</div>
+          <div class="entry-loc">Outside city walls · Northwest, near Porta Ercolano</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        A wealthy suburban villa — 60 rooms — built in the 2nd century BC and expanded over time. The famous Room 5 contains the Megalography: a 17-meter continuous frieze of 29 life-size figures, painted around 60–50 BC. The subject is Dionysiac initiation — a rite of passage, probably connected to the mystery cult of Dionysus that promised initiates a blessed afterlife. The red is cinnabar; it hasn't faded. The painting style is second Pompeian style — illusionistic, attempting to create the impression of three-dimensional figures standing in real space against a red backdrop.
+        <div class="entry-insight">Start on the left wall and follow the narrative clockwise. A boy reads from a ritual scroll. A woman carries offerings on a tray. A satyric figure plays the pan pipes. Then: a woman pulls back a purple cloth to reveal a sacred object (the liknon, or winnowing basket). A winged demon raises a whip. A woman bends under the blow, her companion comforting her. The final woman — calm, direct, being dressed by attendants — is thought to be the domina of the villa, newly initiated. She looks back at you with the composure of someone who has been through something transformative and come out the other side.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── HIDDEN GEMS ── -->
+  <div id="hidden">
+    <div class="sh"><div class="sh-n">04</div><div class="sh-t"><em>Hidden</em> & Overlooked</div></div>
+    <hr class="rule">
+
+    <div class="gem">
+      <div class="gem-label">✦ The rule of deviation</div>
+      <div class="gem-text">The tourist flow is entirely predictable. It follows Via dell'Abbondanza east and the Forum axis north-south. Anything two blocks off this spine is yours alone. The site is 66 hectares. Most visitors see about 15% of it.</div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-gem">Hidden</span>
+        <div>
+          <div class="entry-name">Thermopolium of Regio V</div>
+          <div class="entry-loc">Regio V · Via delle Nozze d'Argento — new excavation zone</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        Excavated 2019–2020 as part of the Great Pompeii Project. The counter paintings are exceptional: a Nereid riding a seahorse, a rooster, a mallard in flight, a chained dog below the counter (the same "Cave Canem" motif, here as warning to would-be thieves). The dolia — storage jars set into the counter — still contained traces of food: pork, fish, snails, fava beans. A human skeleton was found lying on a bed in a back room. A painted sign on the wall still legible. <strong>Almost no tourists find this.</strong>
+        <div class="entry-insight">Ask a site worker for directions to the Regio V thermopolium specifically — it's not well signposted and the entrance from the main path is easy to miss. It's near the House of the Silver Wedding in the new excavation area.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-gem">Hidden</span>
+        <div>
+          <div class="entry-name">House of the Silver Wedding (Casa delle Nozze d'Argento)</div>
+          <div class="entry-loc">Regio V — near new excavations</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        Named after the occasion of its excavation (the silver wedding anniversary of the Italian royal family, 1893). It has one of the finest atriums in Pompeii — a tetrastyle atrium with four columns supporting the roof opening. The proportions are perfect. Beyond it, a large peristyle garden with remains of the original planting layout. Rarely visited because it's slightly off the main route. <strong>Worth going specifically for the atrium alone.</strong>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-gem">Hidden</span>
+        <div>
+          <div class="entry-name">The Bakeries (Pistrina)</div>
+          <div class="entry-loc">Scattered — best ones in Regio VI and VII</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        There were at least 30 bakeries in Pompeii. The best-preserved ones have their <strong>volcanic stone mills still in place</strong> — large hourglass-shaped mills driven by donkeys or slaves walking in circles. You can see the grooves worn into the stone floor by the donkeys' feet. Ovens still intact, with the ash still in them. One bakery had 81 loaves found carbonized inside its oven — the baker never came back. The Bakery of Modestus (Regio VI) is the most complete and least visited.
+        <div class="entry-insight">Look at the mill design: the lower stone is fixed and conical; the upper stone (catillus) rotates over it, driven by horizontal wooden arms. Grain fed into the top, flour emerged at the base. These are functionally identical to mills used in Herculaneum, which you saw yesterday — but here you see the whole production chain in one room.</div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-gem">Hidden</span>
+        <div>
+          <div class="entry-name">The Graffiti — Everywhere</div>
+          <div class="entry-loc">All Regiones — look at walls at eye level and below</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        Over 11,000 pieces of graffiti have been catalogued in Pompeii. They are on house walls, bar walls, tomb walls, the amphitheatre. They are mundane, funny, cruel, sexual, and occasionally moving. <em>"Whoever loves, let them flourish; let them perish who know not love; let them perish twice over whoever forbids love."</em> A real gladiator's fight results: <em>"Celadus the Thracian makes the girls sigh."</em> A math problem scratched by a bored student: <em>"Twenty-six soldiers / each needs a sword..."</em> Political endorsements: <em>"The muleteer Messius recommends Marcus Cerrinius Vatia for aedile."</em> These were written by real people, in their own words, in Latin that has survived 2,000 years.
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <div class="entry-head">
+        <span class="entry-tag t-civic">Engineering</span>
+        <div>
+          <div class="entry-name">The Water System</div>
+          <div class="entry-loc">Visible throughout — look for lead pipes and street fountains</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        Pompeii had running water. The Augustan aqueduct fed a castellum aquae (water tower) at the highest point of the city, distributing water via lead pipes to street fountains (about one per block), public baths, and wealthy private homes. Street fountains are everywhere — large stone basins with a carved head (often animal or divine) spouting water from the mouth. Most Pompeians collected their daily water from these. <strong>Over 40 street fountains survive.</strong>
+        <div class="entry-insight">Look at the stone lip of any street fountain. It's deeply worn on one side — the side where people rested their jugs while filling them. This groove was made by thousands of daily visits over decades. The lead pipes are still visible in sections of excavated street; some still have the original flanged joints where sections were soldered together.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="div"><span>✦</span></div>
+
+  <!-- ── FOOD ── -->
+  <div id="food">
+    <div class="sh"><div class="sh-n">05</div><div class="sh-t">Where to <em>Eat</em></div></div>
+    <hr class="rule">
+
+    <div class="note">
+      <strong>The rule:</strong> Do not eat inside the park (expensive, terrible). Don't eat at the first restaurants you see outside the Porta Marina entrance — tourist traps. The places below are genuinely excellent and within 10–15 minutes on foot.
+    </div>
+
+    <div class="resto">
+      <div class="resto-top">
+        <div class="resto-name">Ristorante Spinelli Bistrot</div>
+        <div class="resto-stars">★★★★★ 4.8 &nbsp;·&nbsp; 1,097 reviews</div>
+      </div>
+      <div class="resto-tag">Lunch — Top Pick · Piazza Bartolo Longo, 42 · Open from 12:30PM · Closed Wednesday</div>
+      <div class="resto-body">
+        The consensus best lunch near the site. Local ingredients, unpretentious presentation, precise cooking. <strong>Order the braised pork neck, the vongole pasta, or the octopus</strong> — reviewers consistently single these out. The outdoor terrace faces the church piazza, which has a sunset view worth timing. The house wine is good and priced reasonably. There's a resident cat named Mimì who has her own fan base. The owner recommends daily specials enthusiastically — go with it.
+      </div>
+    </div>
+
+    <div class="resto">
+      <div class="resto-top">
+        <div class="resto-name">Kalma</div>
+        <div class="resto-stars">★★★★★ 4.9 &nbsp;·&nbsp; 356 reviews</div>
+      </div>
+      <div class="resto-tag">Dinner only — Tasting menu · Via Nolana, 162 · Open Wed–Sun from 7:30PM · Book ahead</div>
+      <div class="resto-body">
+        If you want one exceptional dinner on this stretch before you leave, this is it. Small, intimate, calm. <strong>Tasting menu "Open Your Mind" at €65pp</strong> — serious cooking, each dish built around local Campanian ingredients in creative combinations. Wine pairing available; ask for something from Vesuvius slopes (the Lacryma Christi DOC is grown on volcanic soil and worth drinking here of all places). Not a touristy restaurant — a genuinely good one that happens to be near Pompeii.
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:1.5rem">
+      <strong>Also:</strong> The town of Pompeii (modern, distinct from the ancient site) has a real food culture. The Sant'Anna pastry shop near Piazza Bartolo Longo does excellent sfogliatella (ricotta-filled pastry — if you haven't had one yet, now is the time). Grab one on your way back to the car.
+    </div>
+
+  </div>
+
+  <div class="fstrip"></div>
+
+  <!-- ── BEYOND ── -->
+  <div id="beyond">
+    <div class="sh"><div class="sh-n">06</div><div class="sh-t">Beyond Pompeii — <em>With Your Car</em></div></div>
+    <hr class="rule">
+
+    <div class="note">
+      You have a rental car. This changes everything. Three post-Pompeii options, ranked by effort vs. reward.
+    </div>
+
+    <div class="beyond">
+      <div class="beyond-n">A</div>
+      <div>
+        <div class="beyond-title">Oplontis — Villa Poppea (15 min · Torre Annunziata)</div>
+        <div class="beyond-body">
+          <strong>Highest reward, lowest effort.</strong> Directly on your route home to Castellammare. This is the villa believed to belong to <strong>Poppaea Sabina, Empress Nero's wife</strong> — and it's one of the finest Roman structures in existence. Enormous rooms, gardens, swimming pool, and frescoes in Second Pompeian Style that are better preserved than most of what you'll see inside Pompeii itself. Almost zero crowds. Many archaeologists consider this the more impressive site. <strong>Closed Tuesdays — open Wednesday onward, which is tomorrow.</strong> Combine with your Pompeii ticket (ask at the entrance about the combined "Pompeii+" pass). Allow 1.5 hours.
+        </div>
+      </div>
+    </div>
+
+    <div class="beyond">
+      <div class="beyond-n">B</div>
+      <div>
+        <div class="beyond-title">Mount Vesuvius — The Crater Rim (45 min drive · buy tickets tonight)</div>
+        <div class="beyond-body">
+          The most emotionally resonant thing you can do after Pompeii. Drive up the SS18 and the Vesuvius road toward the national park car park. From there: 3€ shuttle to the trailhead or 20-minute walk; then a 30-minute hike up loose volcanic gravel to the crater rim. <strong>You stand on the edge of the caldera that killed the city you just spent all day in.</strong> The views over the Bay of Naples, Capri, Castellammare, and the entire coastline you've been traveling are extraordinary — especially in late afternoon light. <strong>Book tickets online tonight at ticketvesuviolive.it</strong> — they sell out and cannot be purchased on-site. Tickets: €12. Allow 3 hours total. Don't go if it's windy; the trail closes.
+        </div>
+      </div>
+    </div>
+
+    <div class="beyond">
+      <div class="beyond-n">C</div>
+      <div>
+        <div class="beyond-title">Naples Archaeological Museum (40 min drive · best done as a separate day)</div>
+        <div class="beyond-body">
+          The MANN holds everything too precious to leave at Pompeii — the <strong>Alexander Mosaic original</strong>, the Secret Cabinet (Gabinetto Segreto) of erotic art now fully open to the public, the finest bronzes from Herculaneum, room after room of frescoes, mosaics, and sculpture. After Pompeii and Herculaneum, this museum will hit differently — you'll have context for everything in it. <strong>Probably best saved for a separate morning</strong> rather than tacked onto an already full day. If you have a flexible day left: this is the move.
+        </div>
+      </div>
+    </div>
+
+    <div class="beyond">
+      <div class="beyond-n">D</div>
+      <div>
+        <div class="beyond-title">Gragnano — The Pasta Town (20 min drive into the hills)</div>
+        <div class="beyond-body">
+          For food obsessives: the hillside town above Castellammare that has been producing dried pasta since the 16th century, and still does. The main street, <strong>Via Roma, was architecturally designed to funnel mountain wind through the town to air-dry pasta hanging from wooden racks</strong> — a design solution that predates modern food science by centuries. PGI-certified pasta. You can buy directly from producers: Pastificio Gentile and Pastificio Di Martino are both worth visiting. A different kind of archaeology — of food culture.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="div"><span>✦</span></div>
+
+  <!-- ── TIPS ── -->
+  <div id="tips">
+    <div class="sh"><div class="sh-n">07</div><div class="sh-t">Practical <em>Notes</em></div></div>
+    <hr class="rule">
+
+    <div class="tips">
+      <div class="tip">
+        <span class="tip-icon">🌡️</span>
+        <strong>Heat & Shade</strong>
+        Almost zero shade on-site. Hat, sunscreen, 1.5L water each minimum. There are water fountains inside (not many). The midday break isn't optional — it's survival.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">👟</span>
+        <strong>Footwear</strong>
+        Basalt paving stones, uneven and polished smooth. Real walking shoes. Not sandals, not new shoes. Your feet carry you through 5 hours of uneven Roman road.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">🗺️</span>
+        <strong>Navigation</strong>
+        Download the free <strong>Pompeii official app</strong> before you arrive — offline map, opening status for individual houses. The site is 66 hectares and signage is minimal. Without a map you will loop the same streets.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">🚗</span>
+        <strong>Parking</strong>
+        Via Villa dei Misteri, directly by the Porta Marina entrance. Multiple lots. €5–7 for the day. Have cash. The lots closest to the entrance fill up by 10AM.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">📖</span>
+        <strong>No Audio Guide Needed</strong>
+        This guide replaces it. The official audio guide covers roughly 20 stops with generic commentary. What you need is context, not narration — and you have it.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">🏛️</span>
+        <strong>Opening Hours</strong>
+        Park closes 7:30PM, last entry 6PM. Your 9AM entry is ideal — first two hours are notably less crowded. Don't leave everything for after lunch.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">📸</span>
+        <strong>Photography</strong>
+        Tripods not permitted without a permit. Photography is otherwise free throughout. The best light for the Villa dei Misteri frescoes is mid-afternoon when the room gets indirect western light.
+      </div>
+      <div class="tip">
+        <span class="tip-icon">⚡</span>
+        <strong>What to Skip</strong>
+        The gift shop inside the park (overpriced). The restaurant inside the park. The "official" souvenir street on Via Sacra just outside. Save your money and appetite for Spinelli and the Sant'Anna pastry shop.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-q">"They did not know they were making history. They thought they were just living."</div>
+  <div class="footer-c">Field Guide · Pompeii · May 27, 2026 · Made in Castellammare di Stabia</div>
+</div>
+
+<script>
+  // Particles
+  const pt = document.getElementById('pt');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'p';
+    const left = Math.random() * 100;
+    const delay = Math.random() * 14;
+    const dur = 9 + Math.random() * 11;
+    const dx = (Math.random() - 0.5) * 100 + 'px';
+    p.style.cssText = `left:${left}%;--dx:${dx};animation-delay:${delay}s;animation-duration:${dur}s;`;
+    pt.appendChild(p);
+  }
+</script>
+</body>
+</html>
