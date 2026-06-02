@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monday, June 1 — Baia Dive & Gaeta</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sea: #0d4f6e;
+    --deep: #071e2b;
+    --foam: #c8dfe8;
+    --sand: #e8d9c0;
+    --amber: #c9843c;
+    --rust: #9b3d1f;
+    --pale: #f4efe6;
+    --muted: #8a9ba8;
+    --ink: #1a2830;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--deep);
+    color: var(--pale);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated water background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 120% 80% at 20% 110%, rgba(13,79,110,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 80% -10%, rgba(7,30,43,0.8) 0%, transparent 50%),
+      linear-gradient(160deg, #071e2b 0%, #0a3347 40%, #071e2b 100%);
+    z-index: -2;
+  }
+
+  /* Subtle wave lines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 48px,
+      rgba(200,223,232,0.03) 48px,
+      rgba(200,223,232,0.03) 50px
+    );
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 72px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .date-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: clamp(2.2rem, 7vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--foam);
+    margin-bottom: 12px;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: var(--sand);
+  }
+
+  .route-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .route-line::before, .route-line::after {
+    content: '';
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--muted));
+  }
+  .route-line::after {
+    background: linear-gradient(to left, transparent, var(--muted));
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 68px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(200,223,232,0.2) 10%, rgba(200,223,232,0.2) 90%, transparent);
+  }
+
+  .block {
+    display: grid;
+    grid-template-columns: 68px 1fr;
+    gap: 0 28px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .block:nth-child(1) { animation-delay: 0.1s; }
+  .block:nth-child(2) { animation-delay: 0.2s; }
+  .block:nth-child(3) { animation-delay: 0.3s; }
+  .block:nth-child(4) { animation-delay: 0.4s; }
+  .block:nth-child(5) { animation-delay: 0.5s; }
+  .block:nth-child(6) { animation-delay: 0.6s; }
+  .block:nth-child(7) { animation-delay: 0.7s; }
+  .block:nth-child(8) { animation-delay: 0.8s; }
+
+  .time-col {
+    text-align: right;
+    padding-top: 4px;
+    position: relative;
+  }
+
+  .time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    display: block;
+  }
+
+  .time-col::after {
+    content: '';
+    position: absolute;
+    right: -34px;
+    top: 9px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--sea);
+    border: 2px solid var(--foam);
+    box-shadow: 0 0 0 3px rgba(200,223,232,0.1);
+  }
+
+  .hero-dot .time-col::after {
+    background: var(--amber);
+    border-color: var(--amber);
+    width: 14px;
+    height: 14px;
+    right: -36px;
+    top: 7px;
+    box-shadow: 0 0 0 4px rgba(201,132,60,0.2), 0 0 12px rgba(201,132,60,0.4);
+  }
+
+  .content {
+    border-left: none;
+    padding-bottom: 4px;
+  }
+
+  .block-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .block-title {
+    font-size: 1.45rem;
+    font-weight: 400;
+    color: var(--foam);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .block-title strong {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .block-desc {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: rgba(244,239,230,0.75);
+    margin-bottom: 14px;
+  }
+
+  /* TIPS & GEMS */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+  }
+
+  .pill-tip {
+    background: rgba(13,79,110,0.5);
+    border: 1px solid rgba(200,223,232,0.2);
+    color: var(--foam);
+  }
+
+  .pill-gem {
+    background: rgba(201,132,60,0.15);
+    border: 1px solid rgba(201,132,60,0.35);
+    color: var(--amber);
+  }
+
+  .pill-warn {
+    background: rgba(155,61,31,0.15);
+    border: 1px solid rgba(155,61,31,0.4);
+    color: #e07050;
+  }
+
+  /* FEATURE CARD — DIVE */
+  .dive-card {
+    background: linear-gradient(135deg, rgba(13,79,110,0.4), rgba(7,30,43,0.6));
+    border: 1px solid rgba(200,223,232,0.15);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dive-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(200,223,232,0.015) 20px,
+      rgba(200,223,232,0.015) 22px
+    );
+  }
+
+  .dive-card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .dive-card p {
+    font-size: 0.95rem;
+    color: rgba(244,239,230,0.8);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* INFO ROW */
+  .info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .info-item {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+
+  .info-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .info-val {
+    font-size: 1rem;
+    color: var(--foam);
+    font-weight: 400;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 60px 0 52px;
+    animation: fadeUp 0.6s ease both;
+    animation-delay: 0.35s;
+  }
+
+  .section-divider span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(200,223,232,0.12);
+  }
+
+  /* GAETA CARD */
+  .arrival-card {
+    background: linear-gradient(135deg, rgba(201,132,60,0.12), rgba(155,61,31,0.08));
+    border: 1px solid rgba(201,132,60,0.2);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+  }
+
+  /* RESTAURANT GRID */
+  .resto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .resto-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .resto-name {
+    font-size: 1rem;
+    color: var(--sand);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .resto-desc {
+    font-size: 0.85rem;
+    color: rgba(244,239,230,0.55);
+    font-weight: 300;
+    line-height: 1.5;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+
+  .stars {
+    color: var(--amber);
+    font-size: 10px;
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(200,223,232,0.08);
+    animation: fadeUp 0.6s ease both;
+    animation-delay: 0.9s;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 540px) {
+    .timeline::before { left: 52px; }
+    .block { grid-template-columns: 52px 1fr; gap: 0 18px; }
+    .time-col::after { right: -24px; }
+    .hero-dot .time-col::after { right: -26px; }
+    .resto-grid { grid-template-columns: 1fr; }
+    .info-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <p class="date-label">Your Day Guide · Monday, June 2</p>
+    <h1>Baia <em>to</em> Gaeta</h1>
+    <p class="route-line">Naples → Campi Flegrei → Baia → Gaeta</p>
+  </header>
+
+  <div class="timeline">
+
+    <!-- BLOCK 1 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">7:30<br>AM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Morning · Naples</p>
+        <h2 class="block-title"><strong>Fuel up before you go</strong></h2>
+        <p class="block-desc">Eat a proper breakfast before the drive — you'll want energy before a dive. Head to any bar in your neighbourhood for a cornetto and a real Neapolitan espresso standing at the counter. Avoid a big meal: diving on a full stomach is uncomfortable.</p>
+        <div class="pills">
+          <span class="pill pill-warn">⚠ No heavy food before diving</span>
+          <span class="pill pill-tip">💡 Light meal only — cornetto, yogurt, fruit</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 2 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">8:15<br>AM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Drive · ~40 min</p>
+        <h2 class="block-title"><strong>Naples → Bacoli</strong> via Pozzuoli</h2>
+        <p class="block-desc">Take the SS7 Quater / Tangenziale west toward Pozzuoli then follow signs for Bacoli and Baia. The drive takes you through the Campi Flegrei — the great volcanic caldera that rings Naples to the west. Windows down: the air will smell faintly of sulfur as you pass Pozzuoli. Pack your luggage in the car now so you drive straight on to Gaeta after diving.</p>
+        <div class="pills">
+          <span class="pill pill-tip">🚗 Leave bags packed — direct drive to Gaeta after</span>
+          <span class="pill pill-tip">📍 Park at the beach lot north of the dive centre</span>
+          <span class="pill pill-gem">✨ Walk through the pedestrian tunnel under the rail line to reach the dive centre</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 3 — HERO -->
+    <div class="block hero-dot">
+      <div class="time-col">
+        <span class="time">10:00<br>AM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Main Event · Bacoli</p>
+        <h2 class="block-title"><strong>Underwater Archaeological Park</strong> of Baia</h2>
+
+        <div class="dive-card">
+          <p class="dive-card-title">🤿 What you're diving into</p>
+          <p>Baia was the greatest luxury resort of ancient Rome — emperors, senators, and poets kept villas here on the volcanic shoreline. Around the 4th–8th centuries AD, bradyseism (volcanic ground movement) slowly submerged the entire city beneath the bay. Today a Roman street grid, mosaic floors, statues, and the nymphaeum of Emperor Claudius lie 3–7 metres underwater. You'll swim through rooms that Caesar, Cicero, and Hadrian once walked.</p>
+        </div>
+
+        <div class="info-row">
+          <div class="info-item">
+            <p class="info-label">Depth</p>
+            <p class="info-val">3–7 m</p>
+          </div>
+          <div class="info-item">
+            <p class="info-label">Visibility</p>
+            <p class="info-val">Varies · best in calm mornings</p>
+          </div>
+          <div class="info-item">
+            <p class="info-label">Duration</p>
+            <p class="info-val">~45–60 min per dive</p>
+          </div>
+          <div class="info-item">
+            <p class="info-label">Contact</p>
+            <p class="info-val">+39 349 497 4183</p>
+          </div>
+        </div>
+
+        <div class="pills" style="margin-top:16px;">
+          <span class="pill pill-gem">✨ Look for the mosaic floors — undisturbed Roman originals</span>
+          <span class="pill pill-gem">✨ The Nymphaeum of Claudius: a submerged banqueting hall</span>
+          <span class="pill pill-tip">💡 Mornings give the best light through the water</span>
+          <span class="pill pill-tip">💡 Ask guides about specific statue locations — some are replicas in situ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 4 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">12:30<br>PM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Optional · Bacoli</p>
+        <h2 class="block-title"><strong>Castello Aragonese di Baia</strong> — 30 min stop</h2>
+        <p class="block-desc">If you have energy after diving, this clifftop Aragonese castle is a 5-minute drive and houses a remarkable museum of Roman artefacts from the submerged city — including original statues recovered from the bay. Open Tue/Thu–Sun 9am–5:30pm. Skip if you're tired and hungry — Gaeta is the better use of your afternoon.</p>
+        <div class="pills">
+          <span class="pill pill-tip">💡 Open Tuesday, Thursday–Sunday only</span>
+          <span class="pill pill-gem">✨ Originals of statues you'll have just swum past</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 5 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">1:30<br>PM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Lunch · Bacoli / Pozzuoli</p>
+        <h2 class="block-title">Seafood lunch on the water</h2>
+        <p class="block-desc">The Bacoli waterfront and nearby Pozzuoli port have excellent, unpretentious seafood trattorias. Look for a place with tables outside near the marina and order <em>spaghetti alle vongole</em> or <em>frittura di paranza</em> (mixed fried seafood). You're in one of the most active fishing ports near Naples — the quality is exceptional and prices are local. Budget ~€15–20 per person.</p>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Pozzuoli fish market port has terrace trattorias with incredible views</span>
+          <span class="pill pill-tip">💡 Ask for <em>vino sfuso</em> — local house wine poured from a jug</span>
+          <span class="pill pill-warn">⚠ Avoid tourist menus with photos outside</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="section-divider">
+      <span>Drive north · 1h 20min on the coast</span>
+    </div>
+
+    <!-- BLOCK 6 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">3:00<br>PM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Drive · ~1h 20 min</p>
+        <h2 class="block-title"><strong>Baia → Gaeta</strong> — the coastal road</h2>
+        <p class="block-desc">Take the SS7 Appia north via Formia then cut across to Gaeta. Alternatively, for the scenic route: join the Via Domiziana (SS7bis) which hugs the Tyrrhenian coast the entire way — the drive passes through Lago Patria, the Gulf of Gaeta, and arrives from the south with views of the peninsula. Add 20 minutes but it's worth it on a clear afternoon.</p>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Via Domiziana coastal route: sea on your right the whole way</span>
+          <span class="pill pill-tip">💡 Stop at Serapo beach viewpoint just before Gaeta for your first view of the peninsula</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 7 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">4:30<br>PM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Arrival · Gaeta</p>
+
+        <div class="arrival-card">
+          <p class="block-category" style="color:var(--amber);">Your Base for Two Nights</p>
+          <h2 class="block-title" style="color:var(--sand);">Welcome to Gaeta</h2>
+          <p class="block-desc">Gaeta is one of Lazio's great secrets — a medieval fortified peninsula jutting into its own crystal gulf, with Roman ruins on one side and a glittering beach on the other. Check in, drop the bags, and feel the shift from Naples' intensity to something much quieter.</p>
+        </div>
+
+        <p class="block-desc">After checking in, walk the <strong>Passeggiata di Gaeta Medievale</strong> — the old town is a single narrow promontory of lanes, arches, and stairways climbing between two seas. The light in late afternoon is extraordinary. Take the main coastal road into the medieval quarter and walk north toward the cathedral.</p>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Cathedral of Sant'Erasmo: split columns from an earthquake in 1231, said to have occurred at the moment of Christ's death</span>
+          <span class="pill pill-gem">✨ Climb to any terrace for views of both sides of the peninsula simultaneously</span>
+          <span class="pill pill-tip">💡 The old town is best explored on foot — car parks are outside</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 8 -->
+    <div class="block">
+      <div class="time-col">
+        <span class="time">7:00<br>PM</span>
+      </div>
+      <div class="content">
+        <p class="block-category">Sundowner · Gaeta</p>
+        <h2 class="block-title">Aperitivo then <strong>dinner</strong></h2>
+        <p class="block-desc">Walk the lungomare for an Aperol Spritz as the sun drops behind Monte Orlando. Then choose your dinner — Gaeta has an outstanding local food scene for a town this size.</p>
+
+        <div class="resto-grid">
+          <div class="resto-card">
+            <p class="resto-name">Bless Gaeta</p>
+            <p class="resto-desc">Fine dining wine bar, hidden down Via dell'Indipendenza. Chef Francesca's rotating seasonal menu — the best cooking in town. Book ahead.</p>
+            <p class="stars">★★★★★</p>
+          </div>
+          <div class="resto-card">
+            <p class="resto-name">Osteria Il Ritrovo</p>
+            <p class="resto-desc">Baccalà specialists — 12 preparations of salt cod. Tiny, beloved, lungomare location. Possibly the freshest fish in Gaeta.</p>
+            <p class="stars">★★★★★</p>
+          </div>
+          <div class="resto-card">
+            <p class="resto-name">Dolia</p>
+            <p class="resto-desc">Contemporary Mediterranean in Piazza Conca, old town. Sleek modern interior, exceptional local ingredients. Great wine list.</p>
+            <p class="stars">★★★★½</p>
+          </div>
+          <div class="resto-card">
+            <p class="resto-name">Local <em>tiella</em></p>
+            <p class="resto-desc">Gaeta's signature dish: a sealed pastry filled with octopus, greens or escarole. Buy a slice from a bakery — not to miss.</p>
+            <p class="stars">✨ Hidden gem</p>
+          </div>
+        </div>
+
+        <div class="pills" style="margin-top:16px;">
+          <span class="pill pill-warn">⚠ Bless and Il Ritrovo: book a table today</span>
+          <span class="pill pill-gem">✨ After dinner: gelato at Gelateria Il Molo on the seafront</span>
+          <span class="pill pill-tip">💡 The old town is magical at night — quieter, lit by warm lanterns</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end timeline -->
+
+  <footer>
+    <p>Monday, June 2 · Naples → Campi Flegrei → Baia → Gaeta · ~120 km total</p>
+  </footer>
+
+</div>
+</body>
+</html>

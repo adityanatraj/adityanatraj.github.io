@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta → Terracina · June 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300;1,9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f2ea;
+    --paper: #fdf9f3;
+    --ink: #1a1208;
+    --brown: #5c3d1e;
+    --amber: #b8722a;
+    --amber-light: #d4924a;
+    --olive: #5a6040;
+    --rust: #8b3a1c;
+    --muted: #8a7a68;
+    --rule: rgba(92,61,30,0.15);
+    --cream-dark: #ede5d5;
+    --extension: #2d4a35;
+    --extension-bg: rgba(45,74,53,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: var(--ink);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--rust), var(--amber), var(--olive), var(--amber), var(--rust));
+  }
+
+  .header-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .dateline {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dateline::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--amber);
+  }
+
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(2.6rem, 7vw, 4.2rem);
+    font-weight: 300;
+    color: #fdf9f3;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  h1 .arrow {
+    color: var(--amber);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  h1 .dest {
+    font-style: italic;
+  }
+
+  .header-sub {
+    margin-top: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: rgba(253,249,243,0.55);
+    max-width: 520px;
+    line-height: 1.55;
+  }
+
+  /* ─── BODY ─── */
+  .page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  /* ─── SECTION LABEL ─── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 44px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ─── STOP BLOCK ─── */
+  .stop {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0 22px;
+    margin-bottom: 2px;
+    position: relative;
+  }
+
+  .stop + .stop {
+    padding-top: 28px;
+  }
+
+  .stop + .stop::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 0;
+    height: 28px;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .stop-left {
+    text-align: right;
+    padding-top: 3px;
+    position: relative;
+  }
+
+  .stop-left::after {
+    content: '';
+    position: absolute;
+    right: -30px;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+
+  .stop.extension .stop-left::after {
+    background: var(--extension);
+  }
+
+  .time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+
+  .stop-right {
+    padding-left: 8px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 28px;
+  }
+
+  .stop:last-child .stop-right {
+    border-bottom: none;
+  }
+
+  .stop-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--olive);
+    margin-bottom: 4px;
+  }
+
+  .stop.extension .stop-cat {
+    color: var(--extension);
+  }
+
+  .stop-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .stop-title em {
+    font-weight: 300;
+    font-style: italic;
+    color: var(--brown);
+  }
+
+  .stop-body {
+    font-size: 0.97rem;
+    color: #3a2d1f;
+    line-height: 1.68;
+  }
+
+  .stop-body p + p {
+    margin-top: 8px;
+  }
+
+  /* ─── FOOD ITEMS ─── */
+  .buy-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .buy-item {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 5px 5px 0;
+    padding: 10px 13px;
+  }
+
+  .buy-item.goat {
+    border-left-color: var(--olive);
+  }
+
+  .buy-item.sausage {
+    border-left-color: var(--rust);
+  }
+
+  .buy-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .buy-detail {
+    font-size: 0.87rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ─── PILLS ─── */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.07em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    line-height: 1.4;
+  }
+
+  .pill-note {
+    background: rgba(184,114,42,0.1);
+    color: var(--rust);
+    border: 1px solid rgba(184,114,42,0.3);
+  }
+
+  .pill-knee {
+    background: rgba(26,61,82,0.08);
+    color: #1a3d52;
+    border: 1px solid rgba(26,61,82,0.2);
+  }
+
+  .pill-ext {
+    background: var(--extension-bg);
+    color: var(--extension);
+    border: 1px solid rgba(45,74,53,0.3);
+  }
+
+  /* ─── EXTENSION CALLOUT ─── */
+  .extension-banner {
+    background: var(--extension-bg);
+    border: 1px solid rgba(45,74,53,0.2);
+    border-left: 3px solid var(--extension);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 18px;
+    margin: 28px 0 0;
+  }
+
+  .ext-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--extension);
+    margin-bottom: 8px;
+  }
+
+  .ext-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .ext-body {
+    font-size: 0.92rem;
+    color: #2d3d2a;
+    line-height: 1.6;
+  }
+
+  /* ─── HOTEL CARD ─── */
+  .hotel-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin-top: 10px;
+  }
+
+  .hotel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    margin-bottom: 10px;
+  }
+
+  .hotel-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fdf9f3;
+    margin-bottom: 4px;
+  }
+
+  .hotel-address {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(253,249,243,0.5);
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .hotel-desc {
+    font-size: 0.92rem;
+    color: rgba(253,249,243,0.75);
+    line-height: 1.6;
+  }
+
+  /* ─── DIVIDER ─── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 36px 0;
+  }
+
+  /* ─── EXTENSION SECTION ─── */
+  .ext-section {
+    background: var(--extension-bg);
+    border: 1px solid rgba(45,74,53,0.18);
+    border-radius: 10px;
+    padding: 28px 28px;
+    margin-top: 44px;
+  }
+
+  .ext-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--extension);
+    margin-bottom: 8px;
+  }
+
+  .ext-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .ext-intro {
+    font-size: 0.95rem;
+    color: #2a3a27;
+    line-height: 1.68;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .ext-stop {
+    border-top: 1px solid rgba(45,74,53,0.15);
+    padding: 18px 0 0;
+    margin-top: 18px;
+  }
+
+  .ext-stop-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--extension);
+    margin-bottom: 5px;
+  }
+
+  .ext-stop-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .ext-stop-body {
+    font-size: 0.92rem;
+    color: #2d3d2a;
+    line-height: 1.65;
+  }
+
+  .time-cost {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    color: var(--extension);
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <p class="dateline">Wednesday, June 3 · Day Plan</p>
+    <h1>Gaeta <span class="arrow">→</span> <span class="dest">Terracina</span></h1>
+    <p class="header-sub">A slow drive north through the best food corridor in Lazio. No rush. Buy things. Eat things. Arrive by evening with a car full of what Rome can't give you.</p>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- MORNING -->
+  <p class="section-label">Morning · Gaeta</p>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">9:00<br>AM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Checkout</p>
+      <h2 class="stop-title">Grand Hotel Le Rocce — <em>pack and leave unhurried</em></h2>
+      <div class="stop-body">
+        <p>Checkout by 10:30. Load the car. Nothing urgent today — Terracina is 75 minutes north without stops, and the hotel won't need you until 3pm. You have the whole day to spend.</p>
+        <p>Before leaving Gaeta: if you didn't get to a forno yesterday, pick up a piece of tiella for the road. It travels well and you won't find it again.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-knee">🦵 Entirely flat — hotel to car</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FONDI -->
+  <p class="section-label">Late Morning · Fondi</p>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">10:30<br>AM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Dairy · Caseificio</p>
+      <h2 class="stop-title">Caseificio Paolella — <em>the first buffalo mozzarella dairy in Fondi</em></h2>
+      <div class="stop-body">
+        <p>Drive north on the SS7 or Via Flacca (see note below). Fondi is 20 minutes from Gaeta. Turn off to the Paolella dairy on Via Pantanello — a roadside caseificio, no ceremony. This family opened the first buffalo dairy in the Fondi area in 1933, bringing the tradition up from Campania when the drained Pontine marshes proved perfect for buffalo. Still family-run. Production happens in the morning so you arrive when everything is freshest.</p>
+        <p>What to buy: mozzarella di bufala (eat one immediately in the car park), ricotta di bufala (richer and more complex than cow's milk ricotta), burrata if they have it, and ask about the caciotta di bufala stagionata — a semi-aged buffalo cheese with nothing like it in a supermarket.</p>
+      </div>
+      <div class="buy-list">
+        <div class="buy-item">
+          <p class="buy-name">Mozzarella di Bufala DOP</p>
+          <p class="buy-detail">Eat one on the spot. Freshness window is hours, not days. Buy extra to take to Rome.</p>
+        </div>
+        <div class="buy-item goat">
+          <p class="buy-name">Ricotta di Bufala</p>
+          <p class="buy-detail">Denser, creamier, more mineral than cow's milk. Ask for it fresh. Keeps 2–3 days.</p>
+        </div>
+        <div class="buy-item goat">
+          <p class="buy-name">Caciotta di Bufala Stagionata</p>
+          <p class="buy-detail">Semi-aged. Travels. Excellent with the coriander sausage you'll buy in an hour.</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">📍 Via Pantanello s.n., Fondi · +39 0771 511528</span>
+        <span class="pill pill-note">⏰ Mornings only · Closes early afternoon</span>
+        <span class="pill pill-knee">🦵 Roadside stop — flat, drive-in</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">11:15<br>AM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Salumeria · Fondi</p>
+      <h2 class="stop-title">Coriander sausage — <em>Salsiccia di Monte San Biagio</em></h2>
+      <div class="stop-body">
+        <p>Back through Fondi town centre to any good macelleria (butcher). This sausage — PAT-protected, made only in this province — is pork seasoned with coriander, Moscato di Terracina wine, red pepper and chilli, smoked over mastic and myrtle wood. The coriander tradition comes from the Saracens, who used the spice to mask pork and make it permissible under Islamic dietary law. It is genuinely unlike any sausage you have eaten before.</p>
+        <p>Three forms available: <strong>fresh</strong> (eat tonight), <strong>dry-cured</strong> (travels to Rome and beyond), <strong>preserved in olive oil or lard</strong> (brings home). Buy all three if possible.</p>
+      </div>
+      <div class="buy-list">
+        <div class="buy-item sausage">
+          <p class="buy-name">Salsiccia Fresca al Coriandolo</p>
+          <p class="buy-detail">Fresh — cook or eat tonight. Ask the hotel restaurant if they'll prepare it for you.</p>
+        </div>
+        <div class="buy-item sausage">
+          <p class="buy-name">Salsiccia Secca al Coriandolo</p>
+          <p class="buy-detail">Dry-cured — takes the journey home. The format that travels.</p>
+        </div>
+        <div class="buy-item sausage">
+          <p class="buy-name">Salsiccia Sott'Olio</p>
+          <p class="buy-detail">Preserved in olive oil. Sealed jars travel internationally. Outstanding gift.</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">🏪 Any macelleria in Fondi centre — ask for "salsiccia al coriandolo"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTIONAL ITRI EXTENSION — shown inline here, full section at bottom -->
+  <div class="extension-banner">
+    <p class="ext-label">⊕ Optional Extension</p>
+    <p class="ext-title">Itri detour — 25 min from Fondi</p>
+    <p class="ext-body">If you want Marzolina goat cheese, Colline Pontine DOP olive oil direct from a frantoio, and the coriander salami from Itri specifically (a slightly different producer tradition), the full extension is detailed at the bottom of this plan. Adds roughly 1 hour total to the day. The road through Itri rejoins the SS7 toward Terracina cleanly.</p>
+    <div class="pills" style="margin-top: 10px;">
+      <span class="pill pill-ext">↓ See Itri Extension section below</span>
+      <span class="pill pill-knee">🦵 Itri old town involves a hill — buy from the valley shops, not the hilltop</span>
+    </div>
+  </div>
+
+  <!-- VIA FLACCA NOTE -->
+  <p class="section-label">En Route · Via Flacca</p>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">12:15<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Scenic Road · Mozzarella Shacks</p>
+      <h2 class="stop-title">Via Flacca north — <em>roadside buffalo stops</em></h2>
+      <div class="stop-body">
+        <p>From Fondi, take the Via Flacca (SS213) rather than the inland SS7. It's the coastal road, slower but far more beautiful — clifftop views of the Tyrrhenian, sea caves, and the approach to Terracina from the water side is spectacular.</p>
+        <p>Along this road between Fondi and Terracina you will pass informal roadside mozzarella shacks — small operations selling direct from farms, often a handwritten sign and a cooler. Stop at any that look active. No ceremony, no English required. Point at what you want. These are often even fresher than the caseificio and cost almost nothing.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">🧀 Stop on impulse — no planning needed</span>
+        <span class="pill pill-knee">🦵 Pull-off stops, entirely flat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERRACINA ARRIVAL -->
+  <p class="section-label">Afternoon · Terracina</p>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">1:15<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Lunch · Lower Town</p>
+      <h2 class="stop-title">Terracina lower town — <em>first look, then eat</em></h2>
+      <div class="stop-body">
+        <p>Enter Terracina from the south, park in the lower town near the seafront (flat, easy). The lower town is built directly on Roman foundations — the original Via Appia stone cuts are visible in the cliff face along the approach; look for Roman numerals carved into the rock. Piazza del Municipio (the Aemilian Forum) is five minutes' walk and flat.</p>
+        <p>Lunch on the seafront — ask for the local specialty: pasta con le telline (tiny clams specific to this stretch of coast), or the frittura di paranza (fried mixed small fish from the morning catch). Simple fish restaurants all along the lungomare. Il Granchio is the most recommended local name; equally, walk until something looks right.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">🐟 Telline are tiny; ask to confirm they're local, not imported</span>
+        <span class="pill pill-knee">🦵 Lower town entirely flat — Roman grid layout</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">3:00<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Drive · Optional Excursion</p>
+      <h2 class="stop-title">Temple of Jupiter Anxur — <em>if the knees allow</em></h2>
+      <div class="stop-body">
+        <p>Drive up (do not walk — it's a long climb). Park at the top near the archaeological zone. The temple is a 1st-century BC Republican sanctuary 210 metres above the city — from here you can see the entire Gulf of Gaeta to the south and the Circeo promontory to the north. On a clear June afternoon it is one of the finest views in Lazio.</p>
+        <p>The site itself is not extensively maintained — the structures are an honest ruin rather than a polished museum — but the vaulted substructures (cryptoporticus) are extraordinary and unlike anything in Rome. Budget 30–45 minutes. Entry around €10.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">🚗 Drive up, don't walk — the road up is Via San Francesco Nuova</span>
+        <span class="pill pill-knee">🦵 Uneven ground inside the site — take your time, no steps required</span>
+        <span class="pill pill-note">⏰ Open Tue–Sun, closes 7:30pm</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">4:30<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Wine · Enoteca</p>
+      <h2 class="stop-title">Moscato di Terracina DOC — <em>the local white in its hometown</em></h2>
+      <div class="stop-body">
+        <p>Stop at any enoteca or good alimentari in the lower town and pick up a bottle of Moscato di Terracina. This is a dry-to-off-dry white made from a local cultivar of Moscato Bianco — nothing like the sweet Asti version. Coastal, mineral, slightly aromatic. You are in the only place it's made; it costs almost nothing here and you will not find it in Rome.</p>
+      </div>
+      <div class="buy-list">
+        <div class="buy-item">
+          <p class="buy-name">Moscato di Terracina DOC Secco or Abboccato</p>
+          <p class="buy-detail">"Secco" is dry, "abboccato" is off-dry. Both work. Producers: Sant'Andrea or Cincinnato cooperative are the main names.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKIN -->
+  <div class="stop">
+    <div class="stop-left"><span class="time">5:30<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Check-in</p>
+      <h2 class="stop-title">Hotel Ristorante Centosedici</h2>
+      <div class="hotel-card">
+        <p class="hotel-label">Your hotel tonight · Beachfront</p>
+        <p class="hotel-name">Hotel Ristorante Centosedici</p>
+        <p class="hotel-address">Viale Circe 116, 04019 Terracina · +39 0773 731501</p>
+        <p class="hotel-desc">Beachfront, balconies with sea views, own restaurant rated highly for fresh seafood. Score 8.8 from 1,000+ verified guests. Restaurant is closed Mondays — but today is Wednesday so you're fine. If you bought fresh coriander sausage today, ask when you check in whether the kitchen will cook it for you — many small Italian hotel-restaurants will do this willingly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENING -->
+  <p class="section-label">Evening · Terracina</p>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">7:00<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Seafront Walk</p>
+      <h2 class="stop-title">Lungomare at golden hour — <em>Moscato, sea air, end of trip</em></h2>
+      <div class="stop-body">
+        <p>The Terracina seafront at 7pm in June is one of those Italian hours. Walk it slowly. The Temple of Jupiter is lit against the sky above the town. The fishing boats are returning. Open the Moscato you bought this afternoon.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-knee">🦵 Flat promenade — as easy as it gets</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stop">
+    <div class="stop-left"><span class="time">8:30<br>PM</span></div>
+    <div class="stop-right">
+      <p class="stop-cat">Dinner</p>
+      <h2 class="stop-title">Ristorante Centosedici — <em>or walk five minutes to the old town</em></h2>
+      <div class="stop-body">
+        <p>The hotel restaurant is genuinely good — fresh fish, seafood pasta, reviewed warmly for quality. It's also immediately convenient after a day of driving and buying. If you want to venture out: Piazza del Municipio (the old Roman forum) has restaurants with outdoor tables directly on the ancient square. Eating dinner in a Roman forum in a town nobody outside Italy visits — that's the Terracina proposition.</p>
+      </div>
+      <div class="pills">
+        <span class="pill pill-note">🍝 Order the pasta alle telline if it's on the board</span>
+        <span class="pill pill-note">🧀 The caciotta di bufala from today pairs with anything</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ITRI EXTENSION ── -->
+  <div class="ext-section">
+    <p class="ext-section-label">⊕ Optional Extension — adds ~1 hour to the day</p>
+    <h2 class="ext-section-title">The Itri Detour</h2>
+    <p class="ext-intro">From Fondi, instead of heading straight up the Via Flacca, you take a 15-minute inland loop through Itri before rejoining the coast road north of Sperlonga. Three specific things justify this detour that you cannot get anywhere else on the route.</p>
+
+    <div class="ext-stop">
+      <p class="ext-stop-meta">Stop 1 · Itri valley — Frantoio</p>
+      <h3 class="ext-stop-title">Colline Pontine DOP Olive Oil</h3>
+      <p class="ext-stop-body">The Itrana olive — the same cultivar as the Gaeta black olive you've been eating — produces a DOP-certified oil specific to this valley. It's intensely grassy, peppery, and vegetal in a way bottled oil never is. Look for a frantoio (mill) or cooperative selling direct on the road into Itri from Fondi — any local can point you to one. The oil is pressed from Itrana olives grown on the hillsides you can see from the road. Buy the largest bottle you can carry home.</p>
+      <div class="time-cost">
+        <span>⏱ 15 min stop</span>
+        <span>🦵 Valley road — flat</span>
+      </div>
+    </div>
+
+    <div class="ext-stop">
+      <p class="ext-stop-meta">Stop 2 · Itri macelleria</p>
+      <h3 class="ext-stop-title">Salamino al Coriandolo from Itri</h3>
+      <p class="ext-stop-body">Itri has its own tradition of coriander salami — slightly different from the Monte San Biagio sausage (different cure, smaller format). The Gambero Rosso specifically cited the Itri coriander salami as exceptional, paired with the local Viognier. A good macelleria in the lower part of Itri (avoid the hilltop unless your knees are excellent today) will have it alongside the broader range of salsiccia al coriandolo. If you only bought fresh sausage in Fondi, this is the place to add the dry-cured format for travel.</p>
+      <div class="time-cost">
+        <span>⏱ 20 min stop</span>
+        <span>🦵 Stay in the lower valley — do not climb the old town</span>
+      </div>
+    </div>
+
+    <div class="ext-stop">
+      <p class="ext-stop-meta">Stop 3 · Monte San Biagio (optional add)</p>
+      <h3 class="ext-stop-title">Marzolina Goat Cheese</h3>
+      <p class="ext-stop-body">Monte San Biagio is a small hill town 10 minutes from Itri. Marzolina is the only goat cheese made from the local herd here — set in traditional basket moulds, small and intense. It exists almost nowhere else, even in Rome. The best approach is to ask in any alimentari in the lower part of the town, or at the Itri macelleria (who may stock it). It's seasonal and small-production so it's not guaranteed — but if you find it, it's the rarest thing you'll bring home from this entire stretch.</p>
+      <div class="time-cost">
+        <span>⏱ 20 min if you find it quickly</span>
+        <span>🦵 Ask at lower town shops — don't climb unnecessarily</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(45,74,53,0.15);">
+      <p class="ext-stop-body"><strong>Rejoining the route:</strong> from Monte San Biagio or Itri, take the SP21 west toward the coast and pick up the Via Flacca north toward Terracina. You pass just above Sperlonga on this road — you'll see it below on the cliff and understand exactly why you made the right call not staying there. Total extension adds roughly 25km and 55–65 minutes to the drive, not counting stops.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>June 3 · Gaeta → Fondi → Terracina</p>
+    <p>Hotel Centosedici · Viale Circe 116</p>
+  </footer>
+
+</div>
+</body>
+</html>

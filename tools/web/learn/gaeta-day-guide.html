@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta — June 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terracotta: #c2582a;
+    --rust: #9b3a15;
+    --warm-white: #faf5ee;
+    --cream: #f2e8d8;
+    --ink: #1c1208;
+    --stone: #7a6a58;
+    --gold: #c8902e;
+    --sea-dark: #1a3d52;
+    --sea-mid: #2e6580;
+    --sea-light: #9dc4d4;
+    --sage: #6b7c5c;
+    --muted: #9a8878;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--warm-white);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    background-color: var(--sea-dark);
+    color: var(--cream);
+    padding: 56px 32px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .masthead::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 40px;
+    background: var(--warm-white);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .masthead::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 140% 60% at 80% 120%, rgba(46,101,128,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at -10% 50%, rgba(26,61,82,0.6) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .masthead-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .date-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sea-light);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--sea-light);
+  }
+
+  .masthead-sub {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: rgba(242,232,216,0.7);
+    margin-top: 12px;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── INTRO ── */
+  .intro {
+    padding: 40px 0 32px;
+    border-bottom: 1px solid rgba(122,106,88,0.2);
+    margin-bottom: 40px;
+  }
+
+  .intro p {
+    font-size: 1.15rem;
+    color: var(--stone);
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(194,88,42,0.25);
+  }
+
+  /* ── TIME BLOCKS ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .block {
+    display: grid;
+    grid-template-columns: 68px 1fr;
+    gap: 0 20px;
+    padding: 0 0 32px;
+    position: relative;
+  }
+
+  .block:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 28px;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(122,106,88,0.25), rgba(122,106,88,0.08));
+  }
+
+  .time-col {
+    text-align: right;
+    padding-top: 2px;
+    position: relative;
+  }
+
+  .time-col::after {
+    content: '';
+    position: absolute;
+    right: -26px;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    border: 2px solid var(--warm-white);
+    box-shadow: 0 0 0 1px rgba(194,88,42,0.3);
+  }
+
+  .time {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.3;
+    letter-spacing: 0.05em;
+  }
+
+  .content {
+    padding-left: 6px;
+  }
+
+  .block-cat {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 5px;
+  }
+
+  .block-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .block-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--stone);
+  }
+
+  .block-body {
+    font-size: 0.97rem;
+    color: #3d3025;
+    line-height: 1.68;
+  }
+
+  /* ── PILLS ── */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .pill-gem {
+    background: rgba(200,144,46,0.12);
+    color: var(--rust);
+    border: 1px solid rgba(200,144,46,0.35);
+  }
+
+  .pill-tip {
+    background: rgba(107,124,92,0.1);
+    color: var(--sage);
+    border: 1px solid rgba(107,124,92,0.3);
+  }
+
+  .pill-warn {
+    background: rgba(194,88,42,0.1);
+    color: var(--terracotta);
+    border: 1px solid rgba(194,88,42,0.3);
+  }
+
+  .pill-sea {
+    background: rgba(26,61,82,0.1);
+    color: var(--sea-dark);
+    border: 1px solid rgba(26,61,82,0.25);
+  }
+
+  /* ── FOOD CARD ── */
+  .food-card {
+    background: var(--cream);
+    border: 1px solid rgba(122,106,88,0.2);
+    border-left: 3px solid var(--terracotta);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 14px;
+    margin-top: 10px;
+  }
+
+  .food-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .food-desc {
+    font-size: 0.88rem;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+
+  /* ── RESTAURANT GRID ── */
+  .resto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .resto-grid { grid-template-columns: 1fr; }
+  }
+
+  .resto-card {
+    background: var(--cream);
+    border: 1px solid rgba(122,106,88,0.18);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+
+  .resto-card.top {
+    border-top: 3px solid var(--gold);
+  }
+
+  .resto-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .resto-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 8.5px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .resto-desc {
+    font-size: 0.86rem;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+
+  /* ── KNEE CALLOUT ── */
+  .knee-note {
+    background: rgba(26,61,82,0.06);
+    border: 1px solid rgba(26,61,82,0.15);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0 4px;
+    font-size: 0.9rem;
+    color: var(--sea-dark);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .knee-note::before {
+    content: '🦵';
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(122,106,88,0.25), transparent);
+    margin: 36px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(122,106,88,0.2);
+    text-align: center;
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <p class="date-label">Tuesday, June 2 · Your Day Guide</p>
+    <h1>Gaeta</h1>
+    <p class="masthead-sub">The peninsula city — sea on both sides, two thousand years of history in every stone</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="intro">
+    <p>You arrived last night from the Baia dive and a long drive north. Today is the whole reason you routed through this stretch — Gaeta is one of the most undervisited medieval cities on the Italian coast. This is a day of slow, deliberate exploration. Knees are considered throughout: the old town has some slopes but nothing brutal, and the pace is yours to set.</p>
+  </div>
+
+  <!-- MORNING -->
+  <p class="section-label">Morning</p>
+  <div class="timeline">
+
+    <div class="block">
+      <div class="time-col"><span class="time">9:00<br>AM</span></div>
+      <div class="content">
+        <p class="block-cat">Breakfast · Hotel</p>
+        <h2 class="block-title">Start slow. Eat well.</h2>
+        <p class="block-body">Take full advantage of the hotel breakfast at Le Rocce — buffet, sea view, no rush. You have a full day with no trains, no deadlines. Coffee, let things start gently. Legs may be stiff after yesterday; give them time before asking anything of them.</p>
+        <div class="pills">
+          <span class="pill pill-tip">💡 Put on comfortable flat shoes — today is walking, but manageable flat terrain</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col"><span class="time">10:00<br>AM</span></div>
+      <div class="content">
+        <p class="block-cat">Sanctuary · 20 min drive</p>
+        <h2 class="block-title">Montagna Spaccata — <em>the split mountain</em></h2>
+        <p class="block-body">Do this early before midday heat. Drive south from Le Rocce (15 min, free parking nearby on Via Santissima Trinità). The Sanctuary of the Most Holy Trinity is built into a dramatic crack in a coastal cliff — legend holds the rock split at the moment of the Crucifixion. There are two paths: one along the top of the gorge, one at the water's edge below. Take the top path (flatter, spectacular views). The lower path involves steps — skip if knees are unhappy today.</p>
+        <div class="knee-note">Knees: upper path only. It's a 10-min walk from the small parking area, no significant incline. The lower water-level path involves a long descent and return climb — save that for another lifetime.</div>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Free entry. Bring a small coin for the candle offering — it's tradition.</span>
+          <span class="pill pill-tip">💡 La mano del Turco — look for the handprint in the rock face inside the grotto. Extraordinary.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col"><span class="time">11:30<br>AM</span></div>
+      <div class="content">
+        <p class="block-cat">Walk · Gaeta Vecchia</p>
+        <h2 class="block-title">Gaeta Medievale — <em>the old town</em></h2>
+        <p class="block-body">Park at the base of the old town on Lungomare Giovanni Caboto — easy flat street-level parking. From there you enter Gaeta Vecchia on foot. The Passeggiata di Gaeta Medievale is the main walking route; it's well-reviewed for a reason. Cathedral of Sant'Erasmo is along the way — modest entrance, extraordinary 13th-century candelabra inside. Wander without an agenda. This is a lived-in town, not a museum: laundry above alleys, men playing cards outside bars, cats on every windowsill.</p>
+        <div class="knee-note">Knees: the waterfront lungomare is flat and easy. The alleys climbing into the medieval core are cobbled and some have gentle slopes. Stay low and near the seafront if it's a harder day. The best views and character are right at the waterline anyway.</div>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Best detail: sea visible on both sides of the peninsula as you walk. You'll feel it before you see it.</span>
+          <span class="pill pill-tip">💡 Fish market near the port opens early and sells out by late morning — just walk through and look</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- AFTERNOON -->
+  <p class="section-label">Afternoon</p>
+  <div class="timeline">
+
+    <div class="block">
+      <div class="time-col"><span class="time">1:00<br>PM</span></div>
+      <div class="content">
+        <p class="block-cat">Lunch · Gaeta Vecchia</p>
+        <h2 class="block-title">Eat the local thing — <em>tiella and fresh fish</em></h2>
+        <p class="block-body">Your two best options for lunch. Go to whichever feels right when you're there — both are within the old town.</p>
+
+        <div class="resto-grid">
+          <div class="resto-card top">
+            <p class="resto-meta">★★★★★ · 4.8 · Top Pick</p>
+            <p class="resto-name">Osteria Il Ritrovo</p>
+            <p class="resto-desc">The baccalà (salt cod) restaurant — 12 preparations of cod. The cod carpaccio alone is worth the trip. Friendly, small, extremely fresh. Seafront location.</p>
+            <div class="pills" style="margin-top: 7px;"><span class="pill pill-warn">Closed Monday · Open Tue–Sun</span></div>
+          </div>
+          <div class="resto-card top">
+            <p class="resto-meta">★★★★½ · 4.6 · Great Choice</p>
+            <p class="resto-name">Marelì</p>
+            <p class="resto-desc">In the old town. The ragù di totani (flying squid ragù) pasta is famous. Outdoor terrace, quick service, deeply local crowd. Go here for a trattoria feel.</p>
+            <div class="pills" style="margin-top: 7px;"><span class="pill pill-warn">Closed Wednesday</span></div>
+          </div>
+        </div>
+
+        <div class="food-card">
+          <p class="food-name">Tiella Gaetana</p>
+          <p class="food-desc">Don't leave Gaeta without eating this. A sealed pastry — short crust top and bottom — filled with octopus and local olives, or escarole, or salt cod. Buy a slice from a bakery (forno), not a restaurant. Eat it standing up or on a bench. This is the thing.</p>
+        </div>
+
+        <div class="food-card">
+          <p class="food-name">Olive di Gaeta (Itrana variety)</p>
+          <p class="food-desc">The local olive is something genuinely different — small, wrinkled, bitter-sweet, complex. Buy a container at any alimentari (grocery) or market stall. They don't travel far in commerce; this is one of the few places you can eat them truly fresh and cured locally.</p>
+        </div>
+
+        <div class="pills" style="margin-top: 10px;">
+          <span class="pill pill-tip">💡 Italian lunch service is 12:30–2:30pm sharp. Arrive by 1pm to be safe.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col"><span class="time">3:00<br>PM</span></div>
+      <div class="content">
+        <p class="block-cat">Afternoon Rest · Optional Castle</p>
+        <h2 class="block-title">Castello Angioino-Aragonese — <em>or a quiet hour at Serapo</em></h2>
+        <p class="block-body">Two options depending on how your knees are feeling and how much you want to move vs. rest.</p>
+        <p class="block-body" style="margin-top: 8px;"><strong>If you have energy:</strong> the Castello is extraordinary. Guided tours only (€10, €20 for English guide — worth every euro). A 13th-century castle-turned-prison that held political prisoners well into the 20th century. The views from the walls are some of the best on this coast. The tour is around an hour and is flat inside the fortifications. Guided tours leave at fixed times — check at the door.</p>
+        <p class="block-body" style="margin-top: 8px;"><strong>If you'd rather rest:</strong> drive 5 minutes to Spiaggia di Serapo, rent a sun bed and umbrella (€15–20), swim in extraordinary blue Tyrrhenian water, and do absolutely nothing. This is equally valid and possibly smarter before tomorrow's drive to Sperlonga.</p>
+        <div class="knee-note">The castle involves some uneven cobbled surfaces inside. It's manageable but not totally flat. Serapo is sand-level — easier on the body. Your call.</div>
+        <div class="pills">
+          <span class="pill pill-sea">🏖 Serapo water clarity is exceptional in June — still before peak crowds</span>
+          <span class="pill pill-gem">✨ Castle: ask about the underground prison cells — the guide Stefano reportedly makes it special</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="time-col"><span class="time">5:30<br>PM</span></div>
+      <div class="content">
+        <p class="block-cat">Late Afternoon · Gelato</p>
+        <h2 class="block-title">Evening walk — <em>the seafront at golden hour</em></h2>
+        <p class="block-body">Gaeta's Lungomare at around 5:30–7pm, when the light goes golden and the temperature drops, is one of the nicest hours in this town. Walk the flat waterfront road, watch the boats, buy an ice cream from <strong>Gelateria Il Molo</strong> on the seafront. The old town is magical at this hour too — quieter than midday, lit by warm lanterns reflecting off the sea below.</p>
+        <div class="pills">
+          <span class="pill pill-gem">✨ Il Molo gelato on the seafront: local recommendation, excellent pistacchio</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- DINNER -->
+  <p class="section-label">Evening</p>
+  <div class="timeline">
+
+    <div class="block">
+      <div class="time-col"><span class="time">8:00<br>PM</span></div>
+      <div class="content">
+        <p class="block-cat">Dinner · Old Town</p>
+        <h2 class="block-title">Dolia — <em>Cucina Mediterranea Contemporanea</em></h2>
+        <p class="block-body">This is the standout dinner choice. In Piazza Conca in the old town — the most beautiful and ambitious kitchen in Gaeta. Mediterranean contemporary, deep focus on local ingredients, every dish described as a "little work of art." The cod here is exceptional. If you want something extraordinary for your last night in Gaeta, this is it.</p>
+        <div class="resto-card top" style="margin-top: 10px;">
+          <p class="resto-meta">★★★★½ · 4.5 · Best in Gaeta</p>
+          <p class="resto-name">Dolia Gaeta</p>
+          <p class="resto-desc">Piazza Conca, 22. Call ahead if possible: +39 0771 65129. Open: Tue/Thu–Sun dinner, Tue & Sun lunch. Closed Monday and Wednesday.</p>
+        </div>
+        <div class="food-card">
+          <p class="food-name">Or: Trattoria Donna Nina</p>
+          <p class="food-desc">If Dolia feels too formal or is full, Donna Nina is the warm neighborhood alternative — right on the water, great seafood pasta, owner serves personally. More relaxed, equally local.</p>
+        </div>
+        <div class="pills" style="margin-top: 10px;">
+          <span class="pill pill-tip">💡 Dinner in small Italian towns starts 7:30–8pm. Arriving before 7:30 is considered eating early.</span>
+          <span class="pill pill-warn">Tomorrow: pack tonight, check out by 10–11am, Sperlonga is 15 min south</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Tuesday, June 2 · Gaeta, Lazio · Tomorrow: Sperlonga</p>
+  </footer>
+
+</div>
+</body>
+</html>
