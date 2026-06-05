@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>HEIC / HEIF Converter</title>
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────── */
+    :root {
+      --bg:        #020617;
+      --panel:     #0f172a;
+      --card:      #111827;
+      --line:      #334155;
+      --accent:    #7aa2ff;
+      --text:      #e5e7eb;
+      --muted:     #94a3b8;
+      --danger:    #f87171;
+      --green:     #4ade80;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Nav ────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.95);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--text); }
+
+    .nav-title { font-size: 1rem; font-weight: 600; }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+
+    /* ── Controls ───────────────────────────────────────────────── */
+    .controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .format-toggle {
+      display: flex;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .fmt-btn {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fmt-btn.active        { background: var(--accent); color: #020617; }
+    .fmt-btn:disabled      { cursor: not-allowed; opacity: 0.45; }
+
+    .quality-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    #quality-val { font-weight: 600; color: var(--text); min-width: 2.5rem; }
+
+    #quality {
+      width: 110px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    #quality:disabled { cursor: not-allowed; opacity: 0.45; }
+
+    /* ── Drop zone ──────────────────────────────────────────────── */
+    .drop-zone {
+      border: 2px dashed var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 1.5rem;
+      user-select: none;
+    }
+    .drop-zone:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(122, 162, 255, 0.05);
+    }
+
+    .drop-icon  { font-size: 2.5rem; margin-bottom: 0.75rem; line-height: 1; }
+    .drop-label { font-size: 0.975rem; font-weight: 500; margin-bottom: 0.35rem; }
+    .drop-sub   { font-size: 0.825rem; color: var(--muted); }
+
+    .browse-link {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* ── Re-convert button ──────────────────────────────────────── */
+    #reconvert-btn {
+      display: none;
+      width: 100%;
+      padding: 0.7rem;
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    #reconvert-btn.visible { display: block; }
+    #reconvert-btn:hover   { background: var(--accent); color: #020617; }
+
+    /* ── Results grid ───────────────────────────────────────────── */
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .r-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .r-thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+    }
+
+    .r-placeholder {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--panel);
+      font-size: 2rem;
+    }
+
+    .r-body {
+      padding: 0.7rem 0.75rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .r-name {
+      font-size: 0.775rem;
+      font-weight: 600;
+      word-break: break-all;
+      line-height: 1.35;
+    }
+
+    .r-meta { font-size: 0.72rem; color: var(--muted); }
+
+    .r-status              { font-size: 0.75rem; font-weight: 500; }
+    .r-status.queued       { color: var(--muted); }
+    .r-status.converting   { color: var(--accent); }
+    .r-status.done         { color: var(--green); }
+    .r-status.error        { color: var(--danger); }
+
+    .r-dl-wrap { margin-top: auto; padding-top: 0.5rem; }
+
+    .r-dl-btn {
+      width: 100%;
+      padding: 0.4rem 0.75rem;
+      background: var(--accent);
+      color: #020617;
+      font-size: 0.775rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .r-dl-btn:hover { opacity: 0.85; }
+
+    /* Spinner */
+    .spin {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Download All ───────────────────────────────────────────── */
+    #dl-all-btn {
+      display: none;
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    #dl-all-btn.visible { display: block; }
+    #dl-all-btn:hover   { border-color: var(--accent); }
+
+    /* ── Privacy note ───────────────────────────────────────────── */
+    .privacy {
+      margin-top: 2.5rem;
+      font-size: 0.775rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 540px) {
+      main { padding: 1.25rem 1rem 3rem; }
+      .drop-zone { padding: 2rem 1rem; }
+      #results { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="back-link" href="/">← Tools</a>
+    <span class="nav-title">HEIC / HEIF Converter</span>
+  </div>
+</nav>
+
+<main>
+  <p class="subtitle">
+    Convert iPhone photos (.heic&nbsp;/&nbsp;.heif) to JPG or PNG — entirely in your browser.
+    Nothing is uploaded. Large files may take a moment.
+  </p>
+
+  <div class="controls">
+    <div class="format-toggle" role="group" aria-label="Output format">
+      <button class="fmt-btn active" data-fmt="image/jpeg" aria-pressed="true">JPG</button>
+      <button class="fmt-btn"       data-fmt="image/png"  aria-pressed="false">PNG</button>
+    </div>
+    <div class="quality-row" id="quality-row">
+      <span>Quality</span>
+      <input id="quality" type="range" min="50" max="100" value="90"
+             aria-label="JPEG quality percentage">
+      <span id="quality-val">90%</span>
+    </div>
+  </div>
+
+  <div class="drop-zone" id="drop-zone"
+       role="button" tabindex="0"
+       aria-label="Drop HEIC or HEIF files here, or press Enter to browse">
+    <div class="drop-icon">📷</div>
+    <p class="drop-label">Drop .heic or .heif files here</p>
+    <p class="drop-sub">or <label class="browse-link" for="file-input">choose files</label></p>
+    <input type="file" id="file-input"
+           accept=".heic,.heif,image/heic,image/heif" multiple hidden>
+  </div>
+
+  <button id="reconvert-btn">↻ Re-convert All with New Settings</button>
+
+  <div id="results" role="list" aria-label="Conversion results" aria-live="polite"></div>
+
+  <button id="dl-all-btn">Download All</button>
+
+  <p class="privacy">
+    🔒 Conversion runs entirely on your device — no files are uploaded anywhere.<br>
+    Metadata (GPS, camera info) is not preserved in converted files.
+  </p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  const CDN_URL = "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js";
+
+  // ── State ──────────────────────────────────────────────────────────
+  const state = {
+    format: "image/jpeg",
+    quality: 0.90,
+    appliedFormat: null,
+    appliedQuality: null,
+    results: [],
+    converting: false,
+    queue: [],     // result IDs waiting to be converted
+  };
+  let nextId = 0;
+
+  // ── Library bootstrap ──────────────────────────────────────────────
+  function loadLibrary() {
+    const s = document.createElement("script");
+    s.src = CDN_URL;
+    s.onload = init;
+    s.onerror = () => showFatalError(
+      "Could not load the conversion library. Check your connection and reload."
+    );
+    document.head.appendChild(s);
+  }
+
+  function showFatalError(msg) {
+    qs(".subtitle").textContent = msg;
+    qs("#drop-zone").style.display = "none";
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────
+  function init() {
+    bindDropZone();
+    bindControls();
+    window.addEventListener("beforeunload", revokeAll);
+  }
+
+  // ── Drop zone ──────────────────────────────────────────────────────
+  function bindDropZone() {
+    const zone      = qs("#drop-zone");
+    const fileInput = qs("#file-input");
+
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      zone.classList.add("dragover");
+    });
+
+    zone.addEventListener("dragleave", (e) => {
+      // only clear dragover when the pointer truly leaves the zone
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove("dragover");
+    });
+
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("dragover");
+      handleFiles(e.dataTransfer.files);
+    });
+
+    zone.addEventListener("click", (e) => {
+      // the <label> already opens the picker natively; avoid double-trigger
+      if (e.target.tagName !== "LABEL" && e.target.tagName !== "INPUT") fileInput.click();
+    });
+
+    zone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+    });
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length) handleFiles(fileInput.files);
+      fileInput.value = "";  // reset so the same file can be re-selected
+    });
+  }
+
+  // ── Controls ───────────────────────────────────────────────────────
+  function bindControls() {
+    const fmtBtns    = document.querySelectorAll(".fmt-btn");
+    const qualInput  = qs("#quality");
+    const qualVal    = qs("#quality-val");
+    const qualRow    = qs("#quality-row");
+
+    fmtBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        fmtBtns.forEach((b) => {
+          b.classList.remove("active");
+          b.setAttribute("aria-pressed", "false");
+        });
+        btn.classList.add("active");
+        btn.setAttribute("aria-pressed", "true");
+        state.format = btn.dataset.fmt;
+        qualRow.style.display = state.format === "image/jpeg" ? "" : "none";
+        syncReconvertButton();
+      });
+    });
+
+    qualInput.addEventListener("input", () => {
+      state.quality = parseInt(qualInput.value, 10) / 100;
+      qualVal.textContent = qualInput.value + "%";
+      syncReconvertButton();
+    });
+
+    qs("#reconvert-btn").addEventListener("click", reconvertAll);
+    qs("#dl-all-btn").addEventListener("click", downloadAll);
+  }
+
+  function setControlsDisabled(disabled) {
+    document.querySelectorAll(".fmt-btn, #quality").forEach((el) => {
+      el.disabled = disabled;
+    });
+  }
+
+  // ── File handling ──────────────────────────────────────────────────
+  function handleFiles(fileList) {
+    Array.from(fileList).forEach((file) => {
+      const id     = nextId++;
+      const result = { id, file, status: "queued", blob: null, url: null, error: null, frameNote: null };
+      state.results.push(result);
+      state.queue.push(id);
+      appendCard(result);
+    });
+    syncDownloadAllButton();
+    runQueue();
+  }
+
+  // ── Sequential queue ───────────────────────────────────────────────
+  async function runQueue() {
+    if (state.converting || state.queue.length === 0) return;
+    state.converting = true;
+    setControlsDisabled(true);
+
+    // Capture settings at queue-start so they're consistent across the batch
+    const usedFormat  = state.format;
+    const usedQuality = state.quality;
+
+    while (state.queue.length > 0) {
+      const id     = state.queue.shift();
+      const result = state.results.find((r) => r.id === id);
+      if (result) await convertFile(result, usedFormat, usedQuality);
+    }
+
+    state.converting    = false;
+    state.appliedFormat  = usedFormat;
+    state.appliedQuality = usedQuality;
+    setControlsDisabled(false);
+    syncReconvertButton();
+    syncDownloadAllButton();
+  }
+
+  async function convertFile(result, fmt, quality) {
+    result.status = "converting";
+    refreshCard(result);
+
+    try {
+      const output = await heic2any({   // eslint-disable-line no-undef
+        blob:    result.file,
+        toType:  fmt,
+        quality: fmt === "image/jpeg" ? quality : undefined,
+      });
+
+      if (result.url) URL.revokeObjectURL(result.url);
+
+      // heic2any returns Blob[] for multi-image HEIC containers; we take frame 0
+      const blob       = Array.isArray(output) ? output[0] : output;
+      result.blob      = blob;
+      result.url       = URL.createObjectURL(blob);
+      result.frameNote = Array.isArray(output) && output.length > 1
+        ? `frame 1 of ${output.length}`
+        : null;
+      result.status    = "done";
+    } catch (_err) {
+      result.status = "error";
+      result.error  = "Not a valid HEIC/HEIF file.";
+    }
+
+    refreshCard(result);
+  }
+
+  // ── Re-convert all ─────────────────────────────────────────────────
+  function reconvertAll() {
+    state.queue = [];
+    state.results.forEach((r) => {
+      if (r.url) { URL.revokeObjectURL(r.url); r.url = null; }
+      r.blob      = null;
+      r.error     = null;
+      r.frameNote = null;
+      r.status    = "queued";
+      state.queue.push(r.id);
+      refreshCard(r);
+    });
+    syncReconvertButton();
+    syncDownloadAllButton();
+    runQueue();
+  }
+
+  // ── Card rendering ─────────────────────────────────────────────────
+  function appendCard(result) {
+    const el = document.createElement("div");
+    el.className  = "r-card";
+    el.id         = `card-${result.id}`;
+    el.setAttribute("role", "listitem");
+    el.innerHTML  = buildCardHTML(result);
+    qs("#results").appendChild(el);
+  }
+
+  function refreshCard(result) {
+    const el = document.getElementById(`card-${result.id}`);
+    if (el) el.innerHTML = buildCardHTML(result);
+  }
+
+  function buildCardHTML(result) {
+    const origName = result.file.name;
+    const ext      = state.format === "image/jpeg" ? "jpg" : "png";
+    const outName  = origName.replace(/\.(heic|heif)$/i, "") + "." + ext;
+
+    if (result.status === "queued") {
+      return `
+        <div class="r-placeholder" aria-hidden="true">📷</div>
+        <div class="r-body">
+          <div class="r-name">${esc(origName)}</div>
+          <div class="r-status queued">Queued</div>
+        </div>`;
+    }
+
+    if (result.status === "converting") {
+      return `
+        <div class="r-placeholder" aria-hidden="true">📷</div>
+        <div class="r-body">
+          <div class="r-name">${esc(origName)}</div>
+          <div class="r-status converting" aria-live="polite">
+            <span class="spin" aria-hidden="true"></span>Converting…
+          </div>
+        </div>`;
+    }
+
+    if (result.status === "done") {
+      const meta = [fmtBytes(result.file.size) + " → " + fmtBytes(result.blob.size)];
+      if (result.frameNote) meta.push(result.frameNote);
+      return `
+        <img class="r-thumb" src="${result.url}" alt="${esc(outName)}" loading="lazy">
+        <div class="r-body">
+          <div class="r-name">${esc(outName)}</div>
+          <div class="r-meta">${esc(meta.join(" · "))}</div>
+          <div class="r-dl-wrap">
+            <button class="r-dl-btn" data-id="${result.id}"
+                    aria-label="Download ${esc(outName)}">Download</button>
+          </div>
+        </div>`;
+    }
+
+    // error
+    return `
+      <div class="r-placeholder" aria-hidden="true">⚠️</div>
+      <div class="r-body">
+        <div class="r-name">${esc(origName)}</div>
+        <div class="r-status error" role="alert">${esc(result.error)}</div>
+      </div>`;
+  }
+
+  // Event delegation — download buttons live inside the results grid
+  qs("#results").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-id]");
+    if (!btn) return;
+    const result = state.results.find((r) => r.id === parseInt(btn.dataset.id, 10));
+    if (result) triggerDownload(result);
+  });
+
+  // ── Download ───────────────────────────────────────────────────────
+  function triggerDownload(result) {
+    if (!result.blob) return;
+    const ext      = state.format === "image/jpeg" ? "jpg" : "png";
+    const filename = result.file.name.replace(/\.(heic|heif)$/i, "") + "." + ext;
+    const a        = Object.assign(document.createElement("a"), {
+      href: result.url, download: filename,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function downloadAll() {
+    const done = state.results.filter((r) => r.status === "done");
+    // Stagger clicks so browsers don't suppress rapid-fire download requests
+    done.forEach((r, i) => setTimeout(() => triggerDownload(r), i * 250));
+  }
+
+  // ── UI sync helpers ────────────────────────────────────────────────
+  function syncReconvertButton() {
+    const hasResults   = state.results.length > 0;
+    const allSettled   = state.results.every((r) => r.status === "done" || r.status === "error");
+    const fmtDrifted   = state.appliedFormat !== null && state.appliedFormat !== state.format;
+    const qualDrifted  = state.appliedFormat !== null &&
+                         Math.abs(state.appliedQuality - state.quality) > 0.001;
+    const settingsDrifted = fmtDrifted || qualDrifted;
+    qs("#reconvert-btn").classList.toggle("visible", hasResults && allSettled && settingsDrifted);
+  }
+
+  function syncDownloadAllButton() {
+    const btn = qs("#dl-all-btn");
+    const n   = state.results.filter((r) => r.status === "done").length;
+    btn.classList.toggle("visible", n >= 2);
+    btn.textContent = `Download All (${n} files)`;
+  }
+
+  // ── Cleanup ────────────────────────────────────────────────────────
+  function revokeAll() {
+    state.results.forEach((r) => { if (r.url) URL.revokeObjectURL(r.url); });
+  }
+
+  // ── Utilities ──────────────────────────────────────────────────────
+  function qs(sel) { return document.querySelector(sel); }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function fmtBytes(bytes) {
+    return bytes < 1024 * 1024
+      ? Math.round(bytes / 1024) + " KB"
+      : (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  loadLibrary();
+}());
+</script>
+
+</body>
+</html>
