@@ -20,8 +20,12 @@
   - [ ] JS — HTML escaping (XSS prevention)
   - [ ] Accessibility (aria, keyboard nav)
 - [ ] Register tool in index.html tools array
-- [ ] Code review (staff engineer perspective)
-- [ ] Commit and push to feature branch
+- [x] Code review (staff engineer perspective) — 5 findings, all fixed
+  - [x] Fix 1/2: result.usedFormat — extension based on actual conversion format
+  - [x] Fix 3: Guard against heic2any returning empty array []
+  - [x] Fix 4: typeof heic2any guard with distinct library-load error message
+  - [x] Fix 5: if (state.converting) return guard in reconvertAll()
+- [x] Commit and push to feature branch
 
 ## Decisions Locked In
 - Sequential conversion queue (one file at a time)
