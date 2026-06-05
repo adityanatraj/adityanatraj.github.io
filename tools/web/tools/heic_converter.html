@@ -15,7 +15,8 @@
       --text:      #e5e7eb;
       --muted:     #94a3b8;
       --danger:    #f87171;
-      --green:     #4ade80;
+      --green:     #86efac;
+      --border-soft: #1e2d40;
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 16px;
@@ -126,15 +127,18 @@
 
     /* ── Drop zone ──────────────────────────────────────────────── */
     .drop-zone {
-      border: 2px dashed var(--line);
+      border: 1px solid var(--border-soft);
       border-radius: var(--radius-lg);
       background: var(--panel);
       padding: 3rem 2rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.2s, background 0.2s;
       margin-bottom: 1.5rem;
       user-select: none;
+    }
+    .drop-zone:hover {
+      border-color: var(--line);
     }
     .drop-zone:focus-visible {
       outline: 2px solid var(--accent);
@@ -146,8 +150,8 @@
     }
 
     .drop-icon  { font-size: 2.5rem; margin-bottom: 0.75rem; line-height: 1; }
-    .drop-label { font-size: 0.975rem; font-weight: 500; margin-bottom: 0.35rem; }
-    .drop-sub   { font-size: 0.825rem; color: var(--muted); }
+    .drop-label { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.35rem; }
+    .drop-sub   { font-size: 0.8rem; color: var(--muted); }
 
     .browse-link {
       color: var(--accent);
@@ -192,14 +196,14 @@
 
     .r-thumb {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 3 / 4;
       object-fit: cover;
       display: block;
     }
 
     .r-placeholder {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 3 / 4;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -216,15 +220,15 @@
     }
 
     .r-name {
-      font-size: 0.775rem;
+      font-size: 0.8rem;
       font-weight: 600;
       word-break: break-all;
       line-height: 1.35;
     }
 
-    .r-meta { font-size: 0.72rem; color: var(--muted); }
+    .r-meta { font-size: 0.7rem; color: var(--muted); }
 
-    .r-status              { font-size: 0.75rem; font-weight: 500; }
+    .r-status              { font-size: 0.8rem; font-weight: 500; }
     .r-status.queued       { color: var(--muted); }
     .r-status.converting   { color: var(--accent); }
     .r-status.done         { color: var(--green); }
@@ -237,7 +241,7 @@
       padding: 0.4rem 0.75rem;
       background: var(--accent);
       color: #020617;
-      font-size: 0.775rem;
+      font-size: 0.8rem;
       font-weight: 700;
       border: none;
       border-radius: var(--radius-sm);
@@ -262,25 +266,31 @@
 
     /* ── Download All ───────────────────────────────────────────── */
     #dl-all-btn {
-      display: none;
       width: 100%;
       padding: 0.75rem;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       color: var(--text);
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
-      transition: border-color 0.15s;
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: border-color 0.15s, opacity 0.25s ease, transform 0.25s ease;
     }
-    #dl-all-btn.visible { display: block; }
-    #dl-all-btn:hover   { border-color: var(--accent); }
+    #dl-all-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    #dl-all-btn:hover { border-color: var(--accent); }
 
     /* ── Privacy note ───────────────────────────────────────────── */
     .privacy {
       margin-top: 2.5rem;
-      font-size: 0.775rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-align: center;
       line-height: 1.7;
@@ -332,14 +342,14 @@
            accept=".heic,.heif,image/heic,image/heif" multiple hidden>
   </div>
 
-  <button id="reconvert-btn">↻ Re-convert All with New Settings</button>
+  <button id="reconvert-btn">Re-convert</button>
 
   <div id="results" role="list" aria-label="Conversion results" aria-live="polite"></div>
 
   <button id="dl-all-btn">Download All</button>
 
   <p class="privacy">
-    🔒 Conversion runs entirely on your device — no files are uploaded anywhere.<br>
+    Conversion runs entirely on your device — no files are uploaded anywhere.<br>
     Metadata (GPS, camera info) is not preserved in converted files.
   </p>
 </main>
