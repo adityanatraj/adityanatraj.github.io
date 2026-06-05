@@ -462,7 +462,7 @@
   function handleFiles(fileList) {
     Array.from(fileList).forEach((file) => {
       const id     = nextId++;
-      const result = { id, file, status: "queued", blob: null, url: null, error: null, frameNote: null };
+      const result = { id, file, status: "queued", blob: null, url: null, error: null, frameNote: null, usedFormat: null };
       state.results.push(result);
       state.queue.push(id);
       appendCard(result);
@@ -500,6 +500,7 @@
     refreshCard(result);
 
     try {
+      if (typeof heic2any !== "function") throw new Error("library-not-loaded"); // eslint-disable-line no-undef
       const output = await heic2any({   // eslint-disable-line no-undef
         blob:    result.file,
         toType:  fmt,
@@ -509,16 +510,20 @@
       if (result.url) URL.revokeObjectURL(result.url);
 
       // heic2any returns Blob[] for multi-image HEIC containers; we take frame 0
-      const blob       = Array.isArray(output) ? output[0] : output;
-      result.blob      = blob;
-      result.url       = URL.createObjectURL(blob);
-      result.frameNote = Array.isArray(output) && output.length > 1
+      const blob         = Array.isArray(output) ? output[0] : output;
+      if (!blob) throw new Error("heic2any returned no output blob");
+      result.blob        = blob;
+      result.url         = URL.createObjectURL(blob);
+      result.usedFormat  = fmt;
+      result.frameNote   = Array.isArray(output) && output.length > 1
         ? `frame 1 of ${output.length}`
         : null;
-      result.status    = "done";
-    } catch (_err) {
+      result.status      = "done";
+    } catch (err) {
       result.status = "error";
-      result.error  = "Not a valid HEIC/HEIF file.";
+      result.error  = err && err.message === "library-not-loaded"
+        ? "Conversion library failed to load. Check your connection and reload."
+        : "Not a valid HEIC/HEIF file.";
     }
 
     refreshCard(result);
@@ -526,12 +531,14 @@
 
   // ── Re-convert all ─────────────────────────────────────────────────
   function reconvertAll() {
+    if (state.converting) return;
     state.queue = [];
     state.results.forEach((r) => {
       if (r.url) { URL.revokeObjectURL(r.url); r.url = null; }
-      r.blob      = null;
-      r.error     = null;
-      r.frameNote = null;
+      r.blob        = null;
+      r.error       = null;
+      r.frameNote   = null;
+      r.usedFormat  = null;
       r.status    = "queued";
       state.queue.push(r.id);
       refreshCard(r);
@@ -557,9 +564,12 @@
   }
 
   function buildCardHTML(result) {
-    const origName = result.file.name;
-    const ext      = state.format === "image/jpeg" ? "jpg" : "png";
-    const outName  = origName.replace(/\.(heic|heif)$/i, "") + "." + ext;
+    const origName   = result.file.name;
+    // For done cards use the format that was actually applied; for pending cards
+    // use the current toggle selection so the user sees what they'll get.
+    const fmtForName = result.usedFormat ?? state.format;
+    const ext        = fmtForName === "image/jpeg" ? "jpg" : "png";
+    const outName    = origName.replace(/\.(heic|heif)$/i, "") + "." + ext;
 
     if (result.status === "queued") {
       return `
@@ -616,7 +626,7 @@
   // ── Download ───────────────────────────────────────────────────────
   function triggerDownload(result) {
     if (!result.blob) return;
-    const ext      = state.format === "image/jpeg" ? "jpg" : "png";
+    const ext      = (result.usedFormat ?? state.format) === "image/jpeg" ? "jpg" : "png";
     const filename = result.file.name.replace(/\.(heic|heif)$/i, "") + "." + ext;
     const a        = Object.assign(document.createElement("a"), {
       href: result.url, download: filename,
